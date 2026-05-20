@@ -2,7 +2,7 @@
 
 Repository di tutte le decisioni di prodotto e tecniche del progetto. Ogni file tratta un tema specifico, in modo da essere navigabile senza scrollare un singolo documento gigante.
 
-Ultimo aggiornamento: 19 maggio 2026
+Ultimo aggiornamento: 20 maggio 2026
 
 ---
 

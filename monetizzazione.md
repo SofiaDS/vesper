@@ -2,7 +2,7 @@
 
 Decisioni e opzioni in valutazione per il modello di monetizzazione dell'app. Tema strategico che incrocia business, etica e identità del prodotto.
 
-Ultimo aggiornamento: 19 maggio 2026
+Ultimo aggiornamento: 20 maggio 2026
 
 **Stato**: ⚠️ Decisione strategica in sospeso — da discutere tra founder.
 
@@ -156,19 +156,55 @@ Per arrivare a un MRR significativo (es. 5.000€/mese) servono **40-50.000 uten
 - "Boost del tuo profilo nei risultati di ricerca" → contraddice `ricerca_utenti.md` ("ordine casuale entro stessa affinità")
 - "Filtri di ricerca premium" → spacca la community tra "chi può cercare bene" e chi no
 - "Badge di status visibile" → contraddice la scelta di reputazione invisibile (vedi `reputazione.md` quando esisterà)
+- "Chat di supporto live a pagamento" → per il nostro target (utenti vulnerabili che possono essere in situazioni di safety) il supporto in casi di sicurezza non può essere dietro un paywall. Il supporto via email gratuito (vedi `appelli.md`) resta universale per tutti.
 
-Principio comune: tutto questo gruppo comunica *"se paghi sei più degna di interazione"*. Veleno per una community a forte identità.
+Principio comune: tutto questo gruppo comunica *"se paghi sei più degna di interazione"* o *"se paghi sei più al sicuro"*. Veleno per una community a forte identità.
 
-### ✅ Feature accettabili (comodità personali, nessun vantaggio sociale)
+### 🆓 Feature di safety/discretion — sempre gratis per tutte
+
+Categoria introdotta dopo l'analisi delle feature Ultra di Wapa (vedi discussione del 19 maggio 2026). Wapa mette queste dietro paywall perché ha un target ampio dove sono "nice to have"; per il nostro target (donne queer/trans in contesti potenzialmente ostili) sono **feature di protezione**, non di vanity. Metterle a pagamento equivarrebbe a dire "se sei in pericolo, paga per essere protetta".
+
+Feature in questa categoria:
+
+- **Lock dell'app con codice numerico** (4 cifre o biometria): protegge da chi prende fisicamente il telefono in mano. Critico per chi vive con familiari/partner ostili. Sempre gratis.
+- **Icona app discreta**: possibilità di cambiare l'icona dell'app in qualcosa di non-riconoscibile (es. icona "Note", "Calcolatrice", o icona neutra senza riferimenti LGBTQ+). Sempre gratis.
+- **Suono di notifica discreto**: possibilità di scegliere suoni di notifica generici/neutri, indistinguibili da quelli di altre app. Sempre gratis.
+- **Modalità incognito / appari offline**: leggere chatroom e DM senza apparire online. Sempre gratis. *Nota: implica un ripensamento della modalità incognito che era stata classificata come feature premium "accettabile"; vedi sezione "Feature accettabili" sotto. La rivalutiamo come safety, non comfort.*
+- **Block screenshots** (Android): impedire screenshot dell'app via `FLAG_SECURE`. Su iOS non è tecnicamente possibile in modo completo, quindi feature solo Android in v1, da comunicare con disclaimer onesto. Sempre gratis.
+
+Principio generale: **se una feature serve a proteggere l'utente da un terzo (partner, famiglia, stalker, datore di lavoro), è gratis. Se serve a comodità personale, può essere a pagamento.**
+
+### ✅ Feature accettabili a pagamento (comodità personali, nessun vantaggio sociale, nessun vantaggio di safety)
 
 - **Avatar e temi**: pacchetti avatar preset extra, temi colore app, font personalizzati.
 - **Salvataggio illimitato di ricerche**: in v1 il limite è 5 (vedi `ricerca_utenti.md` sez. 9bis). Premium → 20-30.
 - **Bio più lunga / più tag interessi**: limiti più alti sui campi del profilo.
-- **Modalità incognito**: legge la chatroom senza apparire nella lista membri attivi. Da discutere bene per implicazioni di moderazione.
 - **Esportazione dati**: backup mensile dei propri DM in formato leggibile.
-- **Notifiche più granulari**: filtri di notifica avanzati.
+- **Notifiche più granulari**: filtri di notifica avanzati (es. mute per fascia oraria, mute per chatroom specifica).
+- **Eventuale traduzione automatica messaggi** (idea da Wapa Pro, img 12): utile per espansione internazionale futura, da rivalutare in v2.
 
-Tutte queste sono comodità che NON danno vantaggi nelle interazioni con le altre utenti.
+Tutte queste sono comodità che NON danno vantaggi nelle interazioni con le altre utenti e NON riguardano la sicurezza personale.
+
+### 💝 Bottone "Sostieni il progetto" — presente da v1
+
+Indipendentemente dal modello di monetizzazione finale (sezione 2), in v1 viene introdotto un piccolo bottone "Sostieni il progetto" accessibile da Impostazioni.
+
+**Funzionamento**:
+- Porta a una pagina esterna (Ko-fi, Liberapay, PayPal, o equivalente).
+- Donazione a piacere, una tantum o ricorrente.
+- Zero overhead tecnico (nessun in-app purchase, nessuna gestione abbonamenti in v1).
+- Zero implicazioni per gli store (le donazioni esterne via web sono generalmente ammesse, ma vedi nota sotto).
+
+**Motivazione**:
+- Comunica fin dal day-one che l'app esiste grazie al supporto della community.
+- Permette alle utenti che credono nel progetto di sostenerlo senza dover aspettare il modello di monetizzazione "vero".
+- Coerente con l'identità "founded values first" del progetto.
+- Test naturale di disponibilità a pagare: se le donazioni iniziano ad arrivare, è un segnale per il modello supporter (Opzione B).
+
+**Cautele**:
+- **Apple e Google Play hanno policy stringenti su pagamenti esterni**: in alcuni casi richiedono che i pagamenti per beni/servizi digitali passino per i loro sistemi (commissione 15-30%). Le donazioni a no-profit certificati sono escluse; le donazioni "generiche" a una app for-profit ricadono in zona grigia. **Da verificare con consulente legale e leggendo le policy aggiornate degli store** prima dell'implementazione.
+- Possibile soluzione di compromesso: rendere il bottone visibile solo nella versione web (se mai esisterà) o redirezionare a un sito esterno chiaramente di "supporto al progetto" e non "acquisto feature".
+- **Da chiarire nei TOS**: la donazione non sblocca feature premium né dà vantaggi nell'app. È sostegno puro.
 
 ---
 
@@ -227,7 +263,7 @@ Se la risposta è "un misto" (cosa probabilmente vera, non è scelta binaria), s
 
 ### Da approfondire successivamente
 
-- **Modalità incognito**: feature accattivante ma con implicazioni di moderazione (un'utente che legge senza apparire può facilitare stalking?). Da valutare bene se inclusa nel premium.
+- **Modalità incognito**: riclassificata come safety feature gratis (vedi sezione 4). Resta da definire l'aspetto specifico: un'utente che legge senza apparire può facilitare stalking? Va combinata con linee guida moderazione (vedi `moderazione.md`) e magari con un disclaimer "incognito non ti esonera dalle regole della community".
 - **Reti ADV specifiche**: se si va su opzione A o C-evoluta, scegliere quali reti (AdMob standard vs EthicalAds vs Carbon vs altre). Decisione tecnico-etica.
 - **Bandi e grant**: ricerca attiva, in parallelo, indipendentemente dall'opzione scelta.
 - **Eventuale modello B2B futuro**: partnership editoriali con realtà allineate (es. libreria queer che paga per sponsorizzare evento in chatroom — non ADV ma partnership curata). Lontano nel tempo, ma vale la pena tenerlo come idea aperta.
@@ -236,4 +272,7 @@ Se la risposta è "un misto" (cosa probabilmente vera, non è scelta binaria), s
 
 - ✅ Mai vendere dati a terzi.
 - ✅ Mai feature a pagamento che creano gerarchie di interazione (DM extra, boost, vedi-chi-ti-ha-visto).
-- ✅ Niente monetizzazione in v1.
+- ✅ Mai feature di safety/discretion a pagamento (lock app, icona discreta, suono discreto, incognito, block screenshot). Vedi sezione 4.
+- ✅ Mai chat di supporto live a pagamento per casi di sicurezza. Supporto via email gratuito per tutti.
+- ✅ Bottone "Sostieni il progetto" (donazione esterna) presente da v1. Vedi sezione 4.
+- ✅ Niente monetizzazione "vera" in v1.

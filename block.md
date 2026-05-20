@@ -2,7 +2,7 @@
 
 Decisioni di prodotto per il sistema di block tra utenti. Tema critico per la sicurezza in un'app che ospita persone potenzialmente vulnerabili (lesbiche, queer, persone trans, donne in contesti familiari ostili).
 
-Ultimo aggiornamento: 19 maggio 2026
+Ultimo aggiornamento: 20 maggio 2026
 
 ---
 
@@ -11,7 +11,7 @@ Ultimo aggiornamento: 19 maggio 2026
 1. Principio guida
 2. Perimetro del block — cosa smette di funzionare
 3. Visibilità del block — chi sa cosa
-4. Cronologia DM precedente al block (PUNTO APERTO)
+4. Cronologia DM precedente al block — scelta dell'utente
 5. Gestione e reversibilità
 6. Block + ricerca + chatroom — casi limite
 7. Block e ban (interazione con moderazione)
@@ -85,38 +85,37 @@ Il block è **dichiarato unilateralmente da A** ma ha **effetti simmetrici sulla
 
 ---
 
-## 4. Cronologia DM precedente al block (PUNTO APERTO)
+## 4. Cronologia DM precedente al block — scelta dell'utente
 
-**Stato**: ⚠️ **Decisione in sospeso — da discutere tra founder.**
+**Scelta**: la decisione sulla cronologia DM viene **delegata all'utente che blocca**, al momento del block. ✅
 
-### Le tre opzioni in tavola
+### Il dialog di conferma del block
 
-#### Opzione A — Restano in sola lettura per entrambe
+Quando A tappa "blocca" sul profilo o nella chat di B, compare un dialog con tre opzioni (ispirato al pattern di Wapa, img 1 della discussione):
 
-- A e B mantengono accesso alla cronologia esistente. Nessuna delle due può scrivere nuovi messaggi.
-- **Pro**: nessuna perdita di contenuto per chi blocca (può conservare prove di molestie per segnalazione/denuncia).
-- **Contro**: la persona bloccata mantiene per sempre accesso al passato di chi l'ha bloccata. Può rileggere, fare screenshot, ridistribuire materiale sensibile (coming out, foto intime, identità reale, posizioni). In un'app per persone vulnerabili, è un rischio rilevante.
+- **Annulla** — il block non viene eseguito.
+- **Solo blocca** — viene eseguito il block ma la cronologia DM resta come prima per entrambe (in sola lettura, nessuna delle due può scrivere nuovi messaggi). A mantiene l'evidenza, B mantiene la propria copia.
+- **Blocca e cancella i miei messaggi anche per l'altra** — viene eseguito il block E i messaggi scritti da A vengono rimossi anche dal telefono di B. I messaggi scritti da B restano (non si toccano i contenuti altrui). A perde accesso alla cronologia completa? No: A continua a vedere la conversazione integrale dal proprio lato (inclusi i propri messaggi e quelli di B), è solo dal lato di B che spariscono i messaggi di A.
 
-#### Opzione B — Spariscono per la persona bloccata, restano per chi blocca ⭐ *raccomandata da Claude*
+### Perché delegare all'utente
 
-- A blocca B → la conversazione sparisce **completamente** dalla lista DM di B (come se non fosse mai esistita). A continua a vederla nella propria lista DM, può consultarla, esportarla, usarla come prova in una segnalazione.
-- **Pro**: chi si protegge mantiene l'evidenza; chi viene bloccata non si porta via il materiale dell'altra. Coerente col principio guida "più protettivo che proporzionato".
-- **Contro**: tecnicamente più complesso (richiede soft-delete asimmetrico lato server). Eticamente: si rimuove materiale che B ha co-prodotto (le sue stesse parole sparirebbero anche per lei). Argomento contrario: B può sempre fare screenshot prima del block; ma in pratica nessuno screenshotta tutto preventivamente, quindi la protezione resta significativa.
+Coerente col principio guida "più protettivo che proporzionato": chi si protegge è la persona meglio posizionata per sapere se ha materiale sensibile da rimuovere o se vuole preservare le prove. Tre vantaggi:
 
-#### Opzione C — Spariscono per entrambe
+1. **Empowerment**: chi blocca prende una decisione informata invece che subire una scelta di prodotto.
+2. **Flessibilità per casi diversi**: chi blocca per molestie vuole tenere le prove → "Solo blocca". Chi blocca dopo aver condiviso materiale sensibile (coming out, foto intime, identità reale) vuole rimuovere ciò che ha mandato → "Blocca e cancella". Una sola scelta di prodotto non copre entrambi i casi.
+3. **Asimmetria a senso unico**: si cancellano solo i messaggi scritti da A. Quelli scritti da B restano nei suoi log (sono suoi, A non ha diritto di cancellarli). Questo evita usi abusivi del "cancella per entrambe".
 
-- La conversazione viene cancellata da entrambi i lati.
-- **Pro**: massima privacy a posteriori. Niente strascichi.
-- **Contro**: A perde l'evidenza. Se aveva bloccato proprio per molestie, ha perso il materiale che le serviva per segnalare. Da scartare quasi sicuramente per questo motivo.
+### Limiti tecnici da sapere
 
-### Considerazioni trasversali
+- La cancellazione lato client di B **non garantisce** che B non abbia già fatto screenshot. È un best-effort, non una garanzia. Va comunicato nei TOS.
+- **Lato server** i messaggi restano nel backend per la durata di legge (vedi `gdpr_e_legale.md`), anche se "cancellati" lato UI di B. La scelta utente riguarda solo la visibilità sul telefono di B.
+- **Lo sblocco non ripristina nulla**: se A ha scelto "Blocca e cancella", anche dopo lo sblocco i messaggi rimossi dal telefono di B non tornano. È un punto fermo.
 
-- **Qualunque opzione si scelga**, lo sblocco successivo **non ripristina la cronologia**. È un punto fermo. Se ho cancellato/perso accesso, è perso, anche se sblocco.
-- **In nessun caso** la cronologia viene cancellata dal server immediatamente: resta nel backend per la durata di legge (vedi `gdpr_e_legale.md`) per eventuali indagini interne o richieste legali. La scelta A/B/C riguarda solo la **visibilità lato utente**.
+### UX del dialog
 
-### Come decidere
-
-Suggerimento di metodo per la conversazione tra founder: chiedersi *"se due delle nostre utenti più vulnerabili (es. una donna trans in famiglia ostile, una ragazza appena fatta coming out a 18 anni) si bloccassero dopo aver condiviso materiale sensibile, quale scelta vorrebbero?"*. La risposta probabilmente orienta verso B.
+- I tre bottoni vanno presentati senza forzare una scelta come "default migliore". L'utente deve poter scegliere consapevolmente.
+- Il copy va testato per essere chiaro: la differenza tra "solo blocca" e "blocca e cancella" deve essere immediatamente comprensibile. Da iterare in fase di design.
+- Considerare se aggiungere un tooltip/info-icon che spieghi "i messaggi di [B] restano, vengono cancellati solo i miei" per evitare malintesi.
 
 ---
 
@@ -211,7 +210,7 @@ Suggerimento di metodo per la conversazione tra founder: chiedersi *"se due dell
 
 ## 9. Punti aperti residui
 
-- **Cronologia DM precedente al block** (sezione 4): decisione tra Opzione A / B / C — da discutere tra founder. Raccomandazione di Claude: Opzione B.
 - **Soglia "review automatica per block multipli"** (sezione 7): quanti block in quanto tempo fanno scattare la review? Ipotesi iniziale 10 in 7 giorni, da validare con dati reali una volta lanciata l'app.
 - **Block list importabile/esportabile?**: utile in caso di migrazione o backup. Tendenzialmente no in v1, da rivalutare.
 - **Notifica a chi blocca se l'utente bloccata viene bannata?**: no in v1 (la persona "sparisce" e basta). Si può aggiungere in futuro come informazione opzionale ("una persona che avevi bloccato non è più nella community"), ma rischia di esporre informazioni di moderazione.
+- **Copy esatto del dialog di block** (sezione 4): le diciture "Solo blocca" / "Blocca e cancella i miei messaggi anche per l'altra" sono di lavoro. Da raffinare in fase di design UX per essere chiare e non spaventose.
