@@ -2,7 +2,7 @@
 
 Come funziona il sistema di permessi progressivi che gli utenti sbloccano nel tempo, e il sistema di vouching (garanti).
 
-Ultimo aggiornamento: 16 maggio 2026
+Ultimo aggiornamento: 20 maggio 2026
 
 ---
 
@@ -107,6 +107,13 @@ Esempi di scenari in cui vanno riviste:
 
 ---
 
-## Punti collegati ai sistemi di reputazione
+## Punti collegati al sistema di reputazione
 
-Il **sistema di reputazione vero e proprio** (come si calcolano i punti, cosa contano gli eventi positivi/negativi, decadimento nel tempo, visibilità all'utente) è ancora **da definire**. Vedi [`punti_aperti.md`](./punti_aperti.md) sezione D.
+Il **sistema di reputazione** è trattato in un file dedicato: vedi [`reputazione.md`](./reputazione.md).
+
+Pilastri già decisi (sezioni 1-3 di `reputazione.md`):
+- Reputazione come strumento di moderazione **invisibile**: non sblocca permessi, non è mai visibile agli utenti, non fa scattare azioni automatiche.
+- È un sistema **parallelo** agli Strati di permessi, non sostitutivo. Gli Strati restano l'unico meccanismo che governa chi può fare cosa.
+- Si attiva dal giorno 1 del lancio.
+
+Restano da definire (sezioni 4-6 di `reputazione.md`): eventi che fanno salire/scendere la reputazione e i loro pesi, visibilità in dashboard, decadimento nel tempo, soglie di calibrazione.
