@@ -25,7 +25,8 @@ Ultimo aggiornamento: 20 maggio 2026
 | File | Contenuto |
 |---|---|
 | [`utenti_e_identita.md`](./utenti_e_identita.md) | Verifica identità, dichiarazione di appartenenza, categorie, esclusione uomini cis, principi etici |
-| [`permessi_e_strati.md`](./permessi_e_strati.md) | I 3 strati di permessi progressivi, sistema vouching (garanti), reputazione |
+| [`permessi_e_strati.md`](./permessi_e_strati.md) | I 3 strati di permessi progressivi, sistema vouching (garanti) |
+| [`reputazione.md`](./reputazione.md) | Sistema di reputazione invisibile come strumento di moderazione (in fase di definizione) |
 | [`moderazione.md`](./moderazione.md) | Chi modera, segnalazioni, filtro AI, gestione casi speciali, dashboard moderatori |
 | [`appelli.md`](./appelli.md) | Procedure di appello per rifiuto verifica e ban |
 | [`profilo_utente.md`](./profilo_utente.md) | Campi profilo, visibilità, avatar preset, evoluzione v2 con foto |
