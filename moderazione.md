@@ -2,7 +2,7 @@
 
 Tutte le decisioni su come viene moderata la community: chi modera, come si segnala, filtro AI, dashboard moderatori, gestione casi speciali.
 
-Ultimo aggiornamento: 16 maggio 2026
+Ultimo aggiornamento: 21 maggio 2026
 
 ---
 
@@ -135,6 +135,41 @@ Questa è la categoria più delicata perché un falso positivo (bannare per erro
 
 **Nota importante**: questa configurazione è da considerare come **approccio iniziale di partenza**, non come scelta definitiva. Va rivista dopo il primo mese di lancio sulla base dei dati reali raccolti.
 
+### 6.1. Processo di revisione del filtro AI (deciso il 20 maggio 2026)
+
+La revisione del filtro AI non è un evento "una tantum" dopo il lancio, ma un processo strutturato e ripetibile, in modo che le decisioni si basino su dati reali e non sull'impressione del momento.
+
+**Trigger della revisione**:
+- **Prima revisione**: dopo **1 mese** dal lancio effettivo dell'app (non dal day-one tecnico, dal momento in cui ci sono utenti reali che scrivono in chatroom).
+- **Revisioni successive**: ogni **3 mesi**, finché il filtro non raggiunge una configurazione stabile.
+- **Revisione anticipata su segnale forte**: se in qualsiasi momento la coda dei flag AI ha un tasso di falsi positivi visibilmente alto (>50% archiviati dai moderatori) o sta diventando ingestibile, la revisione viene anticipata senza aspettare la data.
+
+**Dati da raccogliere per la revisione**:
+- Numero totale di messaggi flaggati dal filtro nel periodo.
+- Esito di ciascun flag: archiviato come falso positivo, confermato con warning, confermato con mute, confermato con ban.
+- Distribuzione per categoria OpenAI (hate, violence, sexual, self-harm, ecc.).
+- Tasso di precisione per categoria (% di flag confermati come violazione reale).
+- Casi notevoli di falsi positivi ricorrenti (es. parole riappropriate dalla community che continuano a essere flaggate).
+- Casi notevoli di falsi negativi noti: violazioni reali emerse via segnalazione utente ma che il filtro AI non aveva intercettato.
+
+**Decisioni che la revisione può prendere**:
+- Confermare la modalità soft per tutte le categorie.
+- Passare a "hard mode selettiva": blocco automatico solo per categorie con precisione molto alta (es. ≥95%) e gravità elevata (probabilmente "sexual/minors", "self-harm/instructions"). Le altre categorie restano in soft.
+- Aggiornare la blocklist italiana custom (aggiungere termini emersi come problematici, rimuovere termini che generano troppi falsi positivi nella community).
+- Aggiungere allowlist (eccezioni) per termini riappropriati che il filtro continua a flaggare ma che la community usa in modo non offensivo.
+- Calibrare le soglie di confidenza dell'API per ridurre falsi positivi.
+
+**Chi conduce la revisione**:
+- I due fondatori insieme, in una sessione dedicata.
+- I dati vengono estratti dalla dashboard Appsmith (sezione "Coda flag AI" con storico, vedi sezione 7).
+
+**Documentazione delle decisioni**:
+- Ogni revisione produce un breve verbale interno con dati raccolti, decisioni prese, motivazione.
+- I verbali sono conservati come storico per le revisioni successive (utile per capire trend, non ripetere errori, giustificare cambi di configurazione in caso di contestazioni GDPR).
+
+**Allineamento con altri processi simili**:
+- Questo schema (trigger → dati → decisioni → verbale) è il modello da replicare per altri processi di calibrazione del sistema: vedi `permessi_e_strati.md` sezione 3 (calibrazione soglie strati), `reputazione.md` sezione 6 (calibrazione soglie reputazione, ancora da definire). Mantenere uno schema comune semplifica il lavoro dei fondatori.
+
 ---
 
 ## 7. Dashboard moderatori
@@ -171,4 +206,4 @@ Questa è la categoria più delicata perché un falso positivo (bannare per erro
 ## Punti aperti sulla moderazione
 
 - **SLA esatti di risposta per segnalazioni gravi** (target <2h?). Vedi [`punti_aperti.md`](./punti_aperti.md).
-- **Revisione del filtro AI** dopo 1-2 mesi di dati reali (passaggio a hard mode selettiva o no).
+- ~~**Revisione del filtro AI** dopo 1-2 mesi di dati reali (passaggio a hard mode selettiva o no).~~ ✅ Processo definito il 20 maggio 2026 (vedi sezione 6.1). Resta l'esecuzione al raggiungimento del trigger.

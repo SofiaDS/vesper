@@ -1,9 +1,9 @@
 # Stack tecnico — App community lesbica/queer
 
 Documento dedicato alle decisioni tecniche di progetto: linguaggi, framework, servizi, infrastruttura, costi.
-Documento separato da `decisioni_progetto.md` che invece raccoglie le decisioni di prodotto.
+Documento complementare ai file di decisioni di prodotto (vedi `README.md` per la mappa completa).
 
-Ultimo aggiornamento: 20 maggio 2026
+Ultimo aggiornamento: 21 maggio 2026
 
 ---
 
@@ -83,10 +83,10 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - Categorie pre-definite (violence, hate, sexual, self-harm, ecc.)
   - Integrabile facilmente da Edge Function quando arriva nuovo messaggio
 - **Blocklist italiana**: lista di parole/regex specifiche per slur transfobici/bifobici/lesbofobici nel contesto italiano, mantenuta dai fondatori, aggiornata sulla base dei casi reali.
-- **Modalità iniziale**: soft mode (vedi punto 11 di `decisioni_progetto.md`) — messaggi flaggati visibili ai moderatori senza blocco automatico al day-one.
+- **Modalità iniziale**: soft mode (vedi `moderazione.md` sezione 6) — messaggi flaggati visibili ai moderatori senza blocco automatico al day-one.
 
 ### 5. Dashboard moderatori — Appsmith self-hosted
-(Già definito nel documento `decisioni_progetto.md` punto 12, qui solo riferimento)
+(Già definito in `moderazione.md` sezione 7, qui solo riferimento)
 - **Scelta**: Appsmith Community Edition self-hosted su VPS europeo.
 - **VPS consigliato**: Hetzner Germania (€5-15/mese per VPS Linux base sufficiente).
 - **Connessione**: Appsmith si connette direttamente al database PostgreSQL di Supabase via connection string (Supabase espone PostgreSQL standard).
@@ -139,6 +139,30 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - "Sostieni il progetto" (donazione esterna, vedi `monetizzazione.md`).
 - **Gratis per tutti**: rientra nella categoria support/safety di `monetizzazione.md` sezione 4 — mai dietro paywall.
 
+### 10. Liveness detection per il selfie video — `expo-camera` + revisione manuale
+- **Scelta**: cattura del selfie video con `expo-camera` (libreria standard Expo), upload del file grezzo a Supabase Storage, **revisione manuale** del video da parte dei fondatori in dashboard.
+- **Motivazione**:
+  - Coerente con la scelta più ampia di gestione manuale della verifica (punto 1 di `utenti_e_identita.md`): costo marginale zero, massima sensibilità contestuale, niente dipendenze da terze parti.
+  - `expo-camera` è già nelle dipendenze standard di un progetto Expo, nessuna libreria aggiuntiva.
+  - Niente liveness detection client-side automatica in v1: l'aggiunta di SDK biometrici (es. AWS Rekognition) introdurrebbe complessità e costi senza benefici reali finché i volumi sono bassi.
+- **Da rivedere**: quando si supera la soglia di ~100-200 registrazioni/giorno (vedi punto 1 di `utenti_e_identita.md`), valutare un layer AI di pre-filtro liveness per ridurre il carico manuale. Decisione di rinvio già documentata.
+- **Alternative scartate**:
+  - Librerie con liveness detection client-side avanzata (es. FaceTec, iProov, BioID): costose, vendor lock-in, eccessive per i volumi MVP.
+  - AWS Rekognition o Google Vision con detection automatica: introdurrebbero trasferimenti dati extra-UE su dati biometrici, complicando il GDPR senza vantaggi reali in fase iniziale.
+
+### 11. CI/CD — EAS per build nativi + GitHub Actions per CI codice
+- **Scelta**: combinazione di due strumenti complementari, ciascuno per il proprio dominio.
+  - **Expo Application Services (EAS)**: per i build nativi iOS+Android e il submit agli store. È il default per progetti Expo, gestisce credenziali, signing, profili provisioning Apple senza esporre il fondatore alla complessità nativa.
+  - **GitHub Actions**: per CI sul codice (lint, type-check TypeScript, eventuali unit test) su ogni push/PR.
+- **Motivazione della separazione**:
+  - EAS fa una cosa che GitHub Actions non sa fare bene (build nativi firmati e submit agli store): non ha senso reinventarla.
+  - GitHub Actions fa una cosa che EAS non fa (CI generica sul codice): non ha senso pagare EAS per cicli di build solo per fare `npm run lint`.
+  - Free tier di entrambi sufficiente per un MVP a singolo fondatore.
+- **Costi**:
+  - EAS free tier: 30 build/mese su priorità standard. Per un fondatore singolo è abbondante.
+  - GitHub Actions: 2000 minuti/mese gratis su repo privati. Più che sufficiente per CI leggera.
+- **Da rivedere**: se i tempi di build EAS diventeranno bloccanti per il workflow, valutare l'upgrade al piano a pagamento (~€19/mese) per la coda prioritaria.
+
 ---
 
 ## STACK COMPLETO — RIEPILOGO
@@ -188,13 +212,6 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - **Google Workspace / Microsoft 365**: ~€6/mese per casella, overkill in v1.
 - **Da decidere ancora**: per email "applicative" inviate dal backend (es. notifica esito appello automatica, comunicazioni community) — si usa Supabase, o un servizio dedicato tipo Resend/SendGrid/Mailgun? Le caselle Zoho sono per email "umane" (lette e scritte dai founder), non per invio massivo programmatico dal codice.
 
-**T2. Liveness detection per il selfie video**
-- Il selfie video di 3 secondi per la verifica liveness richiede una libreria specifica per la cattura.
-- Opzioni da valutare:
-  - `expo-camera` + caricamento video grezzo a Supabase Storage (semplice, moderazione tutta manuale)
-  - Librerie con liveness detection client-side (più sofisticato ma più complesso)
-- Decisione rimandata alla fase di sviluppo della verifica.
-
 ### Priorità MEDIA
 
 **T3. Monitoraggio errori e crash reporting**
@@ -202,15 +219,16 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 - Opzioni: Sentry (free tier generoso), Bugsnag, LogRocket.
 - Da decidere prima del lancio in beta.
 
-**T4. CI/CD (deploy automatico)**
-- Sistema per buildare e pubblicare nuove versioni dell'app senza fare tutto a mano.
-- Opzioni: Expo Application Services (EAS), GitHub Actions.
-- EAS è il default per Expo, si integra natively. Da valutare in fase di lancio.
-
 **T5. Strumenti di analytics**
 - Per capire come gli utenti usano l'app (rispettando GDPR).
 - Opzioni: PostHog (open source, hostabile EU), Plausible Analytics (EU, privacy-first), Mixpanel (US).
 - Per coerenza con i valori del progetto, valutare PostHog self-hosted o Plausible.
+
+**T9. Filtraggio lato server delle liste membri chatroom in base alla block list**
+- Conseguenza dell'invisibilità reciproca decisa in `block.md` sezione 6: la lista membri di una chatroom va filtrata lato server per ciascuna utente sulla base della propria block list.
+- Tecnicamente fattibile con join su tabella `blocks` durante il caricamento della lista membri, ma incide su performance quando le chatroom diventano grandi e/o le block list lunghe.
+- Da progettare in fase di sviluppo della chatroom: serve indice su `blocks(blocker_id, blocked_id)` e probabile caching della block list dell'utente attiva lato client per filtrare anche i messaggi in arrivo via realtime.
+- Stesso pattern si applica al filtraggio dei risultati di ricerca (`ricerca_utenti.md` sezione 8) e dei messaggi citati (`block.md` sezione 6).
 
 ### Priorità BASSA (post-lancio)
 

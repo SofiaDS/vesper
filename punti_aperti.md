@@ -2,7 +2,7 @@
 
 Tutte le decisioni ancora da prendere, organizzate per priorità.
 
-Ultimo aggiornamento: 20 maggio 2026
+Ultimo aggiornamento: 21 maggio 2026
 
 ---
 
@@ -63,9 +63,9 @@ Da definire quando l'app sarà cresciuta e queste feature avranno senso:
 Vedi [`stack_tecnico.md`](./stack_tecnico.md) per i dettagli completi:
 
 - **T1**: Email applicative per invii programmatici dal backend (Resend/SendGrid/Mailgun/AWS SES) — le caselle umane sono già decise (Zoho Mail Free, vedi punto 10 di `stack_tecnico.md`)
-- ~~**T2**: Liveness detection per il selfie video — libreria specifica~~ ✅ Decisione presa il 20 maggio 2026: `expo-camera` + revisione manuale (vedi punto 11 di `stack_tecnico.md`)
+- ~~**T2**: Liveness detection per il selfie video — libreria specifica~~ ✅ Decisione presa il 20 maggio 2026: `expo-camera` + revisione manuale (vedi punto 10 di `stack_tecnico.md`)
 - **T3**: Monitoraggio errori e crash reporting — direzione provvisoria **Sentry**, da confermare in Tappa 4 (preparazione lancio store)
-- ~~**T4**: CI/CD (Expo Application Services o GitHub Actions)~~ ✅ Decisione presa il 20 maggio 2026: EAS per build nativi + GitHub Actions per CI codice (vedi punto 12 di `stack_tecnico.md`)
+- ~~**T4**: CI/CD (Expo Application Services o GitHub Actions)~~ ✅ Decisione presa il 20 maggio 2026: EAS per build nativi + GitHub Actions per CI codice (vedi punto 11 di `stack_tecnico.md`)
 - **T5**: Strumenti di analytics — decisione rimandata a Tappa 5 (post-lancio), criterio: scegliere lo strumento in base a *cosa* si vuole misurare, non prima
 
 ---

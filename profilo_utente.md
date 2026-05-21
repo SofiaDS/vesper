@@ -2,7 +2,7 @@
 
 Decisioni sui campi del profilo utente, sulla loro visibilità, sul sistema di avatar preset, e sull'evoluzione futura con foto reali.
 
-Ultimo aggiornamento: 19 maggio 2026
+Ultimo aggiornamento: 21 maggio 2026
 
 ---
 
@@ -48,7 +48,7 @@ Colonna "Filtrabile": indica se il campo può essere usato come filtro nella ric
 | **"Cerco" / Intenti** | No | Utente sceglie se mostrare | Sì (multi-select) | Amicizia, dating, relazione, networking, confronto, solo chattare |
 | **Fuma / Non fuma** | No | Utente sceglie se mostrare | Sì | Opzioni: fuma / non fuma / occasionalmente / preferisco non dire |
 | **Sport / Attività fisica** | No | Utente sceglie se mostrare | Sì | Opzioni: sì regolarmente / saltuariamente / no / preferisco non dire. Eventualmente tag di tipo (es. corsa, yoga, palestra) — da valutare |
-| **Filtro DM** | No | Interno, non visibile | No | Chi può scrivermi: tutte / dalla mia città / con miei stessi intenti / verificate da X mesi |
+| **Filtro DM** | No | Interno, non visibile | No | Chi può scrivermi: tutte / dalla mia città / con miei stessi intenti / verificate da X mesi. Configurabile da Strato 2 (vedi [`permessi_e_strati.md`](./permessi_e_strati.md) sezione 1.1) |
 | **Online status** | No | **Default OFF, opt-in** | No | Mai orari precisi, max "online" o "online di recente". **Mai mostrato nei risultati di ricerca**, anche se attivo nel profilo |
 | **Cercabile** (flag globale) | No | **Default OFF, opt-in** | (è il flag stesso) | Quando OFF, l'utente non compare mai nei risultati. Vedi [`ricerca_utenti.md`](./ricerca_utenti.md) |
 

@@ -2,13 +2,14 @@
 
 Come funziona il sistema di permessi progressivi che gli utenti sbloccano nel tempo, e il sistema di vouching (garanti).
 
-Ultimo aggiornamento: 20 maggio 2026
+Ultimo aggiornamento: 21 maggio 2026
 
 ---
 
 ## Indice
 
 1. I 3 strati di permessi progressivi
+   1.1. Filtro DM in ricezione (configurabile da Strato 2)
 2. Sistema vouching (garanti)
 3. Note aperte sulle soglie
 
@@ -33,7 +34,7 @@ Dopo la verifica iniziale, ogni utente è automaticamente al **Strato 1**. Sbloc
 
 **Permessi NON ancora attivi**:
 - Inviare richieste DM
-- Foto profilo pubblica (nota: in v1 niente foto, solo avatar — vedi [`profilo_utente.md`](./profilo_utente.md))
+- Foto profilo pubblica (nota: in v1 niente foto, solo avatar — vedi [`profilo_utente.md`](./profilo_utente.md). La distinzione di permesso sulle foto sarà rilevante solo da v2)
 - Creare contenuti community avanzati
 
 ### Strato 2 — Utente attiva
@@ -46,6 +47,7 @@ Dopo la verifica iniziale, ogni utente è automaticamente al **Strato 1**. Sbloc
 **Permessi sbloccati in più**:
 - Inviare richieste DM (con requisito: 4-5 messaggi minimi in chatroom + accettazione destinataria)
 - Foto profilo pubblica (rilevante quando si introdurranno foto reali in v2, vedi [`profilo_utente.md`](./profilo_utente.md))
+- Configurare il proprio **filtro DM in ricezione** (chi può inviarmi richieste). Vedi sotto-sezione 1.1.
 
 ### Strato 3 — Utente fidata
 
@@ -59,6 +61,29 @@ Dopo la verifica iniziale, ogni utente è automaticamente al **Strato 1**. Sbloc
 - Organizzare eventi (post-MVP)
 - **Garantire per nuove utenti** (vouching, vedi sezione 2)
 - Candidarsi come moderatrice volontaria (vedi [`moderazione.md`](./moderazione.md))
+
+### 1.1. Filtro DM in ricezione (configurabile da Strato 2)
+
+Oltre al requisito generale per inviare richieste DM (mittente almeno Strato 2 + 4-5 messaggi in chatroom + accettazione destinataria), ogni utente da Strato 2 in poi può **restringere ulteriormente chi può inviarle richieste DM** tramite un filtro nel proprio profilo. Il filtro non è obbligatorio (default: aperto a tutte chi soddisfa i requisiti generali) ed è impostazione **interna, non visibile ad altri utenti** (vedi `profilo_utente.md`).
+
+**Opzioni disponibili** (selezionabili una alla volta, non combinabili in v1):
+- **Tutte** (default): chiunque soddisfi i requisiti generali può inviarmi richieste.
+- **Dalla mia città**: solo utenti che hanno reso pubblica la propria città e che sono nella mia stessa città.
+- **Con i miei stessi intenti**: solo utenti che hanno reso pubblico almeno un valore del campo "Cerco / Intenti" in comune con il mio.
+- **Verificate da almeno X mesi**: solo utenti la cui verifica iniziale risale ad almeno 3 / 6 / 12 mesi prima (soglia scelta dall'utente).
+
+**Come si comporta il sistema quando una richiesta viene bloccata dal filtro**:
+- Lato mittente: stessa esperienza prevista per altri casi di non-recapito (vedi `block.md` sezione 3). Messaggio generico "Impossibile inviare la richiesta in questo momento", senza dire perché. Evita che si possa "scoprire" il filtro impostato dall'altra utente.
+- Lato destinataria: nessuna notifica, la richiesta non arriva mai.
+- Lato moderazione: i tentativi falliti **non vengono loggati** come segnale di reputazione (vedi `reputazione.md` sezione 4.3) — il filtro DM è un legittimo strumento di confort dell'utente, non un evento di moderazione.
+
+**Cosa il filtro DM NON fa**:
+- Non sostituisce il sistema di block (sono livelli diversi: il filtro restringe chi può scrivere in prima istanza, il block è una risposta a una persona specifica).
+- Non è visibile ad altri (un'utente non sa se sta tentando di scrivere a qualcuna che ha attivato un filtro).
+- Non si applica retroattivamente: conversazioni già aperte non vengono interrotte dall'attivazione del filtro.
+
+**Perché è attivabile da Strato 2**:
+Da Strato 2 si può sia inviare sia ricevere richieste DM. Configurare il filtro da Strato 1 non avrebbe senso perché in quella fase non si ricevono ancora richieste in modo significativo.
 
 ---
 
@@ -111,9 +136,10 @@ Esempi di scenari in cui vanno riviste:
 
 Il **sistema di reputazione** è trattato in un file dedicato: vedi [`reputazione.md`](./reputazione.md).
 
-Pilastri già decisi (sezioni 1-3 di `reputazione.md`):
+Pilastri già decisi (sezioni 1-4 di `reputazione.md`):
 - Reputazione come strumento di moderazione **invisibile**: non sblocca permessi, non è mai visibile agli utenti, non fa scattare azioni automatiche.
 - È un sistema **parallelo** agli Strati di permessi, non sostitutivo. Gli Strati restano l'unico meccanismo che governa chi può fare cosa.
 - Si attiva dal giorno 1 del lancio.
+- Logica asimmetrica: la reputazione parte da 0 e può solo scendere. Warning = −1, mute temporaneo = −3. Solo eventi confermati di moderazione sulla persona stessa entrano nel sistema.
 
-Restano da definire (sezioni 4-6 di `reputazione.md`): eventi che fanno salire/scendere la reputazione e i loro pesi, visibilità in dashboard, decadimento nel tempo, soglie di calibrazione.
+Restano da definire (sezioni 5-6 di `reputazione.md`): visibilità in dashboard, decadimento nel tempo, storicizzazione, soglie di calibrazione e processo di revisione.
