@@ -2,7 +2,7 @@
 
 Decisioni sui campi del profilo utente, sulla loro visibilità, sul sistema di avatar preset, e sull'evoluzione futura con foto reali.
 
-Ultimo aggiornamento: 21 maggio 2026
+Ultimo aggiornamento: 22 maggio 2026
 
 ---
 
@@ -48,7 +48,8 @@ Colonna "Filtrabile": indica se il campo può essere usato come filtro nella ric
 | **"Cerco" / Intenti** | No | Utente sceglie se mostrare | Sì (multi-select) | Amicizia, dating, relazione, networking, confronto, solo chattare |
 | **Fuma / Non fuma** | No | Utente sceglie se mostrare | Sì | Opzioni: fuma / non fuma / occasionalmente / preferisco non dire |
 | **Sport / Attività fisica** | No | Utente sceglie se mostrare | Sì | Opzioni: sì regolarmente / saltuariamente / no / preferisco non dire. Eventualmente tag di tipo (es. corsa, yoga, palestra) — da valutare |
-| **Filtro DM** | No | Interno, non visibile | No | Chi può scrivermi: tutte / dalla mia città / con miei stessi intenti / verificate da X mesi. Configurabile da Strato 2 (vedi [`permessi_e_strati.md`](./permessi_e_strati.md) sezione 1.1) |
+| **Segno zodiacale** | No | Utente sceglie se mostrare | Sì (multi-select) | Derivato automaticamente dalla data di nascita già raccolta. L'utente decide solo se renderlo pubblico, non lo digita |
+| **Filtro DM** | No | Interno, non visibile | No | Chi può scrivermi: tutte / dalla mia città / con miei stessi intenti / verificate da X mesi |
 | **Online status** | No | **Default OFF, opt-in** | No | Mai orari precisi, max "online" o "online di recente". **Mai mostrato nei risultati di ricerca**, anche se attivo nel profilo |
 | **Cercabile** (flag globale) | No | **Default OFF, opt-in** | (è il flag stesso) | Quando OFF, l'utente non compare mai nei risultati. Vedi [`ricerca_utenti.md`](./ricerca_utenti.md) |
 
@@ -61,6 +62,15 @@ I campi **fuma/non fuma** e **sport** sono pensati come prima coppia di campi "l
 - Orario preferito di chat (mattina / sera / notte)
 
 **Principio**: aggiungere lifestyle solo se richiesti dalle utenti reali una volta lanciata l'app, per non trasformare il profilo in un questionario invasivo. Ogni nuovo campo aumenta la frizione di iscrizione e il rischio di profilazione/discriminazione.
+
+### Nota sul segno zodiacale
+
+L'astrologia è un linguaggio molto presente nella community queer femminile, spesso come icebreaker culturale ("anche tu Scorpione?"). Il segno è incluso in v1 con questi paletti:
+
+- **Derivato, non chiesto in più**: il segno si calcola dalla data di nascita che è già obbligatoria per la verifica età. **Zero dati nuovi raccolti.** L'utente sceglie solo se renderlo pubblico sul profilo.
+- **Niente ora e luogo di nascita**: non si raccolgono, quindi niente ascendente, luna, carta natale. Motivazione: ora+luogo di nascita è un dato fortemente identificante (può ricondurre a registri pubblici), raccoglierlo non si giustifica per una feature culturale-leggera in un'app che ospita persone in contesti potenzialmente ostili.
+- **Solo come campo di profilo e filtro standard**, mai come metrica di compatibilità calcolata tra utenti. Vedi `ricerca_utenti.md` sez. 4 per la decisione esplicita di non introdurre punteggi di compatibilità astrologica, badge sul profilo aperto, o schermate di dettaglio.
+- **Evoluzione futura**: se le utenti chiederanno di poter mostrare anche ascendente/luna, la via considerata è un **campo testuale libero opzionale** che l'utente compila lei (sa il suo big three, non serve che lo calcoli il sistema dai dati grezzi). Da rivalutare in v2 se emerge la richiesta.
 
 ---
 

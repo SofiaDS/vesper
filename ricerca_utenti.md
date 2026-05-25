@@ -2,7 +2,7 @@
 
 Decisioni di prodotto per la funzione di ricerca/scoperta di altre utenti, in due modalità: **ricerca per nickname** e **ricerca a filtri** con punteggio di affinità.
 
-Ultimo aggiornamento: 19 maggio 2026
+Ultimo aggiornamento: 22 maggio 2026
 
 ---
 
@@ -98,6 +98,7 @@ Tutti i filtri sono **opzionali e combinabili**. Una utente può lanciare una ri
 | **"Cerco" / Intenti** | Multi-select | Amicizia / dating / relazione / networking / confronto / solo chattare |
 | **Fuma** | Multi-select | Fuma / non fuma / occasionalmente |
 | **Sport** | Multi-select | Regolarmente / saltuariamente / no |
+| **Segno zodiacale** | Multi-select | 12 segni. Si applica solo a chi ha reso pubblico il segno. Vedi `profilo_utente.md` sez. 2 per come è raccolto (derivato dalla data di nascita) |
 
 **Importante**: i filtri vengono applicati **solo a chi ha reso pubblico quel campo specifico**. Esempio: una ricerca "non fumatrici a Milano" non restituirà utenti che fumano ma hanno il campo "fuma" privato — verranno ignorate, non incluse né escluse arbitrariamente.
 
@@ -107,6 +108,7 @@ Tutti i filtri sono **opzionali e combinabili**. Una utente può lanciare una ri
 - ❌ **Online ora / ultimo accesso**: mai usato come filtro né mostrato nei risultati. Coerente con il principio di non profilazione temporale.
 - ❌ **Reputazione / Strato**: non visibile e non filtrabile dalle utenti. Resta uso interno della moderazione.
 - ❌ **Distanza geografica precisa (km)**: si filtra per città/regione, non per radius. Nessuna geolocalizzazione live.
+- ❌ **Compatibilità astrologica calcolata**: il segno zodiacale entra come filtro standard (+1 come gli altri, vedi sez. 5), non come metrica predittiva separata. Niente punteggio di "compatibilità tra due persone", niente badge sul profilo aperto, niente schermate di dettaglio sulla coppia. Motivazione: una metrica opaca di compatibilità tra coppie di utenti contraddice il principio di affinità trasparente e deterministica della sez. 5 ("5 cose in comune" è fattuale; "siete compatibili al 73%" è predittivo/valutativo, salto qualitativo verso il dating-app pattern). Inoltre, un badge di compatibilità mostrato quando si apre un profilo è esattamente il tipo di segnale che induce/scoraggia contatto in base a un calcolo opaco, in tensione con il "niente match, niente vetrina" della sez. 9. Se la community vorrà comunque qualcosa di più, la via è un campo testuale libero (ascendente/luna che l'utente scrive lei), non un calcolo del sistema.
 
 ---
 
