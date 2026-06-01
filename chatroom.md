@@ -41,14 +41,14 @@ Le conversazioni a tema vanno nelle chat dedicate.
 Le 3 chat tematiche al lancio sono:
 
 1. **Viaggi** — consigli su mete, sicurezza queer nei vari paesi, esperienze di viaggio
-2. **Sport & fitness** — attività fisiche, palestre inclusive, gruppi di corsa, sport di squadra
+2. **Pulse** — attività fisiche, palestre inclusive, gruppi di corsa, sport di squadra
 3. **Serie, film & musica** — cultura pop, consigli, hype collettivo
 
 ### Motivazione della scelta
 
 Temi leggeri e concreti, pensati per rompere il ghiaccio tra persone che non si conoscono ancora. È facile entrare in conversazione senza doversi esporre su argomenti intimi ("anche tu fai yoga!", "sei stata a Lisbona?", "hai finito quella serie?"). Le tre chat si completano:
 - **Viaggi** è aspirazionale
-- **Sport & fitness** è routinario (genera conversazioni regolari)
+- **Pulse** è routinario (genera conversazioni regolari)
 - **Serie, film & musica** è immediato e molto condiviso nel target queer
 
 Temi più impegnativi (coming out, salute mentale, relazioni, attivismo) sono candidati per espansioni future, quando le utenti si conosceranno meglio tra loro.
@@ -57,12 +57,8 @@ Temi più impegnativi (coming out, salute mentale, relazioni, attivismo) sono ca
 
 Per animare le chat nei primi giorni, tenere pronti 2-3 spunti per ciascuna:
 - Viaggi: *"Miglior città europea queer-friendly che avete visitato?"*
-- Sport & fitness: *"C'è qualcuna che cerca compagna di corsa nella propria città?"*
+- Pulse: *"C'è qualcuna che cerca compagna di corsa nella propria città?"*
 - Serie, film & musica: *"Serie finita di recente che consigliereste a tutte qui?"*
-
-### Opzioni precedentemente in ballottaggio (archiviate)
-
-Le opzioni "Intima + ampia" e "Intima + pratica" sono state scartate perché le chat proposte (Cultura & consigli queer, Vita & dintorni) risultavano troppo generiche rispetto al ruolo già coperto dalla chat globale. La scelta finale privilegia temi specifici e a bassa soglia di ingresso.
 
 ---
 
