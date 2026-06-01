@@ -25,13 +25,16 @@ Ultimo aggiornamento: 1 giugno 2026
 
 ### B. Struttura della chatroom — scelta finale
 
-✅ Struttura completa decisa il 1 giugno 2026: 1 globale + 3 tematiche (vedi [`chatroom.md`](./chatroom.md)).
+✅ Struttura base decisa: 1 principale "Foyer" + 2 tematiche (vedi [`chatroom.md`](./chatroom.md)). Chat principale rinominata **Foyer** (era "Saluti & random") il 1 giugno 2026.
 
-~~**Scelta finale tra le 2 opzioni di terna chat**~~ ✅ Deciso il 1 giugno 2026: le 3 chat tematiche al lancio sono **Viaggi**, **Sport & fitness**, **Serie, film & musica**. Temi leggeri e a bassa soglia di ingresso, pensati per rompere il ghiaccio tra persone che non si conoscono ancora.
+✅ **Appartenenza multipla a più chat** decisa il 1 giugno 2026 (vedi [`chatroom.md`](./chatroom.md) sezioni 4-5): un'utente sta in più chat con tetto **1 Foyer obbligatoria + max 3 tematiche**, gestite da una pagina "Le mie chat" (esci/unisciti). Architettura in [`stack_tecnico.md`](./stack_tecnico.md) sezione 10.
 
-Restano da definire:
-- **Segmentazione per città/regione**: rimandata, valutare quando si superano ~500-1000 utenti attive per area.
-- **Segmentazione per fascia d'età**: rimandata, valutare se e quando emerge richiesta esplicita dalla community.
+Resta da definire:
+
+- **Scelta finale tra le 2 opzioni di terna chat** (Intima+ampia vs Intima+pratica). Decisione tra founder in sessione dedicata, **entro fine Tappa 2** della roadmap (vedi `stack_tecnico.md`), così la struttura è disponibile per la beta interna PWA in Tappa 3. Possibile input pre-decisione da 2-3 conversazioni informali con persone del target, se i founder lo ritengono utile (non obbligatorio).
+- **Calibrazione del tetto massimo di chat tematiche** (provvisoriamente 3): da rivedere con dati reali dopo il lancio, insieme alle altre soglie del progetto.
+- **Limite chat come feature a pagamento**: candidato borderline, da confermare/scartare — vedi [`monetizzazione.md`](./monetizzazione.md) sezione 4.
+- **Segmentazione per città/regione**: rimandata, valutare quando si superano ~500-1000 utenti attive.
 - **Limite di utenti contemporanei prima di sdoppiare la room**: da definire più avanti con dati reali.
 
 ### C. Sistema di reputazione
