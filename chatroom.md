@@ -43,19 +43,17 @@ Ogni chat ha un **titolo** (breve, evocativo) e una **descrizione** degli argome
 
 > *Presentati, fai due chiacchiere, condividi quello che non rientra altrove. Il salotto della community.*
 
-### Tematica 1 — "Viaggi & eventi" *(nome breve in via di scelta)*
+### Tematica 1 — "Wander" *(viaggi & eventi)*
 
-> *Mete, weekend, consigli di viaggio queer-friendly, ma anche eventi, Pride, raduni della community e serate insieme.*
-
-**Nota**: il titolo definitivo (formato corto sullo stile di "Pulse"/"Cult") è in fase di scelta. Candidati in valutazione: **Orbit**, **Roam**, **Drift**, **Fuori**, **Rotta**. "Viaggi & eventi" resta come descrizione/working title finché non si decide.
+> *Mete, weekend e consigli di viaggio queer-friendly, ma anche eventi, Pride, raduni e serate insieme.*
 
 ### Tematica 2 — "Pulse" *(fitness & sport)*
 
-> *Allenamento, sport, attività all'aperto, movimento e motivazione. Trova compagne di allenamento e racconta i tuoi progressi.*
+> *Allenamento, sport e attività all'aperto. Movimento, motivazione e compagne con cui condividere i progressi.*
 
-### Tematica 3 — "Cult" *(arte e cultura)*
+### Tematica 3 — "Cult" *(arte & cultura)*
 
-> *Musica, cinema, teatro, serie TV, mostre. Cosa stai guardando e ascoltando, consigli e ossessioni condivise.*
+> *Musica, cinema, teatro, serie TV e mostre. Cosa guardi e ascolti, consigli e ossessioni condivise.*
 
 ---
 
@@ -63,7 +61,7 @@ Ogni chat ha un **titolo** (breve, evocativo) e una **descrizione** degli argome
 
 La struttura iniziale prevedeva **1 globale + 2 tematiche**, con un ballottaggio tra due terne entrambe imperniate su una chat **"Relazioni & affetti"** (opzione "Intima + ampia" vs "Intima + pratica"). Quella decisione è stata **superata**.
 
-**Scelta finale**: 1 globale + 3 tematiche — **Viaggi & eventi**, **Pulse** (fitness/sport), **Cult** (arte/cultura).
+**Scelta finale**: 1 globale + 3 tematiche — **Wander** (viaggi & eventi), **Pulse** (fitness/sport), **Cult** (arte/cultura).
 
 Conseguenze da registrare:
 - La chat **"Relazioni & affetti"**, che nel ballottaggio era data come presente "in ogni caso", **non è inclusa** nella terna di lancio. Resta come possibile tematica futura (vedi sezione 4).
@@ -93,6 +91,5 @@ Le chat tematiche **non sono per sempre**. Ogni 3-6 mesi rivedere:
 
 ### Punti aperti sulla struttura
 
-- **Nome breve definitivo della chat "Viaggi & eventi"**: da scegliere tra i candidati (vedi sezione 2).
 - **Segmentazione per città/regione**: rimandata, valutare quando si superano ~500-1000 utenti attive.
 - **Limite di utenti contemporanei prima di sdoppiare la room**: da definire più avanti con dati reali.
