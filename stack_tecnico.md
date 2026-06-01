@@ -3,7 +3,7 @@
 Documento dedicato alle decisioni tecniche di progetto: linguaggi, framework, servizi, infrastruttura, costi.
 Documento separato da `decisioni_progetto.md` che invece raccoglie le decisioni di prodotto.
 
-Ultimo aggiornamento: 16 maggio 2026
+Ultimo aggiornamento: 1 giugno 2026
 
 ---
 
@@ -112,6 +112,41 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 - **Scelta**: TypeScript per le Edge Functions di Supabase.
 - **Motivazione**: stessa stack del frontend (un solo linguaggio da padroneggiare), cattura errori a compile time, autocomplete migliore di JavaScript puro.
 
+### 9. Feature "Segnala un problema" — mailto pre-compilato
+- **Scelta**: bottone "Segnala un problema" in Impostazioni che apre il client email predefinito dell'utente con destinatario e oggetto pre-compilati. Pattern ispirato a Wapa (img 13 della discussione del 20 maggio 2026).
+- **Motivazione**:
+  - Zero overhead per le utenti (niente form custom, niente accesso ai dati del device da richiedere).
+  - Zero infrastruttura lato backend in v1 (nessuna API da costruire, nessun database di issue tracking).
+  - Triage rapido lato team grazie ai tag nell'oggetto.
+  - Filtri email automatici per smistare le segnalazioni.
+- **Cosa pre-compilare nell'oggetto**:
+  - Tipo di segnalazione (scelto dall'utente prima di aprire l'email tramite un piccolo selettore): `#crash`, `#bug`, `#feedback`, `#a11y`.
+  - Piattaforma (auto): `#android` o `#ios`.
+  - Versione app (auto): `#v1.2.3`.
+  - Identificatore utente parziale/hash (auto): `#u-XXXXX` — **non l'email reale, non il nickname**, per privacy in caso di forward.
+  - Session ID o report UUID (auto): `#s-XXXXX` — utile per correlare con log lato server.
+- **Cosa NON pre-compilare**: email reale dell'utente, nickname, città, coordinate GPS.
+- **Corpo email**: vuoto, con placeholder che suggerisce cosa includere ("Descrivi cosa stavi facendo quando è successo, cosa ti aspettavi, cosa è successo invece...").
+- **Destinatario**: mailbox dedicata (es. `bug@[dominio]`) **separata** da:
+  - quella di supporto generale,
+  - quella di gestione appelli (vedi `appelli.md`),
+  - quella di comunicazione legale/GDPR (vedi `gdpr_e_legale.md`).
+  La separazione permette filtri e routing diversi, e tiene pulite le caselle.
+- **Implementazione tecnica**: API `Linking.openURL("mailto:...")` di React Native, 5 righe di codice. Nessuna libreria esterna richiesta. Vedi anche T3 (Sentry/Bugsnag) per crash reporting automatico — bug report manuale e crash report automatico sono complementari, non alternativi.
+- **Posizionamento UX**: Impostazioni → Help / Supporto → "Segnala un problema". Distinto da:
+  - "Segnala un utente" (dentro chatroom/profilo, va alla moderazione, vedi `moderazione.md`).
+  - "Appello" (flusso email dedicato già definito in `appelli.md`).
+  - "Sostieni il progetto" (donazione esterna, vedi `monetizzazione.md`).
+- **Gratis per tutti**: rientra nella categoria support/safety di `monetizzazione.md` sezione 4 — mai dietro paywall.
+
+### 10. Appartenenza alle chat — modello multi-room
+- **Decisione di prodotto**: vedi `chatroom.md` sezioni 4-5 (un'utente sta in più chat con tetto 1 Foyer obbligatoria + max 3 tematiche).
+- **Modello dati**: tabella di join `chat_membership` (`user_id`, `chatroom_id`, `joined_at`). L'appartenenza è un concetto di prima classe da subito, anche se al lancio (3 chat totali) il tetto non "morde" ancora.
+- **Enforcement del limite**: regola applicativa lato client + blindatura lato DB con `CHECK`/trigger PostgreSQL su Supabase (Foyer non lasciabile; max 3 righe "tematica" per `user_id`). Evita aggiramenti via client manomesso.
+- **Realtime**: ogni client si abbona **solo** ai canali delle chat di cui fa parte → meno sottoscrizioni per utente, meno carico e consumo (coerente coi principi di costo).
+- **Liste membri / conteggi**: il numero utenti e l'eventuale anteprima nella pagina "Le mie chat" vanno filtrati lato server sulla block list di ciascuna utente (vedi `block.md` sezione 6). Punto di attenzione su come si caricano le liste a chatroom popolose.
+- **Al lancio**: tutte auto-iscritte a Foyer + 2 tematiche; la UX di join/leave e il tetto diventano rilevanti solo quando le chat tematiche supereranno le 3 (fase di espansione, vedi `chatroom.md` sezione 3).
+
 ---
 
 ## STACK COMPLETO — RIEPILOGO
@@ -126,10 +161,13 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 | **VPS per Appsmith** | Hetzner Germania | €5-15/mese | €15/mese | €15-30/mese |
 | **Apple Developer Account** | Apple | €99/anno (~€8/mese) | €8/mese | €8/mese |
 | **Google Play Developer** | Google | €25 una tantum | — | — |
-| **Dominio** | Namecheap o simili | €10/anno (~€1/mese) | €1/mese | €1/mese |
-| **Email transazionale** | Supabase incluso fino a soglie | €0 | €0-15/mese | €15-50/mese |
+| **Dominio principale** | Porkbun/OVH (.it) | €7-8/anno (~€0.7/mese) | €0.7/mese | €0.7/mese |
+| **Dominio difensivo** | Cloudflare Registrar (.com) | €9/anno (~€0.8/mese) | €0.8/mese | €0.8/mese |
+| **Email applicative (sistema)** | Supabase incluso fino a soglie | €0 | €0-15/mese | €15-50/mese |
+| **Email caselle dedicate** | Zoho Mail Free (5 caselle) | €0 | €0 | €0 (o ~€5/mese se serve upgrade Lite) |
+| **PWA hosting** | Vercel/Netlify Free | €0 | €0 | €0-20/mese (se bandwidth alta) |
 | **Versionamento codice** | GitHub privato | €0 | €0 | €0 |
-| **TOTALE STIMATO** | | **~€15-25/mese** | **~€50-150/mese** | **~€140-650/mese** |
+| **TOTALE STIMATO** | | **~€17-27/mese** | **~€52-152/mese** | **~€145-675/mese** |
 
 ---
 
@@ -137,10 +175,26 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 
 ### Priorità ALTA
 
-**T1. Email transazionali — provider per email "non di sistema"**
+**T1. Email — Zoho Mail Free per tutte le caselle**
 - Supabase gestisce out-of-the-box le email di sistema (verifica registrazione, recovery password) tramite il proprio servizio di email.
-- Da decidere: per email "applicative" più complesse (es. notifica esito appello, comunicazioni community) si usa Supabase o un servizio dedicato come SendGrid/Resend/Mailgun?
-- Da valutare quando si arriverà al pezzo di gestione email applicative.
+- **Provider per caselle dedicate**: **Zoho Mail Free** (decisione del 20 maggio 2026).
+  - 5 caselle gratis sul dominio dell'app, 5 GB per casella, IMAP/POP3/SMTP completi.
+  - Webmail, app mobile, possibilità di inviare *da* ogni casella (non solo ricevere).
+  - Server EU disponibili, DPA disponibile per compliance GDPR.
+- **Caselle email da creare**:
+  - `bug@[dominio]` → bug report tecnici (feature "Segnala un problema", vedi punto 9 sopra)
+  - `help@[dominio]` o `support@[dominio]` → supporto generale
+  - `appelli@[dominio]` → gestione appelli (vedi `appelli.md`)
+  - `privacy@[dominio]` o `dpo@[dominio]` → richieste GDPR e data protection (vedi `gdpr_e_legale.md`) — casella tenuta separata per audit trail su richieste con scadenze legali (es. 30 giorni risposta GDPR)
+  - `info@[dominio]` o `hello@[dominio]` → contatti generali (sito, comunicazione esterna)
+- **Motivazione della scelta Zoho**:
+  - Cloudflare Email Routing (solo forwarding) sarebbe stato sufficiente per le caselle "leggere", ma `privacy@`/`dpo@` ha esigenze di audit trail e capacità di inviare risposte ufficiali da quell'indirizzo. Avere due provider diversi (Cloudflare per le leggere, Zoho per la legale) aggiungerebbe complessità senza risparmiare nulla: tanto vale partire con Zoho per tutto.
+  - 5 caselle gratis = esattamente le 5 che servono. Senza margine ma sufficiente. Se in futuro serviranno più caselle (es. `eventi@`, `partnership@`), si valuterà l'upgrade a Zoho Mail Lite (~€1/mese per casella).
+- **Alternative considerate e scartate**:
+  - **Cloudflare Email Routing**: gratis e illimitato, ma solo forwarding (non si può inviare da bug@dominio direttamente). Inadatto a casella legale/GDPR.
+  - **ProtonMail Free**: una sola casella, no custom domain nel free tier.
+  - **Google Workspace / Microsoft 365**: ~€6/mese per casella, overkill in v1.
+- **Da decidere ancora**: per email "applicative" inviate dal backend (es. notifica esito appello automatica, comunicazioni community) — si usa Supabase, o un servizio dedicato tipo Resend/SendGrid/Mailgun? Le caselle Zoho sono per email "umane" (lette e scritte dai founder), non per invio massivo programmatico dal codice.
 
 **T2. Liveness detection per il selfie video**
 - Il selfie video di 3 secondi per la verifica liveness richiede una libreria specifica per la cattura.
