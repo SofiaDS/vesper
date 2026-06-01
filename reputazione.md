@@ -4,7 +4,7 @@ Decisioni di prodotto per il sistema di reputazione degli utenti. La reputazione
 
 Ultimo aggiornamento: 1 giugno 2026
 
-**Stato**: 🚧 In fase di definizione — decisi scopo, design, relazione con gli Strati e pesi degli eventi (sez. 1-4) e il meccanismo di decadimento/storicizzazione (sez. 5). Resta da definire la calibrazione e il ripristino post-appello (sez. 6).
+**Stato**: ✅ Completo — tutte le sezioni decise (sez. 1-6). Restano solo rifiniture non bloccanti (forma della visualizzazione in dashboard, sez. 5.4) e la calibrazione coi dati reali dopo 3 mesi dal lancio (sez. 6.2).
 
 ---
 
@@ -15,7 +15,7 @@ Ultimo aggiornamento: 1 giugno 2026
 3. Relazione con gli Strati di permessi (decisa)
 4. Cosa fa salire e scendere la reputazione (deciso)
 5. Decadimento, storicizzazione, visibilità (deciso — forma dashboard da rifinire)
-6. Attivazione e calibrazione — DA DEFINIRE
+6. Attivazione e calibrazione (deciso)
 
 Vedi anche:
 - [`permessi_e_strati.md`](./permessi_e_strati.md) per gli Strati 1/2/3 (sistema complementare ma indipendente)
@@ -206,9 +206,27 @@ Resta da rifinire in fase di build solo la *forma* (es. se aggiungere una sparkl
 
 ## 6. Attivazione e calibrazione
 
-🚧 **Da definire in sessione successiva.**
+### 6.1 Soglie di partenza — DECISO (1 giugno 2026)
 
-Argomenti aperti:
-- Soglie indicative (es. "reputazione sotto -X = guarda con attenzione"): da calibrare con dati reali, ma serve una proposta di partenza
-- Processo di revisione (analogo a quello del filtro AI in [`moderazione.md`](./moderazione.md) sezione 6.1): dopo quanto tempo / quanti utenti rivedere le regole?
-- Come gestire il ripristino dopo appello accolto (vedi [`appelli.md`](./appelli.md)): la reputazione viene resettata, mantenuta, parzialmente compensata?
+Le soglie di partenza sono quelle già definite in **sez. 4.5** (0 / da −1 a −3 / da −4 a −9 / ≤ −10), da rileggere alla luce del decadimento (sez. 5.2): col sistema a finestra mobile, il punteggio riflette **solo eventi recenti**, quindi le soglie vanno interpretate come "eventi confermati negli ultimi mesi", non come accumulo storico. Restano indicazioni interpretative per i moderatori, mai automatismi.
+
+### 6.2 Cadenza di calibrazione — DECISO (1 giugno 2026)
+
+La revisione di durate (3/6 mesi) e soglie avviene **insieme alla revisione delle altre soglie del progetto, dopo i primi 3 mesi dal lancio** (vedi [`permessi_e_strati.md`](./permessi_e_strati.md) sezione 3). Si consolida così in un unico momento di calibrazione, senza moltiplicare le scadenze di revisione.
+
+**Accortezza**: gli eventi di reputazione (warning/mute confermati) saranno **rari** in una community piccola. Se a 3 mesi i dati sono insufficienti per trarre conclusioni, la revisione **conferma i valori e rimanda**, senza forzare modifiche su numeri troppo piccoli. Non si cambiano le durate "a sensazione".
+
+### 6.3 Ripristino dopo appello accolto — DECISO (1 giugno 2026)
+
+Si adottano i due casi già definiti in [`appelli.md`](./appelli.md) sezione 3, tradotti in termini di reputazione:
+
+| Caso | Effetto sulla reputazione |
+|---|---|
+| **Errore identitario** (ban "cis man" infondato) | Ripristino totale: la reputazione torna esattamente com'era prima del ban (con gli eventi che riprendono a decadere dalle loro date originali) |
+| **Errore comportamentale** (ban per accumulo non confermato) | Reset a 0: gli eventi attivi smettono di contare nel punteggio |
+
+**Trattamento nello storico**: in entrambi i casi gli eventi coinvolti **restano visibili nello storico, marcati come "annullato in appello"** — non contano più nel punteggio, ma il moderatore vede che c'erano e che sono stati annullati. Come tutti gli altri eventi, vengono anonimizzati/rimossi al limite di retention di ~12 mesi (vedi [`gdpr_e_legale.md`](./gdpr_e_legale.md)).
+
+**Nota sul caso identitario**: il ban "cis man" **non è** un evento di reputazione (sez. 4.3 — segnalazione grave → ban diretto, fuori dal sistema). Quindi, di norma, nel caso identitario non c'è nessun evento di reputazione da marcare "annullato": la persona riparata non si ritrova alcuna traccia reputazionale del torto subito. Il marcatore "annullato" riguarda quasi esclusivamente i casi comportamentali (warning/mute pregressi azzerati dopo un ban ribaltato).
+
+**Appello dei singoli warning/mute**: al momento non esiste una procedura d'appello per il singolo warning o mute — l'appello è riservato ai ban (vedi [`appelli.md`](./appelli.md)). Un warning/mute eventualmente sbagliato semplicemente decade nei suoi 3/6 mesi. Se in futuro emergesse il bisogno di contestare i singoli eventi lievi, andrà aggiunto in `appelli.md`, non qui.
