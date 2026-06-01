@@ -39,17 +39,15 @@ Resta da definire:
 
 ### C. Sistema di reputazione
 
-✅ Pilastri decisi il 20 maggio 2026 (vedi [`reputazione.md`](./reputazione.md)):
+✅ **Sistema decise per intero il 1 giugno 2026** (vedi [`reputazione.md`](./reputazione.md), ora completo):
 - Scopo: strumento di moderazione invisibile (mai visibile agli utenti, mai automatica)
 - Sistema parallelo agli Strati, senza interazione
 - Attivo dal giorno 1 del lancio
+- Eventi e pesi (sez. 4): logica asimmetrica, warning = −1, mute = −3
+- ~~Visibilità, decadimento, storicizzazione (sez. 5)~~ ✅ Decadimento per evento (warning 3 mesi, mute 6 mesi), eventi scaduti restano nello storico fino a ~12 mesi
+- ~~Soglie di calibrazione e processo di revisione (sez. 6)~~ ✅ Calibrazione a 3 mesi con le altre soglie; ripristino post-appello allineato ad `appelli.md`
 
-🚧 Restano da definire in sessioni successive (sezioni 5, 6 di `reputazione.md`):
-- ~~Cosa fa salire e scendere la reputazione (eventi e pesi)~~ ✅ Deciso il 20 maggio 2026 (sezione 4 di `reputazione.md`): logica asimmetrica, warning = −1, mute = −3
-- Visibilità, decadimento, storicizzazione
-- Soglie di calibrazione e processo di revisione
-
-Questo resta il prossimo tema "grosso" da affrontare, ma è ora strutturato in passi gestibili.
+Restano solo rifiniture **non bloccanti**: forma della visualizzazione in dashboard (sparkline o lista, sez. 5.4) e la calibrazione effettiva coi dati reali dopo 3 mesi dal lancio.
 
 ---
 
