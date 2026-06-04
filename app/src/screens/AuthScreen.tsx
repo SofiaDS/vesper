@@ -10,7 +10,7 @@ export function AuthScreen() {
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  // Mostrato dopo signup quando Supabase richiede la conferma via email.
+  // Mostrato dopo signup. NB: messaggio neutro di proposito (vedi sotto).
   const [info, setInfo] = useState<string | null>(null)
 
   async function handleSubmit(e: FormEvent) {
@@ -32,15 +32,19 @@ export function AuthScreen() {
 
     try {
       if (mode === 'signup') {
-        const { data, error } = await supabase.auth.signUp({ email, password })
+        const { error } = await supabase.auth.signUp({ email, password })
         if (error) throw error
-        // Se la conferma email e' attiva, non c'e' sessione: avvisa l'utente.
-        if (!data.session) {
-          setInfo(
-            'Account creato. Controlla la tua email per confermare l’indirizzo, poi torna qui per accedere.',
-          )
-        }
-        // Se la sessione c'e', l'AuthProvider intercetta il cambio e prosegue.
+        // Messaggio NEUTRO di proposito: non confermiamo se l'email esista
+        // gia' o meno. Supabase, per protezione anti-enumeration, NON da'
+        // errore sui duplicati (torna un user con `identities` vuoto). Se qui
+        // distinguessimo i due casi rivelremmo quali email sono registrate
+        // -> falla di "email enumeration", piu' sensibile su un'app come
+        // Vesper. Quindi lo stesso messaggio vale per nuova email e duplicato.
+        setInfo(
+          'Se l’indirizzo è corretto, ti abbiamo inviato un’email con il link di conferma. Controlla la posta (anche lo spam).',
+        )
+        // Se la conferma email e' disattivata, c'e' gia' la sessione e
+        // l'AuthProvider intercetta il cambio: l'app prosegue da sola.
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,

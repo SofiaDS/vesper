@@ -1,0 +1,67 @@
+<!--
+  Vesper — template email "Confirm signup" per Supabase.
+  Dove incollarlo: Supabase Dashboard -> Authentication -> Emails -> Templates
+  -> "Confirm signup". Incolla il blocco HTML qui sotto nel campo "Message body".
+
+  Oggetto (campo "Subject"):
+  Benvenuta in Vesper — conferma la tua email
+
+  Variabile usata: {{ .ConfirmationURL }} (link di conferma generato da Supabase).
+  Palette "Inchiostro & oro": ink #171520, gold #E8B14E, cream #F7EFDD, coral #EC6A55.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#171520;margin:0;padding:0;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#1f1c2b;border:1px solid rgba(232,177,78,0.25);border-radius:16px;">
+        <tr>
+          <td style="padding:36px 36px 8px;text-align:center;">
+            <span style="font-family:Georgia,'Times New Roman',serif;font-size:30px;letter-spacing:0.08em;color:#E8B14E;">Vesper</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 36px 24px;text-align:center;">
+            <span style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#E8B14E;opacity:0.7;">Ci sei quasi</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 36px;font-family:Arial,Helvetica,sans-serif;color:#F7EFDD;font-size:15px;line-height:1.6;">
+            <p style="margin:0 0 16px;">Ciao,</p>
+            <p style="margin:0 0 16px;">
+              hai creato un account su <strong style="color:#E8B14E;">Vesper</strong>, lo spazio pensato per donne lesbiche, bisessuali e queer, donne trans, uomini trans e persone non-binary AFAB.
+            </p>
+            <p style="margin:0 0 28px;">
+              Per entrare nel Foyer e iniziare a conoscerci, conferma il tuo indirizzo email:
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 36px 28px;">
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block;background-color:#E8B14E;color:#171520;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 28px;border-radius:10px;">
+              Conferma la mia email
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 36px 28px;font-family:Arial,Helvetica,sans-serif;color:#F7EFDD;font-size:13px;line-height:1.6;">
+            <p style="margin:0 0 8px;opacity:0.75;">
+              Se il bottone non funziona, copia e incolla questo link nel browser:
+            </p>
+            <p style="margin:0;word-break:break-all;">
+              <a href="{{ .ConfirmationURL }}" style="color:#E8B14E;text-decoration:underline;">{{ .ConfirmationURL }}</a>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 36px 36px;border-top:1px solid rgba(232,177,78,0.18);">
+            <p style="margin:20px 0 0;font-family:Arial,Helvetica,sans-serif;color:#F7EFDD;font-size:12px;line-height:1.6;opacity:0.55;">
+              Se non hai creato tu questo account, puoi ignorare questa email: senza la conferma non verrà attivato nulla.
+            </p>
+            <p style="margin:12px 0 0;font-family:Arial,Helvetica,sans-serif;color:#F7EFDD;font-size:12px;line-height:1.6;opacity:0.55;">
+              Con cura,<br>il team di Vesper
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
