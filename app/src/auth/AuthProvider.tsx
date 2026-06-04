@@ -16,6 +16,11 @@ interface AuthState {
   profile: Profile | null
   // true quando l'utente e' loggato ma non ha ancora completato l'onboarding
   needsOnboarding: boolean
+  // true quando si arriva dal link "reimposta password" (evento recovery):
+  // l'app deve mostrare la schermata per scegliere una nuova password.
+  recovering: boolean
+  // chiude il flusso di recovery (dopo aver aggiornato la password)
+  clearRecovery: () => void
   // ricarica il profilo dal DB (es. dopo averlo creato in onboarding)
   refreshProfile: () => Promise<void>
   signOut: () => Promise<void>
@@ -27,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
+  const [recovering, setRecovering] = useState(false)
 
   // Tiene traccia dell'utente per cui il profilo e' gia' stato risolto, cosi'
   // da NON ricaricarlo a ogni evento auth (es. refresh del token).
@@ -77,10 +83,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     init()
 
-    // 2) Cambi di stato (login/logout/refresh token).
+    // 2) Cambi di stato (login/logout/refresh token/recovery).
     const { data: sub } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
+      (event, newSession) => {
         if (!active.current) return
+
+        // Link di reset password: mostra la schermata "nuova password".
+        // (arriva con una sessione valida ma temporanea di tipo recovery)
+        if (event === 'PASSWORD_RECOVERY') {
+          setRecovering(true)
+        }
+
         const newUserId = newSession?.user?.id ?? null
         const prevUserId = currentUserId.current
         currentUserId.current = newUserId
@@ -115,6 +128,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     session,
     profile,
     needsOnboarding: Boolean(session) && !profile,
+    recovering,
+    clearRecovery: () => setRecovering(false),
     refreshProfile,
     signOut,
   }
