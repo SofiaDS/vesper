@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -10,13 +11,12 @@ import { supabase } from '../lib/supabase'
 import type { Profile } from '../lib/types'
 
 interface AuthState {
-  // null = ancora in caricamento; undefined non usato
   loading: boolean
   session: Session | null
   profile: Profile | null
   // true quando l'utente e' loggato ma non ha ancora completato l'onboarding
   needsOnboarding: boolean
-  // ricarica il profilo dal DB (es. dopo aver creato il profilo in onboarding)
+  // ricarica il profilo dal DB (es. dopo averlo creato in onboarding)
   refreshProfile: () => Promise<void>
   signOut: () => Promise<void>
 }
@@ -28,7 +28,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
 
-  // Carica il profilo dell'utente loggato (o null se non esiste ancora).
+  // Tiene traccia dell'utente per cui il profilo e' gia' stato risolto, cosi'
+  // da NON ricaricarlo a ogni evento auth (es. refresh del token).
+  const currentUserId = useRef<string | null>(null)
+  const active = useRef(true)
+
+  // Carica il profilo dell'utente (o null se non esiste ancora).
   async function loadProfile(userId: string): Promise<void> {
     const { data, error } = await supabase
       .from('profiles')
@@ -36,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .eq('id', userId)
       .maybeSingle()
 
+    if (!active.current) return
     if (error) {
       console.error('Errore nel caricamento del profilo:', error.message)
       setProfile(null)
@@ -55,34 +61,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    let active = true
+    active.current = true
 
-    // 1) Sessione iniziale al primo render.
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!active) return
+    // 1) Sessione iniziale: carichiamo il profilo PRIMA di togliere il
+    //    "loading", cosi' l'app non mostra mai uno schermo intermedio sbagliato.
+    async function init() {
+      const { data } = await supabase.auth.getSession()
+      if (!active.current) return
       setSession(data.session)
+      currentUserId.current = data.session?.user?.id ?? null
       if (data.session?.user) {
         await loadProfile(data.session.user.id)
       }
-      setLoading(false)
-    })
+      if (active.current) setLoading(false)
+    }
+    init()
 
-    // 2) Reagisce a login/logout/refresh token.
+    // 2) Cambi di stato (login/logout/refresh token).
     const { data: sub } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        if (!active) return
+      (_event, newSession) => {
+        if (!active.current) return
+        const newUserId = newSession?.user?.id ?? null
+        const prevUserId = currentUserId.current
+        currentUserId.current = newUserId
         setSession(newSession)
+
+        // Stesso utente (es. solo refresh del token): niente da ricaricare,
+        // evitiamo flash inutili.
+        if (newUserId === prevUserId) return
+
         if (newSession?.user) {
-          await loadProfile(newSession.user.id)
+          // Utente cambiato (login): mostra "loading" finche' il profilo non
+          // e' risolto, cosi' non lampeggia l'onboarding prima della chat.
+          setLoading(true)
+          loadProfile(newSession.user.id).finally(() => {
+            if (active.current) setLoading(false)
+          })
         } else {
+          // Logout.
           setProfile(null)
         }
-        setLoading(false)
       },
     )
 
     return () => {
-      active = false
+      active.current = false
       sub.subscription.unsubscribe()
     }
   }, [])

@@ -222,3 +222,113 @@ code {
   font: inherit;
   text-decoration: underline;
 }
+
+/* --- Chat (Foyer) --- */
+.chat {
+  width: 100%;
+  max-width: 480px;
+  height: calc(100dvh - 3rem);
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(232, 177, 78, 0.18);
+}
+
+.chat-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.small-inline {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+}
+
+.chat-header .link {
+  margin-top: 0;
+}
+
+.messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+
+.msg {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-width: 80%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(247, 239, 221, 0.06);
+  align-self: flex-start;
+}
+
+.msg-mine {
+  align-self: flex-end;
+  background: rgba(232, 177, 78, 0.16);
+}
+
+.msg-author {
+  font-size: 0.72rem;
+  color: var(--gold);
+  opacity: 0.85;
+}
+
+.msg-body {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.chat-error {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+}
+
+.composer {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(232, 177, 78, 0.18);
+}
+
+.composer input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 9px;
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  background: rgba(247, 239, 221, 0.04);
+  color: var(--cream);
+  font-size: 1rem;
+}
+
+.composer input::placeholder {
+  color: var(--cream);
+  opacity: 0.35;
+}
+
+.composer input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.composer .btn-primary {
+  margin-top: 0;
+  flex-shrink: 0;
+}

@@ -2,7 +2,7 @@ import { useAuth } from './auth/AuthProvider'
 import { isSupabaseConfigured } from './lib/supabase'
 import { AuthScreen } from './screens/AuthScreen'
 import { OnboardingScreen } from './screens/OnboardingScreen'
-import { HomeScreen } from './screens/HomeScreen'
+import { ChatScreen } from './screens/ChatScreen'
 
 function App() {
   const { loading, session, needsOnboarding } = useAuth()
@@ -41,8 +41,8 @@ function App() {
   // Loggata ma senza profilo -> onboarding
   if (needsOnboarding) return <OnboardingScreen />
 
-  // Loggata e con profilo -> home
-  return <HomeScreen />
+  // Loggata e con profilo -> chat del Foyer
+  return <ChatScreen />
 }
 
 export default App
