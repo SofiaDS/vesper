@@ -70,7 +70,7 @@ function App() {
             Connesso a Supabase.{' '}
             {status.tableFound
               ? 'La tabella di prova esiste.'
-              : 'Connessione OK — lo schema del DB non e’ ancora stato creato (atteso in questa fase).'}
+              : 'Connection OK — lo schema del DB non e’ ancora stato creato (atteso in questa fase).'}
           </p>
         )}
         {status.kind === 'error' && (
