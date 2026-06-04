@@ -8,7 +8,7 @@ Tempo stimato: ~1-2 ore la prima volta. Spunta le caselle man mano.
 
 ---
 
-## 1. Strumenti sul tuo computer (Windows)
+## 1. Strumenti sul tuo computer (Windows) DONE
 
 - [ ] **Node.js LTS** (versione 20 o 22) — https://nodejs.org → verifica con `node -v` in Git Bash.
 - [ ] **Git** (probabilmente già installato, usi Git Bash) — `git --version`.
@@ -17,12 +17,12 @@ Tempo stimato: ~1-2 ore la prima volta. Spunta le caselle man mano.
 
 ## 2. Crea il progetto Supabase
 
-- [ ] Vai su https://supabase.com → **New project**.
-- [ ] **Region: Frankfurt (eu-central-1)** ← importante per il GDPR (vedi `stack_tecnico.md`).
+- [ ] Vai su https://supabase.com → **New project**. DONE
+- [ ] **Region: Frankfurt (eu-central-1)** ← importante per il GDPR (vedi `stack_tecnico.md`). DONE
 - [ ] Scegli un nome (es. `vesper-dev`) e salva la password del database in un posto sicuro.
 - [ ] A progetto creato: **Project Settings → API**. Copia:
-  - **Project URL** → andrà in `VITE_SUPABASE_URL`
-  - **anon public key** → andrà in `VITE_SUPABASE_ANON_KEY`
+  - **Project URL** → andrà in `VITE_SUPABASE_URL` DONE
+  - **anon public key** → andrà in `VITE_SUPABASE_ANON_KEY` DONE
 
 ## 3. Avvia l'app in locale
 
