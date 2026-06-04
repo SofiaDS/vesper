@@ -2,7 +2,7 @@
 
 Repository di tutte le decisioni di prodotto e tecniche del progetto. Ogni file tratta un tema specifico, in modo da essere navigabile senza scrollare un singolo documento gigante.
 
-Ultimo aggiornamento: 21 maggio 2026
+Ultimo aggiornamento: 4 giugno 2026
 
 ---
 
@@ -36,6 +36,7 @@ Ultimo aggiornamento: 21 maggio 2026
 | [`minori_e_eta.md`](./minori_e_eta.md) | Età minima 18+, doppia barriera, procedura sospetto minorenne |
 | [`gdpr_e_legale.md`](./gdpr_e_legale.md) | Aspetti GDPR, compliance, TOS, consulenza legale, conservazione dati |
 | [`monetizzazione.md`](./monetizzazione.md) | Modello di business, opzioni ADV/supporter/ibrido, posizionamento strategico |
+| [`branding.md`](./branding.md) | Nome (Vesper), palette "Inchiostro & oro", stato logo, verifiche marchio/dominio |
 | [`punti_aperti.md`](./punti_aperti.md) | Tutte le decisioni ancora da prendere, divise per priorità |
 
 ### Decisioni tecniche
