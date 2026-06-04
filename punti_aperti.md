@@ -25,13 +25,13 @@ Ultimo aggiornamento: 4 giugno 2026
 
 ### B. Struttura della chatroom — scelta finale
 
-✅ Struttura base decisa: 1 principale "Foyer" + 2 tematiche (vedi [`chatroom.md`](./chatroom.md)). Chat principale rinominata **Foyer** (era "Saluti & random") il 1 giugno 2026.
+✅ Struttura base decisa: 1 principale "Foyer" + 3 tematiche — **Wander** (viaggi & eventi), **Pulse** (fitness/sport), **Cult** (arte/cultura) (vedi [`chatroom.md`](./chatroom.md)). Chat principale rinominata **Foyer** (era "Saluti & random") il 1 giugno 2026.
 
 ✅ **Appartenenza multipla a più chat** decisa il 1 giugno 2026 (vedi [`chatroom.md`](./chatroom.md) sezioni 4-5): un'utente sta in più chat con tetto **1 Foyer obbligatoria + max 3 tematiche**, gestite da una pagina "Le mie chat" (esci/unisciti). Architettura in [`stack_tecnico.md`](./stack_tecnico.md) sezione 10.
 
 Resta da definire:
 
-- **Scelta finale tra le 2 opzioni di terna chat** (Intima+ampia vs Intima+pratica). Decisione tra founder in sessione dedicata, **entro fine Tappa 2** della roadmap (vedi `stack_tecnico.md`), così la struttura è disponibile per la beta interna PWA in Tappa 3. Possibile input pre-decisione da 2-3 conversazioni informali con persone del target, se i founder lo ritengono utile (non obbligatorio).
+- ~~**Scelta finale tra le 2 opzioni di terna chat** (Intima+ampia vs Intima+pratica)~~ ✅ Superata: terna di lancio decisa — **Wander**, **Pulse**, **Cult** (vedi [`chatroom.md`](./chatroom.md) sezione 3). La chat "Relazioni & affetti" resta candidata per la prima espansione.
 - **Calibrazione del tetto massimo di chat tematiche** (provvisoriamente 3): da rivedere con dati reali dopo il lancio, insieme alle altre soglie del progetto.
 - **Limite chat come feature a pagamento**: candidato borderline, da confermare/scartare — vedi [`monetizzazione.md`](./monetizzazione.md) sezione 4.
 - **Segmentazione per città/regione**: rimandata, valutare quando si superano ~500-1000 utenti attive.

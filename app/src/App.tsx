@@ -4,21 +4,8 @@ import { supabase, isSupabaseConfigured } from './lib/supabase'
 type Status =
   | { kind: 'loading' }
   | { kind: 'not-configured' }
-  | { kind: 'connected'; tableFound: boolean }
+  | { kind: 'connected'; rooms: number }
   | { kind: 'error'; message: string }
-
-// Codici/segnali che indicano "connessione OK ma tabella mancante":
-// abbiamo raggiunto PostgREST e ha risposto con un errore strutturato.
-function isMissingTable(error: { code?: string; message?: string }): boolean {
-  const code = error.code ?? ''
-  const msg = (error.message ?? '').toLowerCase()
-  return (
-    code === 'PGRST205' || // PostgREST: table not found in schema cache
-    code === '42P01' || // Postgres: undefined_table
-    msg.includes('does not exist') ||
-    msg.includes('could not find the table')
-  )
-}
 
 function App() {
   const [status, setStatus] = useState<Status>({ kind: 'loading' })
@@ -29,20 +16,18 @@ function App() {
       return
     }
 
-    // Test di connessione: interroghiamo una tabella di prova "pingtest".
-    // Se non esiste ancora, l'errore "table not found" conferma comunque
-    // che il client raggiunge Supabase: manca solo lo schema.
+    // Test di connessione + schema: contiamo le chatroom visibili.
+    // Schema Fase 1: 1 Foyer + 3 tematiche (Wander, Pulse, Cult).
+    // NB: da non loggati la RLS nasconde le stanze (count = 0): e' atteso,
+    // conta solo che non ci sia un errore di connessione.
     supabase
-      .from('pingtest')
-      .select('*')
-      .limit(1)
-      .then(({ error }) => {
-        if (!error) {
-          setStatus({ kind: 'connected', tableFound: true })
-        } else if (isMissingTable(error)) {
-          setStatus({ kind: 'connected', tableFound: false })
-        } else {
+      .from('chatrooms')
+      .select('id', { count: 'exact', head: true })
+      .then(({ count, error }) => {
+        if (error) {
           setStatus({ kind: 'error', message: error.message })
+        } else {
+          setStatus({ kind: 'connected', rooms: count ?? 0 })
         }
       })
   }, [])
@@ -51,7 +36,7 @@ function App() {
     <main className="app">
       <header className="brand">
         <h1>Vesper</h1>
-        <p className="tagline">Fase 0 &middot; setup ambiente</p>
+        <p className="tagline">Fase 1 &middot; schema DB</p>
       </header>
 
       <section className="card">
@@ -67,10 +52,9 @@ function App() {
         )}
         {status.kind === 'connected' && (
           <p className="ok">
-            Connesso a Supabase.{' '}
-            {status.tableFound
-              ? 'La tabella di prova esiste.'
-              : 'Connection OK — lo schema del DB non e’ ancora stato creato (atteso in questa fase).'}
+            Connesso a Supabase. Chatroom visibili: <strong>{status.rooms}</strong>
+            {status.rooms === 0 &&
+              ' — normale da non loggati: le stanze sono protette da RLS e diventano visibili dopo il login.'}
           </p>
         )}
         {status.kind === 'error' && (

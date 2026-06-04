@@ -1,6 +1,6 @@
 # Chatroom
 
-Struttura delle chat dell'app: chat principale ("Foyer"), chat tematiche, appartenenza multipla, principi di gestione del traffico.
+Struttura delle chat dell'app: chat globale, chat tematiche, principi di gestione del traffico.
 
 Ultimo aggiornamento: 1 giugno 2026
 
@@ -8,11 +8,10 @@ Ultimo aggiornamento: 1 giugno 2026
 
 ## Indice
 
-1. Impostazione iniziale (1 principale "Foyer" + 2 tematiche)
-2. Scelta finale chat tematiche (in ballottaggio)
-3. Espansione e principio di potatura
-4. Appartenenza multipla e limite di chat
-5. Pagina "Le mie chat" (gestione iscrizioni)
+1. Impostazione (1 globale + 3 tematiche)
+2. Le chat tematiche — titoli e descrizioni
+3. Evoluzione rispetto al ballottaggio precedente
+4. Espansione e principio di potatura
 
 Vedi anche:
 - [`permessi_e_strati.md`](./permessi_e_strati.md) per chi può scrivere/leggere ogni chat
@@ -20,60 +19,68 @@ Vedi anche:
 
 ---
 
-## 1. Impostazione iniziale
+## 1. Impostazione
 
-- **Scelta**: 1 chat principale + 2 chat tematiche (totale 3 chat al lancio).
-- **Motivazione**: in fase di lancio con ~30 utenti iniziali, concentrare il traffico in poche chat evita il "ghost town problem" (chat vuote che scoraggiano la permanenza). Meglio 2 chat vivissime che 5 a metà morte.
+- **Scelta**: 1 chat globale + 3 chat tematiche (totale 4 chat).
+- **Motivazione**: in fase di lancio con ~30 utenti iniziali si è scelto di non frammentare troppo il traffico. Ogni chat tematica è volutamente **ampia** (non micro-nicchia) proprio per restare animabile fin da subito ed evitare il "ghost town problem" (chat vuote che scoraggiano la permanenza). Tre tematiche larghe + una globale molto attiva è il compromesso tra varietà e densità di conversazione. Il principio di potatura (sezione 4) vigila sul rischio che qualcuna resti vuota.
 
-### Ruolo della chat principale — "Foyer"
+### Ruolo della chat globale
 
-La chat principale si chiama **Foyer** (sostituisce il nome di lavoro "Saluti & random"). È la **piazza comune** della community: tutte le utenti ne fanno parte per definizione ed è **obbligatoria** (non lasciabile — vedi sezione 4). Posto dove:
+**"Saluti & random"**. Posto dove:
 - Ci si presenta entrando nella community.
 - Si fanno conversazioni leggere.
-- Va tutto ciò che non rientra altrove.
+- Va tutto ciò che non rientra nelle tematiche.
 
 Le conversazioni a tema vanno nelle chat dedicate.
 
 ---
 
-## 2. Scelta finale chat tematiche — DA DECIDERE
+## 2. Le chat tematiche — titoli e descrizioni
 
-Restano in ballottaggio due configurazioni. **Decisione rimandata**, eventualmente sentendo qualche persona del target prima di scegliere.
+Ogni chat ha un **titolo** (breve, evocativo) e una **descrizione** degli argomenti trattati, mostrata sotto al titolo nella UI.
 
-### Opzione 1 — "Intima + ampia"
+### Globale — "Saluti & random"
 
-1. **Foyer** (principale: saluti, random, cultura, vita quotidiana — tutto il leggero)
-2. **Relazioni & affetti** (single, dating, fidanzate, ex, amore)
-3. **Cultura & consigli queer** (libri, serie, film, musica, eventi, articoli)
+> *Presentati, fai due chiacchiere, condividi quello che non rientra altrove. Il salotto della community.*
 
-**Vantaggio**: la chat cultura crea forte senso di appartenenza condivisa fin dal giorno 1 ("anche tu hai amato quel libro!"). Facile da animare nei primi giorni (i fondatori postano "che state leggendo/guardando"). Vita quotidiana resta naturalmente nel Foyer.
+### Tematica 1 — "Wander" *(viaggi & eventi)*
 
-### Opzione 2 — "Intima + pratica"
+> *Mete, weekend e consigli di viaggio queer-friendly, ma anche eventi, Pride, raduni e serate insieme.*
 
-1. **Foyer** (principale: saluti, random, cultura, attualità)
-2. **Relazioni & affetti** (single, dating, fidanzate, ex, amore)
-3. **Vita & dintorni** (lavoro, casa, viaggi, consigli pratici, sfoghi quotidiani)
+### Tematica 2 — "Pulse" *(fitness & sport)*
 
-**Vantaggio**: spazio dedicato per consigli concreti tipo "come trovare casa a Milano da queer". Più orientata all'utilità. Cultura/serie si mischia nel Foyer.
+> *Allenamento, sport e attività all'aperto. Movimento, motivazione e compagne con cui condividere i progressi.*
 
-### Comune a entrambe
+### Tematica 3 — "Cult" *(arte & cultura)*
 
-La chat **"Relazioni & affetti"** è presente in ogni caso, perché beneficia molto di uno spazio dedicato (intimità non si confonde con i saluti).
+> *Musica, cinema, teatro, serie TV e mostre. Cosa guardi e ascolti, consigli e ossessioni condivise.*
 
 ---
 
-## 3. Espansione e principio di potatura
+## 3. Evoluzione rispetto al ballottaggio precedente
+
+La struttura iniziale prevedeva **1 globale + 2 tematiche**, con un ballottaggio tra due terne entrambe imperniate su una chat **"Relazioni & affetti"** (opzione "Intima + ampia" vs "Intima + pratica"). Quella decisione è stata **superata**.
+
+**Scelta finale**: 1 globale + 3 tematiche — **Wander** (viaggi & eventi), **Pulse** (fitness/sport), **Cult** (arte/cultura).
+
+Conseguenze da registrare:
+- La chat **"Relazioni & affetti"**, che nel ballottaggio era data come presente "in ogni caso", **non è inclusa** nella terna di lancio. Resta come possibile tematica futura (vedi sezione 4).
+- Le terne "Intima + ampia" e "Intima + pratica" sono **scartate** ma conservate qui a fini di tracciabilità delle decisioni.
+
+---
+
+## 4. Espansione e principio di potatura
 
 ### Espansione futura
 
 Nuove chat tematiche specifiche verranno aggiunte quando la community crescerà e mostrerà bisogni chiari.
 
 Esempi di chat che potrebbero nascere col tempo (ma NON al lancio):
+- **Relazioni & affetti** (single, dating, fidanzate, ex, amore) — accantonata dalla terna di lancio, candidata naturale per la prima espansione se la community la richiede.
 - Coming out / questioning
 - Attivismo & politica LGBTQ+
 - Maternità & genitorialità queer
 - Salute mentale & supporto
-- Eventi Pride / appuntamenti community
 - Chat regionali (Milano, Roma, Napoli...) quando si supereranno ~500-1000 utenti attive
 
 ### Principio di potatura
@@ -86,62 +93,3 @@ Le chat tematiche **non sono per sempre**. Ogni 3-6 mesi rivedere:
 
 - **Segmentazione per città/regione**: rimandata, valutare quando si superano ~500-1000 utenti attive.
 - **Limite di utenti contemporanei prima di sdoppiare la room**: da definire più avanti con dati reali.
-
----
-
-## 4. Appartenenza multipla e limite di chat
-
-**Decisione (1 giugno 2026)**: un'utente può far parte di **più chat contemporaneamente**, con un tetto massimo.
-
-### Regola
-
-- **Foyer (principale): sempre inclusa e obbligatoria.** Non è lasciabile — è la piazza comune in cui tutte sono presenti per definizione.
-- **Chat tematiche (minori): opt-in, fino a un massimo di 3 contemporanee.**
-- **Tetto totale: 4 chat** (1 Foyer + max 3 tematiche).
-
-Il numero 3 è **provvisorio**, da calibrare con dati reali dopo il lancio (coerente con le altre soglie del progetto — vedi [`permessi_e_strati.md`](./permessi_e_strati.md) sezione 3 e [`punti_aperti.md`](./punti_aperti.md)).
-
-### Perché un tetto
-
-- **Anti-frammentazione**: è il "ghost town problem" di sezione 1 ribaltato. Se ognuna si iscrive a tutto, il traffico si diluisce e ogni singola chat si svuota. Un tetto spinge a scegliere gli spazi che contano davvero, mantenendo le chat vive.
-- **Tecnico/costi**: meno canali realtime sottoscritti per utente = meno carico e meno consumo. Coerente con il principio di cost-consciousness (vedi [`stack_tecnico.md`](./stack_tecnico.md)).
-
-### Al lancio non cambia nulla
-
-Al lancio le chat totali sono 3 (Foyer + 2 tematiche), tutte sotto il tetto di 4. Il limite "morde" solo in fase di **espansione**, quando le chat tematiche supereranno le 3 (vedi principio di potatura, sezione 3). La feature va però **modellata fin da subito** — l'appartenenza è un concetto di prima classe nel modello dati — per non dover rifare l'architettura dopo. Dettagli implementativi in [`stack_tecnico.md`](./stack_tecnico.md).
-
-### Aumento del limite — possibile feature a pagamento
-
-Alzare il numero di chat tematiche accessibili oltre 3 è un **candidato come feature a pagamento** (comodità personale). È però un caso più delicato delle altre comodità, perché sfiora il principio "mai gerarchie di interazione sociale". L'analisi completa e il caveat sono in [`monetizzazione.md`](./monetizzazione.md) sezione 4.
-
----
-
-## 5. Pagina "Le mie chat" — gestione iscrizioni
-
-Punto di accesso unico per entrare/uscire dalle chat. La pagina mostra **due elenchi distinti**.
-
-### Elenco A — Chat di cui faccio parte
-
-Per ogni chat:
-- **Nome** della chat (es. "Foyer", "Relazioni & affetti").
-- **Numero di utenti dentro** (eventuale anteprima avatar).
-- Tasto **"Esci"** — **disabilitato per il Foyer** (obbligatorio), attivo per le tematiche.
-
-### Elenco B — Chat di cui non faccio parte
-
-Per ogni chat:
-- **Nome** della chat.
-- **Numero di utenti dentro**.
-- Tasto **"Unisciti"** ("Join").
-
-### Comportamento al limite
-
-- Se l'utente è già a 4 chat (Foyer + 3 tematiche) e prova a unirsi a una quinta, il sistema spiega che ha raggiunto il limite e la invita a **uscire da una tematica prima di entrare in un'altra** (oppure, se attiva, ad aumentare il limite — vedi [`monetizzazione.md`](./monetizzazione.md)).
-- L'uscita da una chat è **immediata e reversibile** (si può rientrare in qualsiasi momento).
-- Uscire da una chat **non cancella** i messaggi già scritti lì: restano nello storico della chat, visibili alle altre.
-
-### Note di coerenza
-
-- **Permessi**: entrare/uscire dalle chat tematiche è disponibile fin dallo **Strato 1** (leggere e scrivere in chatroom è già un permesso base — vedi [`permessi_e_strati.md`](./permessi_e_strati.md) sezione 1). L'appartenenza alle chat è **indipendente** dagli Strati.
-- **Block**: il conteggio e l'eventuale anteprima utenti vanno filtrati lato server sulla block list di ciascuna utente, coerentemente con l'invisibilità reciproca (vedi [`block.md`](./block.md) sezione 6).
-- **Privacy**: nessuna notifica push del tipo "X è entrata/uscita dalla chat". Le entrate/uscite sono silenziose.

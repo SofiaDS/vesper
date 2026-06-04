@@ -32,7 +32,7 @@ Ultimo aggiornamento: 4 giugno 2026
 | [`profilo_utente.md`](./profilo_utente.md) | Campi profilo, visibilità, avatar preset, evoluzione v2 con foto |
 | [`ricerca_utenti.md`](./ricerca_utenti.md) | Ricerca per nickname e per filtri di affinità, opt-in, anti-abuso |
 | [`block.md`](./block.md) | Sistema di block tra utenti, perimetro, visibilità, gestione |
-| [`chatroom.md`](./chatroom.md) | Struttura delle chat (1 globale + 2 tematiche), opzioni in ballottaggio |
+| [`chatroom.md`](./chatroom.md) | Struttura delle chat: 1 globale (Foyer) + 3 tematiche (Wander, Pulse, Cult) |
 | [`minori_e_eta.md`](./minori_e_eta.md) | Età minima 18+, doppia barriera, procedura sospetto minorenne |
 | [`gdpr_e_legale.md`](./gdpr_e_legale.md) | Aspetti GDPR, compliance, TOS, consulenza legale, conservazione dati |
 | [`monetizzazione.md`](./monetizzazione.md) | Modello di business, opzioni ADV/supporter/ibrido, posizionamento strategico |
@@ -44,6 +44,8 @@ Ultimo aggiornamento: 4 giugno 2026
 | File | Contenuto |
 |---|---|
 | [`stack_tecnico.md`](./stack_tecnico.md) | Stack tecnologico completo, costi, roadmap di sviluppo |
+| [`app/`](./app/) | Frontend PWA (React + Vite + TypeScript). Setup in [`app/SETUP.md`](./app/SETUP.md) |
+| [`supabase/`](./supabase/) | Schema del database (migration SQL Fase 1, seed, RLS). Vedi [`supabase/README.md`](./supabase/README.md) |
 
 ---
 

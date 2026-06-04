@@ -171,7 +171,7 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 - **Enforcement del limite**: regola applicativa lato client + blindatura lato DB con `CHECK`/trigger PostgreSQL su Supabase (Foyer non lasciabile; max 3 righe "tematica" per `user_id`). Evita aggiramenti via client manomesso.
 - **Realtime**: ogni client si abbona **solo** ai canali delle chat di cui fa parte → meno sottoscrizioni per utente, meno carico e consumo (coerente coi principi di costo).
 - **Liste membri / conteggi**: il numero utenti e l'eventuale anteprima nella pagina "Le mie chat" vanno filtrati lato server sulla block list di ciascuna utente (vedi `block.md` sezione 6). Punto di attenzione su come si caricano le liste a chatroom popolose.
-- **Al lancio**: tutte auto-iscritte a Foyer + 2 tematiche; la UX di join/leave e il tetto diventano rilevanti solo quando le chat tematiche supereranno le 3 (fase di espansione, vedi `chatroom.md` sezione 3).
+- **Al lancio**: auto-iscrizione alla Foyer; le 3 tematiche di lancio (Wander, Pulse, Cult) sono disponibili da subito. La UX di join/leave e il tetto (max 3 tematiche) diventano davvero vincolanti solo in fase di espansione, quando le tematiche supereranno le 3 (vedi `chatroom.md` sezione 3).
 
 ---
 
@@ -316,7 +316,7 @@ Stima realistica per fondatore singolo che impara mentre costruisce, con support
 
 ### Fase 3 — Chat tematiche + polish (1 mese)
 
-- Aggiunta delle 2 chat tematiche
+- Aggiunta delle 3 chat tematiche (Wander, Pulse, Cult)
 - DM con sistema accept-request
 - Notifiche push (OneSignal)
 - Refinement UI/UX
