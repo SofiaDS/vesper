@@ -2,7 +2,7 @@
 
 Decisioni e opzioni in valutazione per il modello di monetizzazione dell'app. Tema strategico che incrocia business, etica e identità del prodotto.
 
-Ultimo aggiornamento: 20 maggio 2026
+Ultimo aggiornamento: 1 giugno 2026
 
 **Stato**: ⚠️ Decisione strategica in sospeso — da discutere tra founder.
 
@@ -19,6 +19,7 @@ Ultimo aggiornamento: 20 maggio 2026
 7. Punti aperti
 
 Vedi anche:
+
 - [`stack_tecnico.md`](./stack_tecnico.md) per i costi infrastruttura da coprire
 - [`gdpr_e_legale.md`](./gdpr_e_legale.md) per le implicazioni legali dell'ADV su categorie speciali
 
@@ -29,6 +30,7 @@ Vedi anche:
 La monetizzazione di questa app è una **scelta etica oltre che di business**. Le utenti sono spesso vulnerabili (persone non out, fasce economiche fragili, giovani, comunità marginalizzate). Ogni scelta di monetizzazione ha un costo non monetario sulla community.
 
 Punti fermi:
+
 - **Niente monetizzazione in v1**: focus su crescita e qualità della community.
 - **Mai feature a pagamento che creano gerarchie di interazione sociale** (es. "più DM se paghi", "boost nei risultati", "vedi chi ha visto il profilo"). Contraddirebbero l'identità chatroom-first non-gerarchica del progetto.
 - **Trasparenza totale sul modello**: le utenti devono capire come l'app si sostiene economicamente, sin dal primo accesso.
@@ -45,12 +47,14 @@ Punti fermi:
 - È il modello standard delle app concorrenti del settore (Wapa, Her, Bumble base).
 
 **Pro**:
+
 - Funnel di conversione chiaro: l'utente prova gratis, paga per togliere il fastidio.
 - Tasso di conversione tipico più alto (5-10% utenti attivi) rispetto al modello supporter puro.
 - Familiare alle utenti, nessuna "educazione" al modello necessaria.
 - Reso scalabile in fase matura.
 
 **Contro**:
+
 - Complessità GDPR su categorie speciali (orientamento, identità di genere): serve consenso esplicito separato per ADV personalizzate. Chi nega vede ADV contestuali (CPM ~dimezzato).
 - Rischio reputazionale su contenuti pubblicitari (annunci omofobi, conversion therapy mascherate, ecc.). Mitigabile con filtri categorici e scelta di reti curate (es. EthicalAds, Carbon) ma mai del tutto eliminabile.
 - Resa economica modesta nei primi 2 anni con utenti italiane di nicchia (CPM 1-5€, serve volume).
@@ -64,12 +68,14 @@ Punti fermi:
 - Modello tipico di progetti a forte identità valoriale: Mastodon, Signal, Wikipedia, Pixelfed.
 
 **Pro**:
+
 - App pulita, nessuna complessità GDPR/ADV.
 - Comunica forte i valori del progetto.
 - Le utenti che pagano lo fanno per sostenere, non per "essere più degne".
 - Coerente al 100% con l'identità chatroom-first non-gerarchica.
 
 **Contro**:
+
 - Conversione più bassa (tipicamente 2-5% utenti attivi).
 - Funziona solo se la community ha una forte identità valoriale condivisa.
 - Ricavo più modesto, copre infrastruttura ma difficilmente stipendi.
@@ -82,12 +88,14 @@ Punti fermi:
 - **v3** (solo se serve, 18+ mesi): se i ricavi supporter non bastano a sostenere l'app, si introducono ADV con la formula "gratis con ADV / supporter no ADV" — il supporter si trasforma automaticamente nel "remove ads" pagante.
 
 **Pro**:
+
 - Permette di partire pulite (no complessità ADV in fase di crescita).
 - Testa il modello valoriale prima di ripiegare su ADV.
 - Ha un piano B (ADV) senza dover improvvisare in emergenza.
 - Coerente con un approccio "founded values first, optimize later".
 
 **Contro**:
+
 - Più complesso da pianificare (tre fasi anziché una).
 - Rischia di rimandare la sostenibilità economica.
 - Se il modello valoriale non funziona in v2, il pivot a v3 richiede comunicazione delicata alle utenti che si sono fidate del "no ADV mai".
@@ -101,6 +109,7 @@ Approfondimento dedicato perché è il punto più delicato.
 ### Problema 1: GDPR su categorie speciali
 
 L'app raccoglie dati che il GDPR (art. 9) classifica come **categorie speciali**:
+
 - Orientamento sessuale (dichiarato all'iscrizione)
 - Identità di genere (idem)
 - Eventualmente: ubicazione, interessi sensibili
@@ -108,6 +117,7 @@ L'app raccoglie dati che il GDPR (art. 9) classifica come **categorie speciali**
 Le reti ADV (AdMob, Meta Audience Network) di default trasmettono identificatori device + segmenti utente alle reti. Per app generaliste non è problematico; per app con dati di categorie speciali, **serve consenso esplicito separato** per ADV personalizzate.
 
 **Soluzione tipica del settore**:
+
 - Banner di consenso al primo avvio: "Accetti pubblicità personalizzate basate sui tuoi dati?"
 - Chi accetta → ADV personalizzate (CPM più alto).
 - Chi rifiuta → ADV contestuali (CPM 30-50% più basso).
@@ -118,12 +128,14 @@ Le reti ADV (AdMob, Meta Audience Network) di default trasmettono identificatori
 ### Problema 2: conflitto sui contenuti pubblicitari
 
 Le reti ADV mostrano annunci di chiunque paghi. Senza filtri attivi, possibili annunci:
+
 - Contenuti religiosi conservatori
 - "Cure" per attrazione dello stesso sesso
 - App di dating etero
 - Brand con storico omofobo (es. alcune catene di fast food, banche, ecc.)
 
 **Mitigazioni possibili**:
+
 - Filtri categorici lato rete ADV (escludere intere categorie tipo "religion", "alternative health").
 - Lista nera di advertiser specifici.
 - Scelta di reti più curate (EthicalAds, Carbon — rendono meno ma sono più pulite).
@@ -136,6 +148,7 @@ Nessuna mitigazione è perfetta. Va messo in conto che ogni tanto sgusciano fuor
 CPM tipici 2026 per app verticali italiane: **1-5€ per mille impression**.
 
 Esempio di calcolo:
+
 - 10.000 utenti attive mensili
 - Ognuna vede ~50 impression/mese (banner + interstitial)
 - = 500.000 impression/mese
@@ -182,26 +195,39 @@ Principio generale: **se una feature serve a proteggere l'utente da un terzo (pa
 - **Esportazione dati**: backup mensile dei propri DM in formato leggibile.
 - **Notifiche più granulari**: filtri di notifica avanzati (es. mute per fascia oraria, mute per chatroom specifica).
 - **Eventuale traduzione automatica messaggi** (idea da Wapa Pro, img 12): utile per espansione internazionale futura, da rivalutare in v2.
+- **Accesso a più chat tematiche oltre il limite base** ⚠️: in v1 il tetto è 1 Foyer + max 3 tematiche (vedi `chatroom.md` sezione 4). Premium potrebbe alzarlo (es. +2/+3 tematiche). **Caso borderline — da validare**, vedi nota sotto.
 
 Tutte queste sono comodità che NON danno vantaggi nelle interazioni con le altre utenti e NON riguardano la sicurezza personale.
+
+> **⚠️ Nota sul limite chat a pagamento (da decidere a quattro mani tra founder)**
+>
+> Questa feature è più delicata delle altre della lista, perché sfiora il principio "mai gerarchie di interazione sociale".
+>
+> - **A favore**: non dà vantaggi *dentro* una chat né nei DM, non rende più visibili, non altera la ricerca. È accesso a *spazi*, non *status*. Più vicina a "salvataggio ricerche illimitato" che a "boost".
+> - **Contro**: l'accesso agli spazi sociali *è* una forma di partecipazione. Se una chat tematica diventa il cuore della vita di community, chi non paga ne resta fuori e può sentirsi "cittadina di serie B" — ed escluderebbe proprio le utenti con meno mezzi, contro lo spirito del progetto.
+>
+> **Posizione iniziale**: tenuta come candidata, da confermare solo se i dati reali mostrano che nessuna chat tematica diventa "essenziale" al punto da rendere il paywall una barriera all'appartenenza. Se così fosse, la feature va **scartata**. Il limite base (4 chat) resta comunque gratuito e sufficiente per la stragrande maggioranza delle utenti.
 
 ### 💝 Bottone "Sostieni il progetto" — presente da v1
 
 Indipendentemente dal modello di monetizzazione finale (sezione 2), in v1 viene introdotto un piccolo bottone "Sostieni il progetto" accessibile da Impostazioni.
 
 **Funzionamento**:
+
 - Porta a una pagina esterna (Ko-fi, Liberapay, PayPal, o equivalente).
 - Donazione a piacere, una tantum o ricorrente.
 - Zero overhead tecnico (nessun in-app purchase, nessuna gestione abbonamenti in v1).
 - Zero implicazioni per gli store (le donazioni esterne via web sono generalmente ammesse, ma vedi nota sotto).
 
 **Motivazione**:
+
 - Comunica fin dal day-one che l'app esiste grazie al supporto della community.
 - Permette alle utenti che credono nel progetto di sostenerlo senza dover aspettare il modello di monetizzazione "vero".
 - Coerente con l'identità "founded values first" del progetto.
 - Test naturale di disponibilità a pagare: se le donazioni iniziano ad arrivare, è un segnale per il modello supporter (Opzione B).
 
 **Cautele**:
+
 - **Apple e Google Play hanno policy stringenti su pagamenti esterni**: in alcuni casi richiedono che i pagamenti per beni/servizi digitali passino per i loro sistemi (commissione 15-30%). Le donazioni a no-profit certificati sono escluse; le donazioni "generiche" a una app for-profit ricadono in zona grigia. **Da verificare con consulente legale e leggendo le policy aggiornate degli store** prima dell'implementazione.
 - Possibile soluzione di compromesso: rendere il bottone visibile solo nella versione web (se mai esisterà) o redirezionare a un sito esterno chiaramente di "supporto al progetto" e non "acquisto feature".
 - **Da chiarire nei TOS**: la donazione non sblocca feature premium né dà vantaggi nell'app. È sostegno puro.
@@ -231,6 +257,7 @@ Prima di scegliere il modello di business, va risolta una domanda di posizioname
 ### Se "un misto" — lavoro che resta da fare
 
 Se la risposta è "un misto" (cosa probabilmente vera, non è scelta binaria), serve articolare il misto con precisione:
+
 - In quali aspetti è "come Wapa fatta meglio"? (es. modello chat?)
 - In quali aspetti è "una cosa diversa"? (es. focus chatroom prima di DM, no foto in v1, reputazione invisibile)
 - Il modello business riflette il quale dei due lati?

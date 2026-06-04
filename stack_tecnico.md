@@ -3,7 +3,7 @@
 Documento dedicato alle decisioni tecniche di progetto: linguaggi, framework, servizi, infrastruttura, costi.
 Documento complementare ai file di decisioni di prodotto (vedi `README.md` per la mappa completa).
 
-Ultimo aggiornamento: 21 maggio 2026
+Ultimo aggiornamento: 1 giugno 2026
 
 ---
 
@@ -23,6 +23,7 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 ## DECISIONI PRESE
 
 ### 1. App mobile — React Native + Expo (TypeScript)
+
 - **Scelta**: React Native con Expo, in TypeScript.
 - **Motivazione**:
   - Un solo codebase per iOS e Android (dimezza il lavoro vs sviluppo nativo)
@@ -37,6 +38,7 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - **Java per Android**: obsoleto per app moderne, sostituito da Kotlin nel nativo
 
 ### 2. Backend — Supabase
+
 - **Scelta**: **Supabase** come backend tutto-in-uno.
 - **Cosa include**:
   - PostgreSQL come database (standard, portabile, senza lock-in serio)
@@ -64,6 +66,7 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - **MongoDB Atlas**: NoSQL non offre vantaggi rispetto a Firestore/Supabase per questo caso, costi più alti del free tier Supabase
 
 ### 3. Notifiche push — OneSignal
+
 - **Scelta**: **OneSignal** per le notifiche push iOS+Android.
 - **Motivazione**:
   - Gratuito fino a numeri molto alti di utenti
@@ -76,6 +79,7 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 - **Da rivedere**: se l'integrazione di OneSignal risulta più complessa del previsto, valutare Expo Notifications come ripiego.
 
 ### 4. Filtro AI per moderazione contenuti — OpenAI Moderation API
+
 - **Scelta**: **OpenAI Moderation API** + blocklist italiana custom mantenuta nelle Edge Functions di Supabase.
 - **Motivazione**:
   - API gratuita (zero costi)
@@ -86,12 +90,15 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 - **Modalità iniziale**: soft mode (vedi `moderazione.md` sezione 6) — messaggi flaggati visibili ai moderatori senza blocco automatico al day-one.
 
 ### 5. Dashboard moderatori — Appsmith self-hosted
+
 (Già definito in `moderazione.md` sezione 7, qui solo riferimento)
+
 - **Scelta**: Appsmith Community Edition self-hosted su VPS europeo.
 - **VPS consigliato**: Hetzner Germania (€5-15/mese per VPS Linux base sufficiente).
 - **Connessione**: Appsmith si connette direttamente al database PostgreSQL di Supabase via connection string (Supabase espone PostgreSQL standard).
 
 ### 6. Versionamento codice — Git + GitHub privato
+
 - **Scelta**: GitHub con repository privato.
 - **Motivazione**: standard de facto, gratuito per repo privati, ottima integrazione con tutti gli strumenti (VS Code, CI/CD, Issues, ecc.).
 - **Repo separati**:
@@ -100,6 +107,7 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - `moderator-dashboard` (config Appsmith esportata)
 
 ### 7. Ambiente di sviluppo — VS Code
+
 - **Scelta**: Visual Studio Code come IDE principale.
 - **Estensioni essenziali**:
   - React Native Tools
@@ -109,10 +117,12 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - Supabase (estensione ufficiale)
 
 ### 8. Linguaggio per logica server-side — TypeScript
+
 - **Scelta**: TypeScript per le Edge Functions di Supabase.
 - **Motivazione**: stessa stack del frontend (un solo linguaggio da padroneggiare), cattura errori a compile time, autocomplete migliore di JavaScript puro.
 
 ### 9. Feature "Segnala un problema" — mailto pre-compilato
+
 - **Scelta**: bottone "Segnala un problema" in Impostazioni che apre il client email predefinito dell'utente con destinatario e oggetto pre-compilati. Pattern ispirato a Wapa (img 13 della discussione del 20 maggio 2026).
 - **Motivazione**:
   - Zero overhead per le utenti (niente form custom, niente accesso ai dati del device da richiedere).
@@ -139,29 +149,14 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - "Sostieni il progetto" (donazione esterna, vedi `monetizzazione.md`).
 - **Gratis per tutti**: rientra nella categoria support/safety di `monetizzazione.md` sezione 4 — mai dietro paywall.
 
-### 10. Liveness detection per il selfie video — `expo-camera` + revisione manuale
-- **Scelta**: cattura del selfie video con `expo-camera` (libreria standard Expo), upload del file grezzo a Supabase Storage, **revisione manuale** del video da parte dei fondatori in dashboard.
-- **Motivazione**:
-  - Coerente con la scelta più ampia di gestione manuale della verifica (punto 1 di `utenti_e_identita.md`): costo marginale zero, massima sensibilità contestuale, niente dipendenze da terze parti.
-  - `expo-camera` è già nelle dipendenze standard di un progetto Expo, nessuna libreria aggiuntiva.
-  - Niente liveness detection client-side automatica in v1: l'aggiunta di SDK biometrici (es. AWS Rekognition) introdurrebbe complessità e costi senza benefici reali finché i volumi sono bassi.
-- **Da rivedere**: quando si supera la soglia di ~100-200 registrazioni/giorno (vedi punto 1 di `utenti_e_identita.md`), valutare un layer AI di pre-filtro liveness per ridurre il carico manuale. Decisione di rinvio già documentata.
-- **Alternative scartate**:
-  - Librerie con liveness detection client-side avanzata (es. FaceTec, iProov, BioID): costose, vendor lock-in, eccessive per i volumi MVP.
-  - AWS Rekognition o Google Vision con detection automatica: introdurrebbero trasferimenti dati extra-UE su dati biometrici, complicando il GDPR senza vantaggi reali in fase iniziale.
+### 10. Appartenenza alle chat — modello multi-room
 
-### 11. CI/CD — EAS per build nativi + GitHub Actions per CI codice
-- **Scelta**: combinazione di due strumenti complementari, ciascuno per il proprio dominio.
-  - **Expo Application Services (EAS)**: per i build nativi iOS+Android e il submit agli store. È il default per progetti Expo, gestisce credenziali, signing, profili provisioning Apple senza esporre il fondatore alla complessità nativa.
-  - **GitHub Actions**: per CI sul codice (lint, type-check TypeScript, eventuali unit test) su ogni push/PR.
-- **Motivazione della separazione**:
-  - EAS fa una cosa che GitHub Actions non sa fare bene (build nativi firmati e submit agli store): non ha senso reinventarla.
-  - GitHub Actions fa una cosa che EAS non fa (CI generica sul codice): non ha senso pagare EAS per cicli di build solo per fare `npm run lint`.
-  - Free tier di entrambi sufficiente per un MVP a singolo fondatore.
-- **Costi**:
-  - EAS free tier: 30 build/mese su priorità standard. Per un fondatore singolo è abbondante.
-  - GitHub Actions: 2000 minuti/mese gratis su repo privati. Più che sufficiente per CI leggera.
-- **Da rivedere**: se i tempi di build EAS diventeranno bloccanti per il workflow, valutare l'upgrade al piano a pagamento (~€19/mese) per la coda prioritaria.
+- **Decisione di prodotto**: vedi `chatroom.md` sezioni 4-5 (un'utente sta in più chat con tetto 1 Foyer obbligatoria + max 3 tematiche).
+- **Modello dati**: tabella di join `chat_membership` (`user_id`, `chatroom_id`, `joined_at`). L'appartenenza è un concetto di prima classe da subito, anche se al lancio (3 chat totali) il tetto non "morde" ancora.
+- **Enforcement del limite**: regola applicativa lato client + blindatura lato DB con `CHECK`/trigger PostgreSQL su Supabase (Foyer non lasciabile; max 3 righe "tematica" per `user_id`). Evita aggiramenti via client manomesso.
+- **Realtime**: ogni client si abbona **solo** ai canali delle chat di cui fa parte → meno sottoscrizioni per utente, meno carico e consumo (coerente coi principi di costo).
+- **Liste membri / conteggi**: il numero utenti e l'eventuale anteprima nella pagina "Le mie chat" vanno filtrati lato server sulla block list di ciascuna utente (vedi `block.md` sezione 6). Punto di attenzione su come si caricano le liste a chatroom popolose.
+- **Al lancio**: tutte auto-iscritte a Foyer + 2 tematiche; la UX di join/leave e il tetto diventano rilevanti solo quando le chat tematiche supereranno le 3 (fase di espansione, vedi `chatroom.md` sezione 3).
 
 ---
 
@@ -192,6 +187,7 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 ### Priorità ALTA
 
 **T1. Email — Zoho Mail Free per tutte le caselle**
+
 - Supabase gestisce out-of-the-box le email di sistema (verifica registrazione, recovery password) tramite il proprio servizio di email.
 - **Provider per caselle dedicate**: **Zoho Mail Free** (decisione del 20 maggio 2026).
   - 5 caselle gratis sul dominio dell'app, 5 GB per casella, IMAP/POP3/SMTP completi.
@@ -212,19 +208,30 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - **Google Workspace / Microsoft 365**: ~€6/mese per casella, overkill in v1.
 - **Da decidere ancora**: per email "applicative" inviate dal backend (es. notifica esito appello automatica, comunicazioni community) — si usa Supabase, o un servizio dedicato tipo Resend/SendGrid/Mailgun? Le caselle Zoho sono per email "umane" (lette e scritte dai founder), non per invio massivo programmatico dal codice.
 
+**T2. Liveness detection per il selfie video**
+
+- Il selfie video di 3 secondi per la verifica liveness richiede una libreria specifica per la cattura.
+- Opzioni da valutare:
+  - `expo-camera` + caricamento video grezzo a Supabase Storage (semplice, moderazione tutta manuale)
+  - Librerie con liveness detection client-side (più sofisticato ma più complesso)
+- Decisione rimandata alla fase di sviluppo della verifica.
+
 ### Priorità MEDIA
 
 **T3. Monitoraggio errori e crash reporting**
+
 - Quando l'app è live, serve sapere quando crasha o ha errori in produzione.
 - Opzioni: Sentry (free tier generoso), Bugsnag, LogRocket.
 - Da decidere prima del lancio in beta.
 
 **T5. Strumenti di analytics**
+
 - Per capire come gli utenti usano l'app (rispettando GDPR).
 - Opzioni: PostHog (open source, hostabile EU), Plausible Analytics (EU, privacy-first), Mixpanel (US).
 - Per coerenza con i valori del progetto, valutare PostHog self-hosted o Plausible.
 
 **T9. Filtraggio lato server delle liste membri chatroom in base alla block list**
+
 - Conseguenza dell'invisibilità reciproca decisa in `block.md` sezione 6: la lista membri di una chatroom va filtrata lato server per ciascuna utente sulla base della propria block list.
 - Tecnicamente fattibile con join su tabella `blocks` durante il caricamento della lista membri, ma incide su performance quando le chatroom diventano grandi e/o le block list lunghe.
 - Da progettare in fase di sviluppo della chatroom: serve indice su `blocks(blocker_id, blocked_id)` e probabile caching della block list dell'utente attiva lato client per filtrare anche i messaggi in arrivo via realtime.
@@ -233,14 +240,17 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 ### Priorità BASSA (post-lancio)
 
 **T6. CDN per asset statici**
+
 - Quando ci saranno avatar preset, immagini di onboarding, ecc., servirà una CDN per servirli velocemente.
 - Supabase Storage può fare da CDN, oppure si valuta Cloudflare R2/Bunny.net.
 
 **T7. Backup database**
+
 - Supabase Pro include backup automatici giornalieri. Sotto free tier, fare backup manuali periodici.
 - Importante quando si avrà la prima base utenti reale.
 
 **T8. Disaster recovery e business continuity**
+
 - Cosa succede se Supabase ha un'interruzione? Quanto tempo di downtime è accettabile?
 - Definire RPO (recovery point objective) e RTO (recovery time objective) prima del lancio.
 
@@ -249,21 +259,23 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
 ## NOTE SU INFRASTRUTTURA E HOSTING
 
 ### Server e dati: tutto in Europa
+
 - **Supabase**: scegliere regione **Francoforte (eu-central-1)** in fase di setup. È fondamentale per GDPR.
 - **Hetzner VPS (Appsmith)**: scegliere data center in Germania.
 - **OneSignal**: ha server distribuiti, accettabile con DPA standard.
 - **OpenAI**: API USA, ma trasmette solo testo dei messaggi (non dati identificativi), accettabile con DPA.
 
 ### Trasferimenti dati extra-UE
+
 - Per OpenAI: testo dei messaggi viene trasmesso negli USA per moderazione. Va dichiarato nell'informativa privacy.
 - Da valutare nel tempo: alternative europee per moderazione AI (es. Mistral AI ha modelli francesi, potrebbe arrivare un'API di moderazione).
-
 
 ## ROADMAP DI APPRENDIMENTO/SVILUPPO
 
 Stima realistica per fondatore singolo che impara mentre costruisce, con supporto AI per il codice.
 
 ### Fase 0 — Setup e familiarizzazione (2-3 settimane)
+
 - Setup ambiente di sviluppo (Node, Expo, VS Code, Git)
 - Tutorial React Native + Expo (app demo "hello world" che gira su telefono)
 - Tutorial Supabase (creazione progetto, prime tabelle, autenticazione)
@@ -271,6 +283,7 @@ Stima realistica per fondatore singolo che impara mentre costruisce, con support
 - Connessione tra app React Native ed un Supabase di prova
 
 ### Fase 1 — MVP minimale (2-3 mesi)
+
 - Registrazione + login + verifica email
 - Schermata di dichiarazione di appartenenza alla community + scelta categoria identità
 - Profilo base con avatar preset (no foto)
@@ -279,6 +292,7 @@ Stima realistica per fondatore singolo che impara mentre costruisce, con support
 - Dashboard Appsmith con coda verifiche e segnalazioni
 
 ### Fase 2 — Verifica e moderazione complete (1-2 mesi)
+
 - Selfie video liveness con `expo-camera`
 - Sistema vouching (garanti)
 - Permessi progressivi automatici (Strato 1 → 2 → 3)
@@ -286,12 +300,14 @@ Stima realistica per fondatore singolo che impara mentre costruisce, con support
 - Procedure appelli via email
 
 ### Fase 3 — Chat tematiche + polish (1 mese)
+
 - Aggiunta delle 2 chat tematiche
 - DM con sistema accept-request
 - Notifiche push (OneSignal)
 - Refinement UI/UX
 
 ### Fase 4 — Beta privata e lancio (1-2 mesi)
+
 - Submission App Store e Play Store
 - Beta test con 20-50 persone della community
 - Bug fixing
@@ -300,4 +316,3 @@ Stima realistica per fondatore singolo che impara mentre costruisce, con support
 **Totale realistico**: **6-9 mesi** per fondatore singolo.
 
 ---
-

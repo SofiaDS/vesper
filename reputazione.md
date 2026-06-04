@@ -2,9 +2,9 @@
 
 Decisioni di prodotto per il sistema di reputazione degli utenti. La reputazione è un sistema parallelo agli Strati di permessi: gli Strati gestiscono i permessi crescenti automatici degli utenti onesti, la reputazione marca chi devia da quel percorso.
 
-Ultimo aggiornamento: 20 maggio 2026
+Ultimo aggiornamento: 1 giugno 2026
 
-**Stato**: 🚧 In fase di definizione — pilastri decisi (sezioni 1-4), visibilità/decadimento e calibrazione ancora da definire (sezioni 5-6).
+**Stato**: ✅ Completo — tutte le sezioni decise (sez. 1-6). Restano solo rifiniture non bloccanti (forma della visualizzazione in dashboard, sez. 5.4) e la calibrazione coi dati reali dopo 3 mesi dal lancio (sez. 6.2).
 
 ---
 
@@ -14,10 +14,11 @@ Ultimo aggiornamento: 20 maggio 2026
 2. Implicazioni di design (decise)
 3. Relazione con gli Strati di permessi (decisa)
 4. Cosa fa salire e scendere la reputazione (deciso)
-5. Visibilità, decadimento, storicizzazione — DA DEFINIRE
-6. Attivazione e calibrazione — DA DEFINIRE
+5. Decadimento, storicizzazione, visibilità (deciso — forma dashboard da rifinire)
+6. Attivazione e calibrazione (deciso)
 
 Vedi anche:
+
 - [`permessi_e_strati.md`](./permessi_e_strati.md) per gli Strati 1/2/3 (sistema complementare ma indipendente)
 - [`moderazione.md`](./moderazione.md) per come i moderatori prendono le decisioni
 - [`appelli.md`](./appelli.md) per come la reputazione può essere ripristinata dopo un ban erroneo
@@ -33,6 +34,7 @@ Cioè: la reputazione è un segnale interno che i moderatori usano per **far eme
 ### Esempio d'uso concreto
 
 Arriva una segnalazione su una nuova utente che ha scritto un messaggio borderline. Il moderatore controlla la sua reputazione:
+
 - Se è una utente con reputazione neutra/positiva e 6 mesi di buona condotta, il moderatore probabilmente archivia o manda un warning leggero.
 - Se è una utente la cui reputazione è scesa di 5 punti negli ultimi 2 mesi, il moderatore guarda lo storico con più attenzione: forse non è il primo caso di linguaggio aggressivo, forse il pattern è chiaro.
 
@@ -163,21 +165,71 @@ I numeri sotto sono **indicazioni di orientamento iniziali**, non automatismi. S
 
 ## 5. Visibilità, decadimento, storicizzazione
 
-🚧 **Da definire in sessione successiva.**
+### 5.1 Decadimento — DECISO (1 giugno 2026)
 
-Argomenti aperti:
-- Storicizzazione: per quanto tempo si conserva l'andamento della reputazione? (vedi anche [`gdpr_e_legale.md`](./gdpr_e_legale.md) per i tempi di retention dei dati di moderazione)
-- Decadimento delle segnalazioni archiviate nel tempo: una segnalazione di 1 anno fa pesa quanto una di ieri?
-- Decadimento del punteggio negativo: una reputazione molto bassa si "riassorbe" con buona condotta nel tempo?
-- Visualizzazione in dashboard: solo valore corrente? Trend? Sparkline? Lista eventi recenti?
+**Modello: scadenza per evento.** Ogni evento confermato ha una propria "vita". Mentre è in vita pesa sul punteggio; alla scadenza smette di contare. Il punteggio corrente è quindi la **somma dei soli eventi ancora attivi** — di fatto una finestra mobile sugli ultimi mesi.
+
+**Durate (provvisorie, da calibrare con dati reali — vedi sez. 6):**
+
+| Evento | Peso | Conta nel punteggio per |
+|---|---|---|
+| Warning confermato | −1 | 3 mesi |
+| Mute confermato | −3 | 6 mesi |
+
+Il mute resta sul groppone il doppio del warning: è una sanzione qualitativamente più seria (coerente col rapporto di pesi di sez. 4.2), ma comunque si recupera, in linea con lo spirito riparativo del progetto (vedi [`appelli.md`](./appelli.md)).
+
+**Orologi indipendenti.** Ogni evento scade per conto suo: un nuovo warning **non** allunga la vita di quelli precedenti. È la conseguenza diretta della scelta "niente moltiplicatori di recidiva" (sez. 4.3). Niente reset, niente congelamento del conto alla rovescia.
+
+**Risalita.** Nel sistema asimmetrico (sez. 4) il decadimento è l'**unico** movimento verso lo 0. Una persona che non accumula nuovi eventi torna automaticamente a reputazione 0 entro 6 mesi dall'ultimo evento (la vita del mute, l'evento più longevo).
+
+### 5.2 Punteggio vs storico — DECISO (1 giugno 2026)
+
+Quando un evento scade, **esce dal punteggio ma resta visibile nello storico** consultabile dai moderatori, fino al limite di retention dei log di moderazione (~12 mesi, vedi [`gdpr_e_legale.md`](./gdpr_e_legale.md)), dopo il quale viene anonimizzato/rimosso come tutto il resto.
+
+Motivazione: coerenza con sez. 2.3 ("mostrare *pattern*, non singoli numeri"). Un'utente con punteggio attuale 0 ma con 3 warning scaduti negli ultimi 10 mesi racconta una storia che il solo numero corrente nasconderebbe. Lo storico permette di cogliere il pattern; il punteggio resta una misura "fresca".
+
+Due livelli distinti:
+
+- **Punteggio corrente** = solo eventi in vita (warning ≤ 3 mesi, mute ≤ 6 mesi).
+- **Storico eventi** = tutti gli eventi degli ultimi ~12 mesi, attivi o scaduti, visibili ma non più conteggiati una volta scaduti.
+
+**Effetto collaterale positivo**: questo scioglie il dubbio lasciato aperto in sez. 4.5. Col decadimento, un punteggio ≤ −10 può derivare solo da molti eventi **recenti e ravvicinati** (ognuno dura 3-6 mesi), quindi è di per sé un segnale di gravità *attuale*, non un residuo accumulato in anni. Le soglie indicative di 4.5 vanno quindi lette come "eventi confermati negli ultimi mesi".
+
+### 5.3 Decadimento delle segnalazioni archiviate — NON APPLICABILE
+
+Le segnalazioni archiviate **non entrano** nel sistema reputazione (sez. 4.3): non c'è nulla da far decadere. La domanda "una segnalazione archiviata di 1 anno fa pesa quanto una di ieri?" cade insieme alla sua premessa.
+
+### 5.4 Visualizzazione in dashboard — direzione decisa, forma aperta
+
+Conseguenza di 5.1-5.2: la scheda utente mostra **valore corrente del punteggio + lista degli eventi recenti**, con indicazione di quali sono ancora attivi e quali scaduti-ma-visibili.
+
+Resta da rifinire in fase di build solo la *forma* (es. se aggiungere una sparkline dell'andamento accanto alla lista). Dettaglio estetico, non bloccante.
 
 ---
 
 ## 6. Attivazione e calibrazione
 
-🚧 **Da definire in sessione successiva.**
+### 6.1 Soglie di partenza — DECISO (1 giugno 2026)
 
-Argomenti aperti:
-- Soglie indicative (es. "reputazione sotto -X = guarda con attenzione"): da calibrare con dati reali, ma serve una proposta di partenza
-- Processo di revisione (analogo a quello del filtro AI in [`moderazione.md`](./moderazione.md) sezione 6.1): dopo quanto tempo / quanti utenti rivedere le regole?
-- Come gestire il ripristino dopo appello accolto (vedi [`appelli.md`](./appelli.md)): la reputazione viene resettata, mantenuta, parzialmente compensata?
+Le soglie di partenza sono quelle già definite in **sez. 4.5** (0 / da −1 a −3 / da −4 a −9 / ≤ −10), da rileggere alla luce del decadimento (sez. 5.2): col sistema a finestra mobile, il punteggio riflette **solo eventi recenti**, quindi le soglie vanno interpretate come "eventi confermati negli ultimi mesi", non come accumulo storico. Restano indicazioni interpretative per i moderatori, mai automatismi.
+
+### 6.2 Cadenza di calibrazione — DECISO (1 giugno 2026)
+
+La revisione di durate (3/6 mesi) e soglie avviene **insieme alla revisione delle altre soglie del progetto, dopo i primi 3 mesi dal lancio** (vedi [`permessi_e_strati.md`](./permessi_e_strati.md) sezione 3). Si consolida così in un unico momento di calibrazione, senza moltiplicare le scadenze di revisione.
+
+**Accortezza**: gli eventi di reputazione (warning/mute confermati) saranno **rari** in una community piccola. Se a 3 mesi i dati sono insufficienti per trarre conclusioni, la revisione **conferma i valori e rimanda**, senza forzare modifiche su numeri troppo piccoli. Non si cambiano le durate "a sensazione".
+
+### 6.3 Ripristino dopo appello accolto — DECISO (1 giugno 2026)
+
+Si adottano i due casi già definiti in [`appelli.md`](./appelli.md) sezione 3, tradotti in termini di reputazione:
+
+| Caso | Effetto sulla reputazione |
+|---|---|
+| **Errore identitario** (ban "cis man" infondato) | Ripristino totale: la reputazione torna esattamente com'era prima del ban (con gli eventi che riprendono a decadere dalle loro date originali) |
+| **Errore comportamentale** (ban per accumulo non confermato) | Reset a 0: gli eventi attivi smettono di contare nel punteggio |
+
+**Trattamento nello storico**: in entrambi i casi gli eventi coinvolti **restano visibili nello storico, marcati come "annullato in appello"** — non contano più nel punteggio, ma il moderatore vede che c'erano e che sono stati annullati. Come tutti gli altri eventi, vengono anonimizzati/rimossi al limite di retention di ~12 mesi (vedi [`gdpr_e_legale.md`](./gdpr_e_legale.md)).
+
+**Nota sul caso identitario**: il ban "cis man" **non è** un evento di reputazione (sez. 4.3 — segnalazione grave → ban diretto, fuori dal sistema). Quindi, di norma, nel caso identitario non c'è nessun evento di reputazione da marcare "annullato": la persona riparata non si ritrova alcuna traccia reputazionale del torto subito. Il marcatore "annullato" riguarda quasi esclusivamente i casi comportamentali (warning/mute pregressi azzerati dopo un ban ribaltato).
+
+**Appello dei singoli warning/mute**: al momento non esiste una procedura d'appello per il singolo warning o mute — l'appello è riservato ai ban (vedi [`appelli.md`](./appelli.md)). Un warning/mute eventualmente sbagliato semplicemente decade nei suoi 3/6 mesi. Se in futuro emergesse il bisogno di contestare i singoli eventi lievi, andrà aggiunto in `appelli.md`, non qui.
