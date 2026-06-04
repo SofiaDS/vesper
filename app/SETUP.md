@@ -65,16 +65,16 @@ Dalla cartella radice del progetto (quella con i `.md` e dentro `app/`), in Git 
 > Nota: `app/.gitignore` esclude `node_modules`, `dist` e `.env.local`, quindi le
 > dipendenze pesanti e le tue chiavi NON finiscono su GitHub. Giusto così.
 
-## 5. Deploy automatico su Vercel (ogni push → online)
+## 5. Deploy automatico su Vercel (ogni push → online) DONE
 
 - [ ] Vai su https://vercel.com → accedi con GitHub → **Add New → Project** → importa il repo `vesper`.
 - [ ] **Root Directory: `app`** ← fondamentale nel monorepo: dice a Vercel di buildare solo la sottocartella dell'app, ignorando i `.md`.
 - [ ] Framework preset: **Vite** (rilevato in automatico). Build: `npm run build`, Output: `dist`.
 - [ ] In **Environment Variables** aggiungi `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (gli stessi del `.env.local`).
-- [ ] **Deploy**. Ottieni un URL tipo `https://vesper.vercel.app`.
+- [ ] **Deploy**. Ottieni un URL tipo `https://vesper-jlb7pm72z-poppi-s-projects1.vercel.app/`.
 - [ ] D'ora in poi **ogni `git push` su `main` ripubblica l'app automaticamente** in ~30s.
 
-## 6. Condividi con l'altra founder
+## 6. Condividi con l'altra founder DONE
 
 - [ ] Mandale **solo il link** Vercel. Lei lo apre nel browser del telefono.
 - [ ] (Opzionale) Su iPhone: Safari → Condividi → "Aggiungi a schermata Home"; su Android: menu → "Installa app". Diventa un'icona come un'app vera — senza store, senza installazioni complicate.
