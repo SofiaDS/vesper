@@ -3,7 +3,7 @@
 Documento dedicato alle decisioni tecniche di progetto: linguaggi, framework, servizi, infrastruttura, costi.
 Documento complementare ai file di decisioni di prodotto (vedi `README.md` per la mappa completa).
 
-Ultimo aggiornamento: 1 giugno 2026
+Ultimo aggiornamento: 4 giugno 2026
 
 ---
 
@@ -36,6 +36,21 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - **Flutter**: ottimo framework ma richiede di imparare Dart da zero
   - **Sviluppo nativo (Swift + Kotlin)**: massima qualità ma doppio lavoro, tempi 3x
   - **Java per Android**: obsoleto per app moderne, sostituito da Kotlin nel nativo
+
+### 1bis. Strategia di delivery — PWA-first (React + Vite), poi Capacitor
+
+- **Decisione (4 giugno 2026)**: si parte con una **PWA** (Progressive Web App) in **React + Vite + TypeScript**, non con React Native + Expo da subito. Il nativo arriva in un secondo momento avvolgendo lo stesso codice con **Capacitor**.
+- **Motivazione** (legata ai requisiti operativi dei founder):
+  - **Iterazione immediata**: ogni `git push` su GitHub innesca un deploy automatico su Vercel/Netlify → l'app aggiornata è online in ~30s su un URL, senza alcun passaggio da store. In locale, hot-reload istantaneo con `npm run dev`.
+  - **Test senza attrito per chi non è tecnico**: l'altra founder testa aprendo **un semplice link** nel browser (con opzione "Aggiungi a schermata Home"). Niente installazione di app, niente Expo Go/QR, niente TestFlight/inviti store.
+  - **Sfrutta la skill esistente**: esperienza FE web (React/JS) spendibile direttamente.
+  - **Nessuna policy store da gestire in fase iniziale** (utile per un'app LGBTQ+).
+  - **Backend invariato**: Supabase è identico per PWA o nativo, quindi nessun lavoro buttato nel passaggio.
+- **Contro accettati**:
+  - Su **iOS** alcune capacità native sono limitate nella PWA: web push solo se l'app è aggiunta alla Home; cattura video per verifica liveness fattibile ma meno fluida del nativo.
+  - Nessuna presenza su App Store / Play Store finché non si fa il wrap con Capacitor.
+- **Percorso nativo (più avanti)**: **Capacitor** impacchetta la stessa codebase React in app native iOS/Android, sbloccando push robuste (OneSignal), fotocamera per la verifica e presenza sugli store, **senza riscrivere il frontend**.
+- **Rapporto con la decisione 1**: React Native + Expo resta valido come opzione per il nativo, ma il percorso scelto è **PWA → Capacitor** per minimizzare il time-to-launch. La decisione 1 va letta come "stack mobile di riferimento", superata in pratica da questa per la fase MVP.
 
 ### 2. Backend — Supabase
 
