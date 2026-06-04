@@ -2,7 +2,7 @@
 
 Tutte le decisioni ancora da prendere, organizzate per priorità.
 
-Ultimo aggiornamento: 1 giugno 2026
+Ultimo aggiornamento: 4 giugno 2026
 
 ---
 
@@ -62,6 +62,14 @@ Da definire quando l'app sarà cresciuta e queste feature avranno senso:
 - **Eventi** (online o in presenza)
 - **Forum/post lunghi** (oltre alla chat in tempo reale)
 - **Buddy system** per nuove utenti (assegnazione di una "guida" tra le utenti attive)
+
+### Branding — logo e nome
+
+Pilastri decisi (vedi [`branding.md`](./branding.md)): palette **"Inchiostro & oro"** scelta, nome **Vesper** candidato forte. Resta da definire:
+
+- **Logo**: non ancora deciso. Le proposte AI sono state scartate. Prossimo passo: sviluppare il **brief strutturato** (aggettivi guida + lista "no" + vincoli tecnici) prima di nuove proposte.
+- **Conferma nome "Vesper"**: subordinata alle verifiche di disponibilità — marchio UIBM/EUIPO (classe app/social), App Store, Play Store, dominio `.it`/`.com`, social handle.
+- **Tonalità di stato e accessibilità**: definire scale di stato (success/warning/error) e verificare i contrasti AA/AAA della palette in fase di wireframe.
 
 ### Punti tecnici da decidere
 
