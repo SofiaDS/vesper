@@ -24,7 +24,7 @@ Tempo stimato: ~1-2 ore la prima volta. Spunta le caselle man mano.
   - **Project URL** → andrà in `VITE_SUPABASE_URL` DONE
   - **anon public key** → andrà in `VITE_SUPABASE_ANON_KEY` DONE
 
-## 3. Avvia l'app in locale
+## 3. Avvia l'app in locale DONE
 
 Dalla cartella `app/` in Git Bash:
 
@@ -38,10 +38,10 @@ Dovresti vedere la schermata "Vesper · Fase 0" con:
 - **"Connessione OK — lo schema del DB non è ancora stato creato"** → perfetto, è lo stato atteso adesso.
 - Se vedi "Variabili d'ambiente mancanti" → controlla `.env.local` e riavvia `npm run dev`.
 
-### Prova l'hot-reload
+### Prova l'hot-reload DONE 
 - [ ] Con `npm run dev` attivo, modifica un testo in `src/App.tsx` e salva: la pagina cambia da sola. Questo è il loop di sviluppo veloce che volevi.
 
-### (Facoltativo) verifica la tabella di prova
+### (Facoltativo) verifica la tabella di prova DONE
 Nel Supabase Dashboard → **SQL Editor**, esegui:
 ```sql
 create table pingtest (id bigint primary key generated always as identity);
@@ -49,7 +49,7 @@ create table pingtest (id bigint primary key generated always as identity);
 Ricarica l'app: ora il messaggio diventa "La tabella di prova esiste". Poi puoi
 cancellarla — lo schema vero lo progetteremo insieme nel prossimo step.
 
-## 4. Metti il codice su GitHub (modello monorepo)
+## 4. Metti il codice su GitHub (modello monorepo) DONE
 
 `app/` è una **sottocartella** del repo già esistente (docs + codice insieme):
 NON fare `git init` dentro `app/`, committi dalla **radice** del repo.
