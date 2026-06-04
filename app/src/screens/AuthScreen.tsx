@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { translateAuthError, validatePassword } from '../lib/authErrors'
 
-type Mode = 'login' | 'signup'
+type Mode = 'login' | 'signup' | 'reset'
 
 export function AuthScreen() {
   const [mode, setMode] = useState<Mode>('login')
@@ -10,8 +10,14 @@ export function AuthScreen() {
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  // Mostrato dopo signup. NB: messaggio neutro di proposito (vedi sotto).
+  // Mostrato dopo signup / richiesta reset. NB: messaggio neutro di proposito.
   const [info, setInfo] = useState<string | null>(null)
+
+  function switchMode(next: Mode) {
+    setMode(next)
+    setError(null)
+    setInfo(null)
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -45,6 +51,16 @@ export function AuthScreen() {
         )
         // Se la conferma email e' disattivata, c'e' gia' la sessione e
         // l'AuthProvider intercetta il cambio: l'app prosegue da sola.
+      } else if (mode === 'reset') {
+        // Reset password: stesso principio anti-enumeration. Supabase non
+        // rivela se l'email esiste; mostriamo SEMPRE lo stesso messaggio.
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin,
+        })
+        if (error) throw error
+        setInfo(
+          'Se l’indirizzo è corretto, ti abbiamo inviato un’email per reimpostare la password. Controlla la posta (anche lo spam).',
+        )
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -63,13 +79,18 @@ export function AuthScreen() {
     }
   }
 
+  const tagline =
+    mode === 'login'
+      ? 'Accedi'
+      : mode === 'signup'
+        ? 'Crea il tuo account'
+        : 'Reimposta la password'
+
   return (
     <main className="app">
       <header className="brand">
         <h1>Vesper</h1>
-        <p className="tagline">
-          {mode === 'login' ? 'Accedi' : 'Crea il tuo account'}
-        </p>
+        <p className="tagline">{tagline}</p>
       </header>
 
       <section className="card">
@@ -86,29 +107,41 @@ export function AuthScreen() {
             />
           </label>
 
-          <label className="field">
-            <span>Password</span>
-            <input
-              type="password"
-              autoComplete={
-                mode === 'login' ? 'current-password' : 'new-password'
-              }
-              required
-              minLength={mode === 'signup' ? 8 : undefined}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={
-                mode === 'signup'
-                  ? 'min 8 caratteri, lettere e numeri'
-                  : 'la tua password'
-              }
-            />
-            {mode === 'signup' && (
-              <span className="hint">
-                Almeno 8 caratteri, con lettere e numeri.
-              </span>
-            )}
-          </label>
+          {mode !== 'reset' && (
+            <label className="field">
+              <span>Password</span>
+              <input
+                type="password"
+                autoComplete={
+                  mode === 'login' ? 'current-password' : 'new-password'
+                }
+                required
+                minLength={mode === 'signup' ? 8 : undefined}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={
+                  mode === 'signup'
+                    ? 'min 8 caratteri, lettere e numeri'
+                    : 'la tua password'
+                }
+              />
+              {mode === 'signup' && (
+                <span className="hint">
+                  Almeno 8 caratteri, con lettere e numeri.
+                </span>
+              )}
+            </label>
+          )}
+
+          {mode === 'login' && (
+            <button
+              type="button"
+              className="link forgot"
+              onClick={() => switchMode('reset')}
+            >
+              Password dimenticata?
+            </button>
+          )}
 
           {error && <p className="err">{error}</p>}
           {info && <p className="ok">{info}</p>}
@@ -118,24 +151,35 @@ export function AuthScreen() {
               ? 'Attendi…'
               : mode === 'login'
                 ? 'Accedi'
-                : 'Registrati'}
+                : mode === 'signup'
+                  ? 'Registrati'
+                  : 'Invia link di reset'}
           </button>
         </form>
 
-        <p className="switch">
-          {mode === 'login' ? 'Non hai un account?' : 'Hai già un account?'}{' '}
-          <button
-            type="button"
-            className="link"
-            onClick={() => {
-              setMode(mode === 'login' ? 'signup' : 'login')
-              setError(null)
-              setInfo(null)
-            }}
-          >
-            {mode === 'login' ? 'Registrati' : 'Accedi'}
-          </button>
-        </p>
+        {mode === 'reset' ? (
+          <p className="switch">
+            Ti sei ricordata la password?{' '}
+            <button
+              type="button"
+              className="link"
+              onClick={() => switchMode('login')}
+            >
+              Torna ad accedere
+            </button>
+          </p>
+        ) : (
+          <p className="switch">
+            {mode === 'login' ? 'Non hai un account?' : 'Hai già un account?'}{' '}
+            <button
+              type="button"
+              className="link"
+              onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
+            >
+              {mode === 'login' ? 'Registrati' : 'Accedi'}
+            </button>
+          </p>
+        )}
       </section>
     </main>
   )

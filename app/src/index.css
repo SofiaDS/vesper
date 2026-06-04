@@ -332,3 +332,155 @@ code {
   margin-top: 0;
   flex-shrink: 0;
 }
+
+/* --- Lobby / elenco stanze --- */
+.rooms {
+  text-align: left;
+  max-width: 480px;
+}
+
+.rooms-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(232, 177, 78, 0.18);
+}
+
+.rooms-brand {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+}
+
+.rooms-header .link {
+  margin-top: 0;
+}
+
+.room-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.room-card {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  border-radius: 12px;
+  background: rgba(247, 239, 221, 0.04);
+  overflow: hidden;
+}
+
+.room-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.85rem 1rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.room-main:disabled {
+  cursor: default;
+}
+
+.room-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.room-desc {
+  font-size: 0.82rem;
+  color: var(--cream);
+  opacity: 0.6;
+  line-height: 1.35;
+}
+
+.room-action {
+  display: flex;
+  align-items: center;
+  padding-right: 0.75rem;
+}
+
+.btn-sm {
+  margin-top: 0;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
+}
+
+.btn-sm:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.rooms-hint {
+  margin-top: 1rem;
+}
+
+/* --- Chat: pulsante indietro, titolo, orario, carica precedenti --- */
+.chat-header .back {
+  margin: 0 0.75rem 0 0;
+  white-space: nowrap;
+}
+
+.chat-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.load-older {
+  align-self: center;
+  margin: 0 0 0.5rem;
+}
+
+.msg-time {
+  align-self: flex-end;
+  font-size: 0.65rem;
+  color: var(--cream);
+  opacity: 0.45;
+  margin-top: 0.1rem;
+}
+
+/* Bottone secondario "fantasma" (es. Esci da una stanza) */
+.btn-ghost {
+  margin-top: 0;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
+  border: 1px solid rgba(236, 106, 85, 0.5);
+  border-radius: 9px;
+  background: none;
+  color: var(--coral);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-ghost:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Più bottoni affiancati nell'area azione di una stanza */
+.room-action {
+  gap: 0.4rem;
+}
+
+/* Link "Password dimenticata?" sotto il campo password */
+.forgot {
+  margin-top: -0.3rem;
+  align-self: flex-start;
+  font-size: 0.82rem;
+}

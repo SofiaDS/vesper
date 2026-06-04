@@ -48,3 +48,18 @@ export const ORIENTATION_OPTIONS: { value: Orientation; label: string }[] = [
 
 // Slug della chatroom globale a cui si fa auto-join dopo l'onboarding.
 export const FOYER_SLUG = 'foyer'
+
+// --- Chatroom ---
+export type RoomKind = 'foyer' | 'tematica'
+
+export interface Chatroom {
+  id: string
+  slug: string
+  name: string
+  description: string | null
+  kind: RoomKind
+}
+
+// Numero massimo di stanze tematiche a cui un utente puo' unirsi
+// (enforced anche dal trigger DB enforce_membership_cap).
+export const MAX_TEMATICHE = 3
