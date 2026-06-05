@@ -6,11 +6,13 @@ import { MAX_TEMATICHE, type Chatroom } from '../lib/types'
 export function RoomsScreen({
   onOpen,
   onOpenProfile,
+  onOpenAdmin,
 }: {
   onOpen: (room: Chatroom) => void
   onOpenProfile: () => void
+  onOpenAdmin: () => void
 }) {
-  const { session, profile, signOut } = useAuth()
+  const { session, profile, signOut, isStaff } = useAuth()
   const [rooms, setRooms] = useState<Chatroom[]>([])
   // Insieme degli id delle stanze a cui l'utente e' gia' iscritto.
   const [joined, setJoined] = useState<Set<string>>(new Set())
@@ -125,6 +127,11 @@ export function RoomsScreen({
           <p className="muted small-inline">Ciao {profile?.nickname}</p>
         </div>
         <div className="rooms-actions">
+          {isStaff && (
+            <button type="button" className="link" onClick={onOpenAdmin}>
+              Moderazione
+            </button>
+          )}
           <button type="button" className="link" onClick={onOpenProfile}>
             Profilo
           </button>

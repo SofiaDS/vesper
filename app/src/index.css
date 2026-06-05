@@ -908,3 +908,155 @@ code {
 .carousel-dots .dot.on {
   background: var(--gold);
 }
+
+/* ===== Area moderazione (admin / moderatore) ===== */
+.admin-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(232, 177, 78, 0.2);
+}
+
+.admin-tab {
+  border: 0;
+  background: transparent;
+  color: var(--cream);
+  opacity: 0.6;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.5rem 0.4rem;
+  border-bottom: 2px solid transparent;
+}
+
+.admin-tab.on {
+  opacity: 1;
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.admin-filter {
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.admin-filter select {
+  font: inherit;
+}
+
+.mod-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* Foto in revisione */
+.mod-photo {
+  display: flex;
+  gap: 0.8rem;
+  padding: 0.7rem;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 177, 78, 0.2);
+  background: rgba(247, 239, 221, 0.04);
+}
+
+.mod-photo-img {
+  width: 96px;
+  height: 96px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border-radius: 10px;
+  background: rgba(247, 239, 221, 0.08);
+}
+
+.mod-photo-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.mod-photo-who {
+  margin: 0;
+  font-weight: 600;
+}
+
+.mod-photo-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.2rem;
+  flex-wrap: wrap;
+}
+
+.btn-approve,
+.btn-reject {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-approve {
+  background: #7fb7a3;
+  color: var(--ink);
+}
+
+.btn-reject {
+  background: var(--coral);
+  color: var(--cream);
+}
+
+.btn-approve:disabled,
+.btn-reject:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Segnalazioni */
+.report-card {
+  padding: 0.7rem;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 177, 78, 0.2);
+  background: rgba(247, 239, 221, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.report-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+}
+
+.report-type {
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.report-reason {
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Moderatori */
+.mod-people {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.mod-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.7rem;
+  border-radius: 9px;
+  border: 1px solid rgba(232, 177, 78, 0.18);
+}
