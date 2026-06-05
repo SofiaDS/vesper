@@ -1060,3 +1060,136 @@ code {
   border-radius: 9px;
   border: 1px solid rgba(232, 177, 78, 0.18);
 }
+
+/* --- Profilo altrui: header bilanciato --- */
+.link-placeholder {
+  width: 1px;
+}
+
+/* --- Autore messaggio cliccabile + footer con segnala --- */
+.msg-author {
+  display: inline-block;
+  margin: 0 0 2px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--coral);
+  cursor: pointer;
+}
+.msg-author:hover {
+  text-decoration: underline;
+}
+.msg-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.msg-report {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--ink);
+  opacity: 0.35;
+  cursor: pointer;
+}
+.msg-report:hover {
+  opacity: 0.9;
+  color: var(--coral);
+}
+
+/* --- Modale generica (es. segnalazione) --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(23, 21, 32, 0.55);
+}
+.modal {
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 12px 40px rgba(23, 21, 32, 0.35);
+}
+.modal-title {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* --- Form di segnalazione --- */
+.report-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0 12px;
+  padding: 0;
+  border: none;
+}
+.report-reason-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+.report-note {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  border: 1px solid rgba(23, 21, 32, 0.2);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+  background: #fff;
+}
+
+/* --- Segnala foto sul carosello --- */
+.carousel-report {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(23, 21, 32, 0.55);
+  color: #fff;
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.carousel-report:hover {
+  background: var(--coral);
+}
+
+/* --- Azioni profilo altrui (blocca/sblocca) --- */
+.pf-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
