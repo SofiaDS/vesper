@@ -19,7 +19,7 @@ import {
   SMOKING_OPTIONS,
   SPORT_OPTIONS,
 } from '../../constants/options'
-import { SMOKING_LABELS, SPORT_LABELS, ZODIAC_LABELS } from '../../constants/labels'
+import { ZODIAC_LABELS } from '../../constants/labels'
 import { glyphFor, normalize, AVATAR_PRESETS } from '../../lib/profile/formatters'
 import {
   listMyPhotos,
@@ -752,7 +752,7 @@ export function ProfileEditor({
         </fieldset>
 
         {[
-          { legend: 'Alimentazione', opts: dietOpts, val: diet, name: 'diet', set: setDiet as (v: Diet | null) => void, visKey: 'show_diet' as const, label: SMOKING_LABELS },
+          { legend: 'Alimentazione', opts: dietOpts, val: diet, name: 'diet', set: setDiet as (v: Diet | null) => void, visKey: 'show_diet' as const },
           { legend: 'Religione & credo', opts: religionOpts, val: religion, name: 'religion', set: setReligion as (v: Religion | null) => void, visKey: 'show_religion' as const, label: null },
           { legend: 'Orientamento politico', opts: politicsOpts, val: politics, name: 'politics', set: setPolitics as (v: Politics | null) => void, visKey: 'show_politics' as const, label: null },
         ].map(({ legend, opts, val, name, set, visKey }) => (
