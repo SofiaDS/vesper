@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 // Dialog per aggiungere una foto profilo: scelta sorgente (selfie in-app o
 // galleria) + ritaglio quadrato (zoom + trascinamento). Produce un JPEG Blob
-// gia' quadrato, che il chiamante carica con uploadPhotoFromBlob.
+// gia' quadrato e senza metadati EXIF, che il chiamante carica con uploadPhotoFromBlob.
 
 const OUTPUT_SIZE = 1024 // lato del JPEG quadrato finale
 const BOX = 300 // lato dell'area di ritaglio a schermo (px logici)
@@ -185,6 +185,7 @@ export function PhotoUploadDialog({
       if (!ctx) throw new Error('Elaborazione non disponibile.')
       const r = OUTPUT_SIZE / BOX
       const { w, h } = geom(img, zoom)
+      // Disegna l'area ritagliata sul canvas (no EXIF: canvas.toBlob non copia metadati).
       ctx.drawImage(img, offset.x * r, offset.y * r, w * r, h * r)
       const blob = await new Promise<Blob | null>((res) =>
         out.toBlob(res, 'image/jpeg', JPEG_QUALITY),
