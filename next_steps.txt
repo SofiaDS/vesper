@@ -1,0 +1,33 @@
+Prossima sessione — cosa implementare
+Bug (da fixare subito)
+BUG-1: Textarea segnalazione — testo bianco su sfondo bianco
+Il <textarea> in ReportDialog probabilmente manca della classe .textarea o della regola color: var(--cream).
+
+BUG-2: Avatar non visibile accanto al nome in chat
+ChatScreen mostra solo il nickname testuale nel .msg-author. Il sistema avatar (emoji/glifo da avatar_preset + accent_color) esiste già in formatters.ts — serve estendere useChatCache con un avatarCache e affiancare il mini-bubble al nickname.
+
+BUG-1: in moderazione i pulsanti "azione presa, rivista archivia" non sono molto chiari. Vorrei che la scelta fosse tra:
+- segnalazione confermata
+- segnalazione rigettata
+- segnalazione che richiede ulteriore revisione (possibilmente da altro moderatore / founder)
+
+Priorità alta
+P1. Migrations mancanti — public_profiles (view), user_blocks, user_roles, reports esistono nel DB ma non come file migration. Il progetto non si ricostruisce da zero.
+
+P2. VerificationScreen — restituisce null. Senza di essa nessuna utente può completare l'onboarding. Flusso già documentato nel file.
+
+P3. Block → DM — Se A blocca B, la conversazione DM rimane visibile e scrivibile. Va filtrata in DmScreen e bloccato sendDmMessage.
+
+P4. promote_my_layer al login — La promozione scatta solo mandando un messaggio. Va aggiunta una chiamata silenziosa in AuthProvider all'init del profilo.
+
+Priorità media
+P5. Filtro DM nelle impostazioni profilo — dm_filter non ha UI in ProfileEditor, gli utenti non possono cambiarlo.
+
+P6. Badge richieste DM non lette — Il bottone "Messaggi" in RoomsScreen non mostra quante richieste in arrivo ci sono.
+
+P7. Annullamento reputazione in appello — Il DB supporta annulled_appeal ma non c'è bottone in ReputationModeration.
+
+Priorità bassa
+P8. Vouching system — lib/vouching/index.ts tutto TODO (non bloccante al lancio)
+P9. Lista utenti iscritti/online alla chat — TODO esplicito in chatroom.md
+P10. decayExpiredEvents come Edge Function schedulata — cleanup GDPR mensile
