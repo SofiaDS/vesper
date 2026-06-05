@@ -38,7 +38,7 @@ export function AuthScreen() {
         const { error } = await supabase.auth.signUp({ email, password })
         if (error) throw error
         setInfo(
-          'Se l'indirizzo è corretto, ti abbiamo inviato un'email con il link di conferma. Controlla la posta (anche lo spam).',
+          "Se l'indirizzo è corretto, ti abbiamo inviato un'email con il link di conferma. Controlla la posta (anche lo spam).",
         )
       } else if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -46,7 +46,7 @@ export function AuthScreen() {
         })
         if (error) throw error
         setInfo(
-          'Se l'indirizzo è corretto, ti abbiamo inviato un'email per reimpostare la password. Controlla la posta (anche lo spam).',
+          "Se l'indirizzo è corretto, ti abbiamo inviato un'email per reimpostare la password. Controlla la posta (anche lo spam).",
         )
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
