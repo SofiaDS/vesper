@@ -67,9 +67,9 @@ La struttura iniziale prevedeva **1 globale + 2 tematiche**, con un ballottaggio
 
 ## 4. Espansione e principio di potatura
 
-### Espansione futura
+### Espansione futura 
 
-Nuove chat tematiche specifiche verranno aggiunte quando la community crescerà e mostrerà bisogni chiari.
+Nuove chat tematiche specifiche verranno aggiunte quando la community crescerà e mostrerà bisogni chiari.dcdced
 
 Esempi di chat che potrebbero nascere col tempo (ma NON al lancio):
 - Coming out / questioning
