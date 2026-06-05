@@ -52,15 +52,15 @@ import { ErrorBoundary } from '../components/ErrorBoundary'
 // (vedi profilo_utente.md sez. 4 / branding.md). La chiave viene salvata; il
 // glifo e' solo la resa visiva provvisoria.
 const AVATAR_PRESETS: { key: string; glyph: string }[] = [
-  { key: 'luna', glyph: '\U0001F319' },
+  { key: 'luna', glyph: '🌙' },
   { key: 'stella', glyph: '⭐' },
-  { key: 'foglia', glyph: '\U0001F33F' },
-  { key: 'onda', glyph: '\U0001F30A' },
-  { key: 'prisma', glyph: '\U0001F52E' },
-  { key: 'fiore', glyph: '\U0001F338' },
-  { key: 'farfalla', glyph: '\U0001F98B' },
-  { key: 'fiamma', glyph: '\U0001F525' },
-]
+  { key: 'foglia', glyph: '🌿' },
+  { key: 'onda', glyph: '🌊' },
+  { key: 'prisma', glyph: '🔮' },
+  { key: 'fiore', glyph: '🌸' },
+  { key: 'farfalla', glyph: '🦋' },
+  { key: 'fiamma', glyph: '🔥' },
+];
 
 const ACCENT_COLORS = ['#E8B14E', '#EC6A55', '#7FB7A3', '#9B8CE0', '#E08CB5']
 
