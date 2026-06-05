@@ -88,3 +88,7 @@ Le chat tematiche **non sono per sempre**. Ogni 3-6 mesi rivedere:
 
 - **Segmentazione per città/regione**: rimandata, valutare quando si superano ~500-1000 utenti attive.
 - **Limite di utenti contemporanei prima di sdoppiare la room**: da definire più avanti con dati reali.
+
+### TODO
+- **Aggiunta lista utenti online**
+- **Aggiunta lista utenti iscritti alla chat** questa vale solo per chat tematiche.
