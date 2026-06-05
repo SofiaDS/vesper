@@ -1,6 +1,6 @@
 Prossima sessione — cosa implementare
 Bug (da fixare subito)
-BUG-1: Textarea segnalazione — testo bianco su sfondo bianco
+BUG-1: Textarea segnalazione — testo bianco su sfondo bianco DONE
 Il <textarea> in ReportDialog probabilmente manca della classe .textarea o della regola color: var(--cream).
 
 BUG-2: Avatar non visibile accanto al nome in chat
