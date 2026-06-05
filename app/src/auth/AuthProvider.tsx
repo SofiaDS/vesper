@@ -7,8 +7,13 @@ import {
   type ReactNode,
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
 import type { Profile } from '../lib/types'
+import { supabase } from '../lib/supabase'
+import {
+  getCurrentSession,
+  subscribeAuthChanges,
+  signOut,
+} from "./authService"
 
 interface AuthState {
   loading: boolean
@@ -90,24 +95,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function signOut(): Promise<void> {
-    await supabase.auth.signOut()
-  }
-
   useEffect(() => {
     active.current = true
 
     // 1) Sessione iniziale: carichiamo il profilo PRIMA di togliere il
     //    "loading", cosi' l'app non mostra mai uno schermo intermedio sbagliato.
     async function init() {
-      const { data } = await supabase.auth.getSession()
+      const session = await getCurrentSession()
       if (!active.current) return
-      setSession(data.session)
-      currentUserId.current = data.session?.user?.id ?? null
-      if (data.session?.user) {
+
+      setSession(session)
+      currentUserId.current = session?.user?.id ?? null
+
+      if (session?.user) {
         await Promise.all([
-          loadProfile(data.session.user.id),
-          loadRoles(data.session.user.id),
+          loadProfile(session.user.id),
+          loadRoles(session.user.id),
         ])
       }
       if (active.current) setLoading(false)
@@ -115,8 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     init()
 
     // 2) Cambi di stato (login/logout/refresh token/recovery).
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
+    const sub = subscribeAuthChanges(
+      (newSession, event) =>  {
         if (!active.current) return
 
         // Link di reset password: mostra la schermata "nuova password".
@@ -154,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       active.current = false
-      sub.subscription.unsubscribe()
+      sub.unsubscribe()
     }
   }, [])
 
