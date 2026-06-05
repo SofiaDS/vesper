@@ -5,6 +5,7 @@ import { useChatCache } from '../hooks/useChatCache'
 import { useChatMessages } from '../hooks/useChatMessages'
 import { useChatRealtime } from '../hooks/useChatRealtime'
 import { ReportDialog } from '../components/ReportDialog'
+import { promoteLayer } from '../lib/layers'
 import type { Chatroom } from '../types'
 import type { ChatMessage } from '../hooks/useChatMessages'
 
@@ -24,7 +25,7 @@ export function ChatScreen({
   onBack: () => void
   onOpenProfile: (userId: string) => void
 }) {
-  const { session, profile } = useAuth()
+  const { session, profile, refreshProfile } = useAuth()
   const [sending, setSending] = useState(false)
   const [text, setText] = useState('')
   const [reportMsg, setReportMsg] = useState<ChatMessage | null>(null)
@@ -91,6 +92,9 @@ export function ChatScreen({
         })
       }
       setText('')
+      promoteLayer().then((newLayer) => {
+        if (newLayer !== profile?.strato) refreshProfile()
+      }).catch(() => { /* promozione fallita silenziosamente */ })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invio non riuscito.')
     } finally {
