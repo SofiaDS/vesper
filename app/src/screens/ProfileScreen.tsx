@@ -509,7 +509,7 @@ function ProfileEditor({
     }
     // La città deve essere scelta dall'elenco (o lasciata vuota).
     if (cityQuery.trim() && !citySelected.current) {
-      setError('Seleziona la città dall'elenco dei suggerimenti.')
+      setError("Seleziona la città dall'elenco dei suggerimenti.")
       return
     }
 
