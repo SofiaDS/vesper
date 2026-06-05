@@ -1156,11 +1156,22 @@ code {
   width: 100%;
   box-sizing: border-box;
   resize: vertical;
-  border: 1px solid rgba(23, 21, 32, 0.2);
-  border-radius: 10px;
-  padding: 8px 10px;
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  border-radius: 9px;
+  padding: 0.65rem 0.75rem;
   font: inherit;
-  background: #fff;
+  background: rgba(247, 239, 221, 0.04);
+  color: var(--cream);
+}
+
+.report-note::placeholder {
+  color: var(--cream);
+  opacity: 0.35;
+}
+
+.report-note:focus {
+  outline: none;
+  border-color: var(--gold);
 }
 
 /* --- Segnala foto sul carosello --- */
