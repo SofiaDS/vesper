@@ -6,21 +6,14 @@ import {
   INTENT_OPTIONS,
   SMOKING_OPTIONS,
   SPORT_OPTIONS,
-  ZODIAC_LABELS,
-  type IdentityCategory,
-  type Orientation,
-  type Intent,
-  type Smoking,
-  type Sport,
-  type Zodiac,
-} from '../lib/types'
-import { PhotoCarousel, glyphFor } from './ProfileScreen'
+} from '../constants/options'
+import { ZODIAC_LABELS } from '../constants/labels'
+import { glyphFor, labelOf, labelsOf } from '../lib/profile/formatters'
+import { PhotoCarousel } from '../components/PhotoCarousel'
 import { ReportDialog } from '../components/ReportDialog'
 import { blockUser, unblockUser, isBlocked } from '../lib/blocks'
+import type { IdentityCategory, Orientation, Intent, Smoking, Sport, Zodiac } from '../types'
 
-// La view public_profiles maschera ogni campo secondo i flag show_* della
-// persona: i campi nascosti tornano null. Qui mostriamo solo cio' che e'
-// presente, senza dover conoscere i flag.
 type PublicProfile = {
   id: string
   nickname: string
@@ -46,27 +39,7 @@ type PublicProfile = {
 const COLS =
   'id, nickname, avatar_preset, accent_color, bio, interests, birth_date, age, identity_category, orientations, city, city_province, city_region, pronouns, intents, smoking, sport, zodiac, is_self'
 
-function labelOf<T extends string>(
-  opts: { value: T; label: string }[],
-  v: T,
-): string {
-  return opts.find((o) => o.value === v)?.label ?? v
-}
-
-function labelsOf<T extends string>(
-  opts: { value: T; label: string }[],
-  vs: T[],
-): string {
-  return vs.map((v) => labelOf(opts, v)).join(', ')
-}
-
-function Row({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="pf-row">
       <span className="pf-label">{label}</span>
@@ -107,9 +80,7 @@ export function PublicProfileScreen({
       else setP(data as PublicProfile)
       setLoading(false)
     })()
-    return () => {
-      alive = false
-    }
+    return () => { alive = false }
   }, [userId])
 
   useEffect(() => {
@@ -117,9 +88,7 @@ export function PublicProfileScreen({
     isBlocked(userId)
       .then((b) => alive && setBlocked(b))
       .catch(() => {})
-    return () => {
-      alive = false
-    }
+    return () => { alive = false }
   }, [userId])
 
   async function toggleBlock() {
@@ -133,7 +102,7 @@ export function PublicProfileScreen({
         setBlocked(true)
       }
     } catch {
-      // silenzioso: l'utente puo' riprovare
+      // silenzioso: l'utente può riprovare
     } finally {
       setBlockBusy(false)
     }
@@ -142,11 +111,7 @@ export function PublicProfileScreen({
   const rows: React.ReactNode[] = []
   if (p) {
     if (p.pronouns)
-      rows.push(
-        <Row key="pron" label="Pronomi">
-          {p.pronouns}
-        </Row>,
-      )
+      rows.push(<Row key="pron" label="Pronomi">{p.pronouns}</Row>)
     if (p.city)
       rows.push(
         <Row key="city" label="Città">
@@ -156,11 +121,7 @@ export function PublicProfileScreen({
         </Row>,
       )
     if (p.age != null)
-      rows.push(
-        <Row key="age" label="Età">
-          {p.age} anni
-        </Row>,
-      )
+      rows.push(<Row key="age" label="Età">{p.age} anni</Row>)
     if (p.birth_date)
       rows.push(
         <Row key="bd" label="Data di nascita">
@@ -169,46 +130,24 @@ export function PublicProfileScreen({
       )
     if (p.identity_category)
       rows.push(
-        <Row key="id" label="Identità">
-          {labelOf(IDENTITY_OPTIONS, p.identity_category)}
-        </Row>,
+        <Row key="id" label="Identità">{labelOf(IDENTITY_OPTIONS, p.identity_category)}</Row>,
       )
     if (p.orientations && p.orientations.length > 0)
       rows.push(
-        <Row key="or" label="Orientamento">
-          {labelsOf(ORIENTATION_OPTIONS, p.orientations)}
-        </Row>,
+        <Row key="or" label="Orientamento">{labelsOf(ORIENTATION_OPTIONS, p.orientations)}</Row>,
       )
     if (p.intents && p.intents.length > 0)
       rows.push(
-        <Row key="in" label="Cosa cerca">
-          {labelsOf(INTENT_OPTIONS, p.intents)}
-        </Row>,
+        <Row key="in" label="Cosa cerca">{labelsOf(INTENT_OPTIONS, p.intents)}</Row>,
       )
     if (p.interests && p.interests.length > 0)
-      rows.push(
-        <Row key="int" label="Interessi">
-          {p.interests.join(', ')}
-        </Row>,
-      )
+      rows.push(<Row key="int" label="Interessi">{p.interests.join(', ')}</Row>)
     if (p.smoking)
-      rows.push(
-        <Row key="sm" label="Fumo">
-          {labelOf(SMOKING_OPTIONS, p.smoking)}
-        </Row>,
-      )
+      rows.push(<Row key="sm" label="Fumo">{labelOf(SMOKING_OPTIONS, p.smoking)}</Row>)
     if (p.sport)
-      rows.push(
-        <Row key="sp" label="Sport">
-          {labelOf(SPORT_OPTIONS, p.sport)}
-        </Row>,
-      )
+      rows.push(<Row key="sp" label="Sport">{labelOf(SPORT_OPTIONS, p.sport)}</Row>)
     if (p.zodiac)
-      rows.push(
-        <Row key="zo" label="Segno">
-          {ZODIAC_LABELS[p.zodiac]}
-        </Row>,
-      )
+      rows.push(<Row key="zo" label="Segno">{ZODIAC_LABELS[p.zodiac]}</Row>)
   }
 
   return (
@@ -219,11 +158,7 @@ export function PublicProfileScreen({
         </button>
         <h1 className="rooms-brand">Profilo</h1>
         {p && !p.is_self ? (
-          <button
-            type="button"
-            className="link"
-            onClick={() => setReporting(true)}
-          >
+          <button type="button" className="link" onClick={() => setReporting(true)}>
             Segnala
           </button>
         ) : (
@@ -239,9 +174,7 @@ export function PublicProfileScreen({
           <div className="avatar-preview">
             <PhotoCarousel
               userId={p.id}
-              onReportPhoto={
-                p.is_self ? undefined : (id) => setReportPhotoId(id)
-              }
+              onReportPhoto={p.is_self ? undefined : (id) => setReportPhotoId(id)}
               fallback={
                 <span
                   className="avatar-bubble"
@@ -259,9 +192,7 @@ export function PublicProfileScreen({
           {rows.length > 0 ? (
             <div className="pf-rows">{rows}</div>
           ) : (
-            <p className="hint">
-              Questa persona ha scelto di mostrare solo nickname e avatar.
-            </p>
+            <p className="hint">Questa persona ha scelto di mostrare solo nickname e avatar.</p>
           )}
 
           {!p.is_self && (

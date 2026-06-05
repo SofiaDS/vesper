@@ -1,0 +1,23 @@
+// Regioni italiane (formato identico ai valori in `comuni.regione`).
+export const REGIONS: string[] = [
+  'Abruzzo',
+  'Basilicata',
+  'Calabria',
+  'Campania',
+  'Emilia-Romagna',
+  'Friuli-Venezia Giulia',
+  'Lazio',
+  'Liguria',
+  'Lombardia',
+  'Marche',
+  'Molise',
+  'Piemonte',
+  'Puglia',
+  'Sardegna',
+  'Sicilia',
+  'Toscana',
+  'Trentino-Alto Adige/Südtirol',
+  'Umbria',
+  "Valle d'Aosta/Vallée d'Aoste",
+  'Veneto',
+]
