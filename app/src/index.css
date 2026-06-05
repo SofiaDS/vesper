@@ -1009,6 +1009,31 @@ code {
 }
 
 /* Segnalazioni */
+.report-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.report-actions .btn-approve,
+.report-actions .btn-reject {
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  text-align: left;
+}
+
+.report-actions .btn-primary {
+  width: 100%;
+  text-align: left;
+  margin-top: 0;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.85rem;
+  border: 1px solid rgba(232, 177, 78, 0.4);
+  background: rgba(232, 177, 78, 0.1);
+  color: var(--gold);
+}
+
 .report-card {
   padding: 0.7rem;
   border-radius: 12px;

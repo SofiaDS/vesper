@@ -18,6 +18,12 @@ const REPORT_TARGET_LABEL: Record<string, string> = {
   photo:   'Foto',
 }
 
+const REPORT_STATUS_LABEL: Record<string, string> = {
+  actioned: 'Confermata',
+  dismissed: 'Rigettata',
+  reviewed: 'In revisione',
+}
+
 const REP_EVENT_LABELS: Record<ReputationEventType, string> = {
   warning:   'Warning (−1)',
   mute_temp: 'Mute (−3)',
@@ -159,9 +165,9 @@ export function ReportsModeration() {
             onChange={(e) => setFilter(e.target.value as ReportStatus | 'all')}
           >
             <option value="open">Aperte</option>
-            <option value="reviewed">Riviste</option>
-            <option value="actioned">Con azione</option>
-            <option value="dismissed">Archiviate</option>
+            <option value="reviewed">In revisione</option>
+            <option value="actioned">Confermate</option>
+            <option value="dismissed">Rigettate</option>
             <option value="all">Tutte</option>
           </select>
         </label>
@@ -190,34 +196,39 @@ export function ReportsModeration() {
             </p>
             {r.reason && <p className="report-reason">{r.reason}</p>}
             {r.status === 'open' ? (
-              <div className="mod-photo-actions">
+              <div className="report-actions">
                 <button
                   type="button"
                   className="btn-approve"
                   onClick={() => resolve(r.id, 'actioned')}
                   disabled={busy === r.id}
+                  title="Violazione confermata — verrà applicata un'azione"
                 >
-                  Azione presa
+                  {busy === r.id ? 'Attendi…' : 'Segnalazione confermata'}
                 </button>
                 <button
                   type="button"
-                  className="link"
-                  onClick={() => resolve(r.id, 'reviewed')}
-                  disabled={busy === r.id}
-                >
-                  Rivista
-                </button>
-                <button
-                  type="button"
-                  className="link"
+                  className="btn-reject"
                   onClick={() => resolve(r.id, 'dismissed')}
                   disabled={busy === r.id}
+                  title="Nessuna violazione riscontrata — segnalazione archiviata"
                 >
-                  Archivia
+                  Segnalazione rigettata
+                </button>
+                <button
+                  type="button"
+                  className="btn-primary btn-sm"
+                  onClick={() => resolve(r.id, 'reviewed')}
+                  disabled={busy === r.id}
+                  title="Caso borderline o grave — richiede secondo parere"
+                >
+                  Richiede revisione
                 </button>
               </div>
             ) : (
-              <p className="muted small-inline">Stato: {r.status}</p>
+              <p className="muted small-inline">
+                {REPORT_STATUS_LABEL[r.status] ?? r.status}
+              </p>
             )}
           </div>
         ))

@@ -3,7 +3,7 @@ Bug (da fixare subito)
 BUG-1: Textarea segnalazione — testo bianco su sfondo bianco DONE
 Il <textarea> in ReportDialog probabilmente manca della classe .textarea o della regola color: var(--cream).
 
-BUG-2: Avatar non visibile accanto al nome in chat
+BUG-2: Avatar non visibile accanto al nome in chat DONE
 ChatScreen mostra solo il nickname testuale nel .msg-author. Il sistema avatar (emoji/glifo da avatar_preset + accent_color) esiste già in formatters.ts — serve estendere useChatCache con un avatarCache e affiancare il mini-bubble al nickname.
 
 BUG-1: in moderazione i pulsanti "azione presa, rivista archivia" non sono molto chiari. Vorrei che la scelta fosse tra:
