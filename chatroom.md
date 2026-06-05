@@ -65,7 +65,7 @@ La struttura iniziale prevedeva **1 globale + 2 tematiche**, con un ballottaggio
 
 ---
 
-## 4. Espansione e principio di potatura
+## 4. Espansione e principio di potatura oioi
 
 ### Espansione futura 
 
