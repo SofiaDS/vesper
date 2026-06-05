@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import {
@@ -19,6 +19,17 @@ import {
   type Sport,
   type Profile,
 } from '../lib/types'
+import {
+  listMyPhotos,
+  listApprovedPhotos,
+  uploadPhoto,
+  deletePhoto,
+  setPrimary,
+  signedUrls,
+  MAX_PHOTOS,
+  type ProfilePhoto,
+  type PhotoStatus,
+} from '../lib/photos'
 
 // Avatar preset: placeholder funzionanti finche' non arriva l'art definitiva
 // (vedi profilo_utente.md sez. 4 / branding.md). La chiave viene salvata; il
@@ -226,12 +237,17 @@ function ProfilePreview({
 
       <div className="profile-card">
         <div className="avatar-preview">
-          <span
-            className="avatar-bubble"
-            style={{ background: profile.accent_color ?? 'var(--gold)' }}
-          >
-            {glyphFor(profile.avatar_preset, profile.nickname)}
-          </span>
+          <PhotoCarousel
+            userId={profile.id}
+            fallback={
+              <span
+                className="avatar-bubble"
+                style={{ background: profile.accent_color ?? 'var(--gold)' }}
+              >
+                {glyphFor(profile.avatar_preset, profile.nickname)}
+              </span>
+            }
+          />
           <span className="pf-nick">@{profile.nickname}</span>
         </div>
 
@@ -474,6 +490,8 @@ function ProfileEditor({
           </span>
           <span className="muted small-inline">@{nickname || '—'}</span>
         </div>
+
+        <PhotoManager userId={profile.id} />
 
         <fieldset className="field">
           <legend>Avatar</legend>
@@ -908,5 +926,224 @@ function ProfileEditor({
         </div>
       </form>
     </main>
+  )
+}
+
+// --- Gestione foto nell'editor (upload / elimina / principale) ---
+
+const PHOTO_STATUS_LABEL: Record<PhotoStatus, string> = {
+  pending: 'In revisione',
+  approved: 'Approvata',
+  rejected: 'Rifiutata',
+}
+
+function PhotoManager({ userId }: { userId: string }) {
+  const [photos, setPhotos] = useState<ProfilePhoto[]>([])
+  const [urls, setUrls] = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement | null>(null)
+
+  async function reload() {
+    const list = await listMyPhotos(userId)
+    setPhotos(list)
+    setUrls(await signedUrls(list.map((p) => p.storage_path)))
+  }
+
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const list = await listMyPhotos(userId)
+        if (!alive) return
+        setPhotos(list)
+        const map = await signedUrls(list.map((p) => p.storage_path))
+        if (alive) setUrls(map)
+      } catch (e) {
+        if (alive) setErr(e instanceof Error ? e.message : 'Errore foto.')
+      } finally {
+        if (alive) setLoading(false)
+      }
+    })()
+    return () => {
+      alive = false
+    }
+  }, [userId])
+
+  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setErr(null)
+    setBusy(true)
+    try {
+      await uploadPhoto(userId, file)
+      await reload()
+    } catch (e2) {
+      setErr(e2 instanceof Error ? e2.message : 'Caricamento non riuscito.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function run(fn: () => Promise<void>, msg: string) {
+    setErr(null)
+    setBusy(true)
+    try {
+      await fn()
+      await reload()
+    } catch (e2) {
+      setErr(e2 instanceof Error ? e2.message : msg)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <fieldset className="field">
+      <legend>
+        Foto{' '}
+        <span className="muted">
+          ({photos.length}/{MAX_PHOTOS})
+        </span>
+      </legend>
+      {loading ? (
+        <p className="hint">Carico le foto…</p>
+      ) : (
+        <div className="photo-grid">
+          {photos.map((p) => (
+            <div
+              key={p.id}
+              className={p.is_primary ? 'photo-cell primary' : 'photo-cell'}
+            >
+              {urls[p.storage_path] ? (
+                <img className="photo-thumb" src={urls[p.storage_path]} alt="" />
+              ) : (
+                <div className="photo-thumb ph" />
+              )}
+              <span className={`photo-badge ${p.status}`}>
+                {PHOTO_STATUS_LABEL[p.status]}
+              </span>
+              <div className="photo-actions">
+                <button
+                  type="button"
+                  className="photo-star"
+                  onClick={() => run(() => setPrimary(userId, p.id), 'Operazione non riuscita.')}
+                  disabled={busy || p.is_primary}
+                  title="Imposta come principale"
+                  aria-label="Imposta come principale"
+                >
+                  {p.is_primary ? '★' : '☆'}
+                </button>
+                <button
+                  type="button"
+                  className="photo-del"
+                  onClick={() => run(() => deletePhoto(p), 'Eliminazione non riuscita.')}
+                  disabled={busy}
+                  title="Elimina"
+                  aria-label="Elimina foto"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          ))}
+          {photos.length < MAX_PHOTOS && (
+            <button
+              type="button"
+              className="photo-add"
+              onClick={() => fileRef.current?.click()}
+              disabled={busy}
+            >
+              <span className="photo-add-plus">{busy ? '…' : '+'}</span>
+              <span>Aggiungi</span>
+            </button>
+          )}
+        </div>
+      )}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={onPick}
+      />
+      <span className="hint">
+        La prima è la principale (★). Le foto restano <em>in revisione</em>{' '}
+        finché non vengono approvate: gli altri le vedono solo dopo l’ok.
+      </span>
+      {err && <p className="err">{err}</p>}
+    </fieldset>
+  )
+}
+
+// --- Carosello foto in anteprima (solo foto approvate, principale per prima) ---
+
+function PhotoCarousel({
+  userId,
+  fallback,
+}: {
+  userId: string
+  fallback: React.ReactNode
+}) {
+  const [urls, setUrls] = useState<string[]>([])
+  const [idx, setIdx] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const list = await listApprovedPhotos(userId)
+        const map = await signedUrls(list.map((p) => p.storage_path))
+        const ordered = list
+          .map((p) => map[p.storage_path])
+          .filter((u): u is string => Boolean(u))
+        if (alive) setUrls(ordered)
+      } catch {
+        // in anteprima ignoriamo gli errori: si mostra il fallback
+      } finally {
+        if (alive) setLoading(false)
+      }
+    })()
+    return () => {
+      alive = false
+    }
+  }, [userId])
+
+  if (loading) return <div className="carousel loading" />
+  if (urls.length === 0) return <>{fallback}</>
+
+  const safe = Math.min(idx, urls.length - 1)
+  return (
+    <div className="carousel">
+      <img className="carousel-img" src={urls[safe]} alt="Foto profilo" />
+      {urls.length > 1 && (
+        <>
+          <button
+            type="button"
+            className="carousel-nav prev"
+            onClick={() => setIdx((safe - 1 + urls.length) % urls.length)}
+            aria-label="Foto precedente"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            className="carousel-nav next"
+            onClick={() => setIdx((safe + 1) % urls.length)}
+            aria-label="Foto successiva"
+          >
+            ›
+          </button>
+          <div className="carousel-dots">
+            {urls.map((_, i) => (
+              <span key={i} className={i === safe ? 'dot on' : 'dot'} />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
   )
 }
