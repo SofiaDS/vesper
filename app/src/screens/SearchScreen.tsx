@@ -23,6 +23,17 @@ import { glyphFor } from './ProfileScreen'
 
 type Tab = 'nickname' | 'filtri'
 
+const STORAGE_KEY = 'vesper_search_filters'
+
+interface StoredSearchState {
+  tab: Tab
+  nick: string
+  filters: SearchFilters
+  ageOn: boolean
+  ageMin: number
+  ageMax: number
+}
+
 // Debounce hook: ritarda l'esecuzione di una funzione fino a quando
 // il valore non rimane stabile per il delay specificato.
 function useDebounce<T>(value: T, delay: number): T {
@@ -125,17 +136,52 @@ export function SearchScreen({
   onBack: () => void
   onOpenProfile: (userId: string) => void
 }) {
+  // Carica stato salvato da localStorage, con fallback ai valori di default
   const [tab, setTab] = useState<Tab>('nickname')
-
-  // Stato nickname.
   const [nick, setNick] = useState('')
-  const debouncedNick = useDebounce(nick, 500) // 500ms debounce
-
-  // Stato filtri.
   const [filters, setFilters] = useState<SearchFilters>({})
   const [ageOn, setAgeOn] = useState(false)
   const [ageMin, setAgeMin] = useState(18)
   const [ageMax, setAgeMax] = useState(99)
+
+  // Carica da localStorage al mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        const state: StoredSearchState = JSON.parse(stored)
+        setTab(state.tab ?? 'nickname')
+        setNick(state.nick ?? '')
+        setFilters(state.filters ?? {})
+        setAgeOn(state.ageOn ?? false)
+        setAgeMin(state.ageMin ?? 18)
+        setAgeMax(state.ageMax ?? 99)
+      }
+    } catch (e) {
+      // Ignora errori di parsing, usa i valori di default
+      console.error('Errore nel caricamento dei filtri salvati:', e)
+    }
+  }, [])
+
+  // Salva stato in localStorage ogni volta che cambia
+  useEffect(() => {
+    const state: StoredSearchState = {
+      tab,
+      nick,
+      filters,
+      ageOn,
+      ageMin,
+      ageMax,
+    }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    } catch (e) {
+      // Silenziosamente ignora se localStorage non è disponibile
+      console.error('Errore nel salvataggio dei filtri:', e)
+    }
+  }, [tab, nick, filters, ageOn, ageMin, ageMax])
+
+  const debouncedNick = useDebounce(nick, 500) // 500ms debounce
 
   // Stato risultati.
   const [results, setResults] = useState<SearchResult[]>([])
