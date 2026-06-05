@@ -60,7 +60,7 @@ export function ChatScreen({
     const missing = senderIds.filter((id) => !nicknameCache.current.has(id))
     if (missing.length === 0) return
     const { data: profs } = await supabase
-      .from('profiles')
+      .from('public_profiles')
       .select('id, nickname')
       .in('id', missing)
     for (const p of profs ?? []) {
@@ -73,7 +73,7 @@ export function ChatScreen({
     const cached = nicknameCache.current.get(senderId)
     if (cached) return cached
     const { data } = await supabase
-      .from('profiles')
+      .from('public_profiles')
       .select('nickname')
       .eq('id', senderId)
       .maybeSingle()

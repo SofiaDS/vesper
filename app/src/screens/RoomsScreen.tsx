@@ -5,8 +5,10 @@ import { MAX_TEMATICHE, type Chatroom } from '../lib/types'
 
 export function RoomsScreen({
   onOpen,
+  onOpenProfile,
 }: {
   onOpen: (room: Chatroom) => void
+  onOpenProfile: () => void
 }) {
   const { session, profile, signOut } = useAuth()
   const [rooms, setRooms] = useState<Chatroom[]>([])
@@ -122,9 +124,14 @@ export function RoomsScreen({
           <h1 className="rooms-brand">Vesper</h1>
           <p className="muted small-inline">Ciao {profile?.nickname}</p>
         </div>
-        <button type="button" className="link" onClick={signOut}>
-          Esci
-        </button>
+        <div className="rooms-actions">
+          <button type="button" className="link" onClick={onOpenProfile}>
+            Profilo
+          </button>
+          <button type="button" className="link" onClick={signOut}>
+            Esci
+          </button>
+        </div>
       </header>
 
       {loading && <p className="muted">Carico le stanze…</p>}
