@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../auth/AuthProvider'
+import { sendDmRequest } from '../lib/dm'
 import {
   IDENTITY_OPTIONS,
   ORIENTATION_OPTIONS,
@@ -55,6 +57,9 @@ export function PublicProfileScreen({
   userId: string
   onBack: () => void
 }) {
+  const { session, profile: myProfile } = useAuth()
+  const myId = session?.user.id
+
   const [p, setP] = useState<PublicProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -62,6 +67,8 @@ export function PublicProfileScreen({
   const [reportPhotoId, setReportPhotoId] = useState<string | null>(null)
   const [blocked, setBlocked] = useState(false)
   const [blockBusy, setBlockBusy] = useState(false)
+  const [dmBusy, setDmBusy] = useState(false)
+  const [dmFeedback, setDmFeedback] = useState<string | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -90,6 +97,20 @@ export function PublicProfileScreen({
       .catch(() => {})
     return () => { alive = false }
   }, [userId])
+
+  async function sendDm() {
+    if (!myId) return
+    setDmBusy(true)
+    setDmFeedback(null)
+    try {
+      await sendDmRequest(myId, userId)
+      setDmFeedback('Richiesta inviata.')
+    } catch (e) {
+      setDmFeedback(e instanceof Error ? e.message : 'Errore nell\'invio.')
+    } finally {
+      setDmBusy(false)
+    }
+  }
 
   async function toggleBlock() {
     setBlockBusy(true)
@@ -197,6 +218,19 @@ export function PublicProfileScreen({
 
           {!p.is_self && (
             <div className="pf-actions">
+              {!blocked && (myProfile?.strato ?? 0) >= 2 && (
+                <>
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={sendDm}
+                    disabled={dmBusy || dmFeedback === 'Richiesta inviata.'}
+                  >
+                    {dmBusy ? 'Invio…' : 'Manda messaggio'}
+                  </button>
+                  {dmFeedback && <p className="hint">{dmFeedback}</p>}
+                </>
+              )}
               <button
                 type="button"
                 className={blocked ? 'btn-primary' : 'btn-ghost'}
