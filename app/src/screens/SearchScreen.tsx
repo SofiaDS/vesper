@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import {
   IDENTITY_OPTIONS,
   ORIENTATION_OPTIONS,
@@ -62,21 +62,18 @@ function ChipGroup({
   )
 }
 
-// Opzioni filtro (si escludono i valori "preferisco non dire/specificare").
-const IDENTITY_F = IDENTITY_OPTIONS.filter(
-  (o) => o.value !== 'preferisco_non_specificare',
-)
-const ORIENTATION_F = ORIENTATION_OPTIONS.filter(
-  (o) => o.value !== 'preferisco_non_dire',
-)
-const SMOKING_F = SMOKING_OPTIONS.filter((o) => o.value !== 'non_dico')
-const SPORT_F = SPORT_OPTIONS.filter((o) => o.value !== 'non_dico')
-const ZODIAC_F = (Object.keys(ZODIAC_LABELS) as Zodiac[]).map((z) => ({
-  value: z,
-  label: ZODIAC_LABELS[z],
-}))
-const REGION_F = REGIONS.map((r) => ({ value: r, label: r }))
-const INTEREST_F = INTEREST_SUGGESTIONS.map((i) => ({ value: i, label: i }))
+// Loading skeleton card per i risultati
+function SkeletonCard() {
+  return (
+    <div className="search-card skeleton">
+      <span className="search-ava skeleton-ava" />
+      <span className="search-meta">
+        <span className="search-nick skeleton-text" />
+        <span className="search-place skeleton-text" style={{ width: '60%' }} />
+      </span>
+    </div>
+  )
+}
 
 function ResultCard({
   r,
@@ -146,10 +143,56 @@ export function SearchScreen({
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(false)
   const [err, setErr] = useState<string | null>(null)
-  
+
   // Traccia se è in corso una ricerca manuale (Enter o tasto Cerca) per non
   // sovrascrivere i risultati durante il debounce.
   const manualSearchRef = useRef(false)
+
+  // Memoize filtered option lists per evitare ricreazione ad ogni render
+  const IDENTITY_F = useMemo(
+    () =>
+      IDENTITY_OPTIONS.filter(
+        (o) => o.value !== 'preferisco_non_specificare',
+      ),
+    [],
+  )
+
+  const ORIENTATION_F = useMemo(
+    () =>
+      ORIENTATION_OPTIONS.filter((o) => o.value !== 'preferisco_non_dire'),
+    [],
+  )
+
+  const SMOKING_F = useMemo(
+    () => SMOKING_OPTIONS.filter((o) => o.value !== 'non_dico'),
+    [],
+  )
+
+  const SPORT_F = useMemo(
+    () => SPORT_OPTIONS.filter((o) => o.value !== 'non_dico'),
+    [],
+  )
+
+  const ZODIAC_F = useMemo(
+    () =>
+      (Object.keys(ZODIAC_LABELS) as Zodiac[]).map((z) => ({
+        value: z,
+        label: ZODIAC_LABELS[z],
+      })),
+    [],
+  )
+
+  const REGION_F = useMemo(
+    () => REGIONS.map((r) => ({ value: r, label: r })),
+    [],
+  )
+
+  const INTEREST_F = useMemo(
+    () => INTEREST_SUGGESTIONS.map((i) => ({ value: i, label: i })),
+    [],
+  )
+
+  const INTENT_F = useMemo(() => INTENT_OPTIONS, [])
 
   function toggle(key: keyof SearchFilters, v: string) {
     setFilters((f) => {
@@ -248,6 +291,9 @@ export function SearchScreen({
     manualSearchRef.current = true
     runNickname(nick.trim())
   }
+
+  // Numero di scheletri da mostrare durante il loading
+  const SKELETON_COUNT = 3
 
   return (
     <main className="app profile search-screen">
@@ -391,7 +437,7 @@ export function SearchScreen({
           <fieldset className="field">
             <legend>Cerco</legend>
             <ChipGroup
-              options={INTENT_OPTIONS}
+              options={INTENT_F}
               selected={filters.intents ?? []}
               onToggle={(v) => toggle('intents', v)}
             />
@@ -440,7 +486,12 @@ export function SearchScreen({
       {searched && (
         <div className="search-results">
           {loading && results.length === 0 ? (
-            <p className="hint">Cerco…</p>
+            // Loading skeleton cards
+            <div className="search-skeletons">
+              {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+                <SkeletonCard key={`skeleton-${i}`} />
+              ))}
+            </div>
           ) : results.length === 0 ? (
             <p className="hint">
               Nessun risultato. Forse non ci sono utenti cercabili che
