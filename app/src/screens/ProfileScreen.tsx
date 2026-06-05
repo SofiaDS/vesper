@@ -6,15 +6,30 @@ import {
   PRONOUNS_MAX,
   MAX_INTERESTS,
   IDENTITY_OPTIONS,
+  IDENTITY_LABELS,
   ORIENTATION_OPTIONS,
+  ORIENTATION_LABELS,
   INTENT_OPTIONS,
+  RELATIONSHIP_STATUS_OPTIONS,
+  RELATIONSHIP_TYPE_OPTIONS,
+  DIET_OPTIONS,
+  RELIGION_OPTIONS,
+  POLITICS_OPTIONS,
   SMOKING_OPTIONS,
+  SMOKING_LABELS,
   SPORT_OPTIONS,
+  SPORT_LABELS,
+  INTEREST_CATEGORIES,
   INTEREST_SUGGESTIONS,
   ZODIAC_LABELS,
   type IdentityCategory,
   type Orientation,
   type Intent,
+  type RelationshipStatus,
+  type RelationshipType,
+  type Diet,
+  type Religion,
+  type Politics,
   type Smoking,
   type Sport,
   type Profile,
@@ -22,7 +37,7 @@ import {
 import {
   listMyPhotos,
   listApprovedPhotos,
-  uploadPhoto,
+  uploadPhotoFromBlob,
   deletePhoto,
   setPrimary,
   signedUrls,
@@ -30,19 +45,20 @@ import {
   type ProfilePhoto,
   type PhotoStatus,
 } from '../lib/photos'
+import { PhotoUploadDialog } from '../components/PhotoUploadDialog'
 
 // Avatar preset: placeholder funzionanti finche' non arriva l'art definitiva
 // (vedi profilo_utente.md sez. 4 / branding.md). La chiave viene salvata; il
 // glifo e' solo la resa visiva provvisoria.
 const AVATAR_PRESETS: { key: string; glyph: string }[] = [
-  { key: 'luna', glyph: '🌙' },
+  { key: 'luna', glyph: '\U0001F319' },
   { key: 'stella', glyph: '⭐' },
-  { key: 'foglia', glyph: '🌿' },
-  { key: 'onda', glyph: '🌊' },
-  { key: 'prisma', glyph: '🔮' },
-  { key: 'fiore', glyph: '🌸' },
-  { key: 'farfalla', glyph: '🦋' },
-  { key: 'fiamma', glyph: '🔥' },
+  { key: 'foglia', glyph: '\U0001F33F' },
+  { key: 'onda', glyph: '\U0001F30A' },
+  { key: 'prisma', glyph: '\U0001F52E' },
+  { key: 'fiore', glyph: '\U0001F338' },
+  { key: 'farfalla', glyph: '\U0001F98B' },
+  { key: 'fiamma', glyph: '\U0001F525' },
 ]
 
 const ACCENT_COLORS = ['#E8B14E', '#EC6A55', '#7FB7A3', '#9B8CE0', '#E08CB5']
@@ -190,13 +206,25 @@ function ProfilePreview({
   if (profile.show_identity)
     rows.push(
       <Row key="id" label="Identità">
-        {labelOf(IDENTITY_OPTIONS, profile.identity_category)}
+        {IDENTITY_LABELS[profile.identity_category] ?? profile.identity_category}
       </Row>,
     )
   if (profile.show_orientation && profile.orientations.length > 0)
     rows.push(
       <Row key="or" label="Orientamento">
-        {labelsOf(ORIENTATION_OPTIONS, profile.orientations)}
+        {profile.orientations
+          .map((o) => ORIENTATION_LABELS[o] ?? o)
+          .join(', ')}
+      </Row>,
+    )
+  if (profile.show_relationship && profile.relationship_status)
+    rows.push(
+      <Row key="rel" label="Relazione">
+        {labelOf(RELATIONSHIP_STATUS_OPTIONS, profile.relationship_status)}
+        {profile.relationship_status === 'in_relazione' &&
+        profile.relationship_type
+          ? ` · ${labelOf(RELATIONSHIP_TYPE_OPTIONS, profile.relationship_type)}`
+          : ''}
       </Row>,
     )
   if (profile.show_intents && profile.intents.length > 0)
@@ -211,16 +239,34 @@ function ProfilePreview({
         {profile.interests.join(', ')}
       </Row>,
     )
+  if (profile.show_diet && profile.diet)
+    rows.push(
+      <Row key="diet" label="Alimentazione">
+        {labelOf(DIET_OPTIONS, profile.diet)}
+      </Row>,
+    )
+  if (profile.show_religion && profile.religion)
+    rows.push(
+      <Row key="rel2" label="Religione & credo">
+        {labelOf(RELIGION_OPTIONS, profile.religion)}
+      </Row>,
+    )
+  if (profile.show_politics && profile.politics)
+    rows.push(
+      <Row key="pol" label="Orientamento politico">
+        {labelOf(POLITICS_OPTIONS, profile.politics)}
+      </Row>,
+    )
   if (profile.show_smoking && profile.smoking)
     rows.push(
       <Row key="sm" label="Fumo">
-        {labelOf(SMOKING_OPTIONS, profile.smoking)}
+        {SMOKING_LABELS[profile.smoking] ?? profile.smoking}
       </Row>,
     )
   if (profile.show_sport && profile.sport)
     rows.push(
-      <Row key="sp" label="Sport">
-        {labelOf(SPORT_OPTIONS, profile.sport)}
+      <Row key="sp" label="Attività fisica">
+        {SPORT_LABELS[profile.sport] ?? profile.sport}
       </Row>,
     )
   if (profile.show_zodiac && profile.zodiac)
@@ -266,15 +312,15 @@ function ProfilePreview({
           <div className="pf-rows">{rows}</div>
         ) : (
           <p className="hint">
-            Per ora gli altri vedono solo il tuo nickname e l’avatar. Tocca
-            “Modifica” per scegliere cosa mostrare.
+            Per ora le altre persone vedono solo il tuo nickname e l’avatar.
+            Tocca “Modifica” per scegliere cosa mostrare.
           </p>
         )}
       </div>
 
       <div className="pf-actions">
         <button type="button" className="link" onClick={onOpenBlocked}>
-          Utenti bloccati
+          Persone bloccate
         </button>
       </div>
     </main>
@@ -302,6 +348,19 @@ function ProfileEditor({
     profile.orientations ?? [],
   )
   const [intents, setIntents] = useState<Intent[]>(profile.intents ?? [])
+  const [relStatus, setRelStatus] = useState<RelationshipStatus | null>(
+    profile.relationship_status ?? null,
+  )
+  const [relType, setRelType] = useState<RelationshipType | null>(
+    profile.relationship_type ?? null,
+  )
+  const [diet, setDiet] = useState<Diet | null>(profile.diet ?? null)
+  const [religion, setReligion] = useState<Religion | null>(
+    profile.religion ?? null,
+  )
+  const [politics, setPolitics] = useState<Politics | null>(
+    profile.politics ?? null,
+  )
   const [interests, setInterests] = useState<string[]>(profile.interests ?? [])
   const [newInterest, setNewInterest] = useState('')
   const [smoking, setSmoking] = useState<Smoking | null>(profile.smoking ?? null)
@@ -335,6 +394,10 @@ function ProfileEditor({
     show_city: profile.show_city,
     show_pronouns: profile.show_pronouns,
     show_intents: profile.show_intents,
+    show_relationship: profile.show_relationship,
+    show_diet: profile.show_diet,
+    show_religion: profile.show_religion,
+    show_politics: profile.show_politics,
     show_smoking: profile.show_smoking,
     show_sport: profile.show_sport,
     show_zodiac: profile.show_zodiac,
@@ -376,6 +439,10 @@ function ProfileEditor({
           : [...prev, tag],
     )
   }
+
+  const customInterests = interests.filter(
+    (t) => !INTEREST_SUGGESTIONS.includes(t),
+  )
 
   function onCityInput(v: string) {
     setCityQuery(v)
@@ -445,6 +512,9 @@ function ProfileEditor({
       return
     }
 
+    // Il tipo di relazione ha senso solo se si è in una relazione.
+    const relTypeToSave = relStatus === 'in_relazione' ? relType : null
+
     setSaving(true)
     try {
       const { error: updErr } = await supabase
@@ -459,6 +529,11 @@ function ProfileEditor({
           identity_category: identity,
           orientations,
           intents,
+          relationship_status: relStatus,
+          relationship_type: relTypeToSave,
+          diet,
+          religion,
+          politics,
           interests,
           smoking,
           sport,
@@ -563,7 +638,7 @@ function ProfileEditor({
             maxLength={PRONOUNS_MAX}
             value={pronouns}
             onChange={(e) => setPronouns(e.target.value)}
-            placeholder="es. lei/lei"
+            placeholder="es. lei/lei, they/them"
           />
           <label className="declare mini">
             <input
@@ -729,6 +804,58 @@ function ProfileEditor({
         </fieldset>
 
         <fieldset className="field">
+          <legend>Stato relazionale</legend>
+          <div className="options">
+            {RELATIONSHIP_STATUS_OPTIONS.map((opt) => (
+              <label key={opt.value} className="chip">
+                <input
+                  type="radio"
+                  name="relstatus"
+                  checked={relStatus === opt.value}
+                  onChange={() => setRelStatus(opt.value)}
+                />
+                <span>{opt.label}</span>
+              </label>
+            ))}
+            {relStatus && (
+              <button
+                type="button"
+                className="link clear-sel"
+                onClick={() => {
+                  setRelStatus(null)
+                  setRelType(null)
+                }}
+              >
+                pulisci
+              </button>
+            )}
+          </div>
+          {relStatus === 'in_relazione' && (
+            <div className="options sub-options">
+              {RELATIONSHIP_TYPE_OPTIONS.map((opt) => (
+                <label key={opt.value} className="chip">
+                  <input
+                    type="radio"
+                    name="reltype"
+                    checked={relType === opt.value}
+                    onChange={() => setRelType(opt.value)}
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+            </div>
+          )}
+          <label className="declare mini">
+            <input
+              type="checkbox"
+              checked={vis.show_relationship}
+              onChange={(e) => setVisFlag('show_relationship', e.target.checked)}
+            />
+            <span>Mostra nel profilo</span>
+          </label>
+        </fieldset>
+
+        <fieldset className="field">
           <legend>Cosa cerchi</legend>
           <div className="options">
             {INTENT_OPTIONS.map((opt) => (
@@ -759,36 +886,39 @@ function ProfileEditor({
               ({interests.length}/{MAX_INTERESTS})
             </span>
           </legend>
-          <div className="options">
-            {INTEREST_SUGGESTIONS.map((tag) => (
-              <label key={tag} className="chip">
-                <input
-                  type="checkbox"
-                  checked={interests.includes(tag)}
-                  onChange={() => toggleInterest(tag)}
-                  disabled={
-                    !interests.includes(tag) && interests.length >= MAX_INTERESTS
-                  }
-                />
-                <span>{tag}</span>
-              </label>
-            ))}
-          </div>
-          {interests.filter((t) => !INTEREST_SUGGESTIONS.includes(t)).length >
-            0 && (
-            <div className="options">
-              {interests
-                .filter((t) => !INTEREST_SUGGESTIONS.includes(t))
-                .map((tag) => (
-                  <button
-                    type="button"
-                    key={tag}
-                    className="chip sel"
-                    onClick={() => toggleInterest(tag)}
-                  >
-                    {tag} ✕
-                  </button>
+          {INTEREST_CATEGORIES.map((cat) => (
+            <div key={cat.label} className="interest-cat">
+              <span className="interest-cat-label">{cat.label}</span>
+              <div className="options">
+                {cat.options.map((tag) => (
+                  <label key={tag} className="chip">
+                    <input
+                      type="checkbox"
+                      checked={interests.includes(tag)}
+                      onChange={() => toggleInterest(tag)}
+                      disabled={
+                        !interests.includes(tag) &&
+                        interests.length >= MAX_INTERESTS
+                      }
+                    />
+                    <span>{tag}</span>
+                  </label>
                 ))}
+              </div>
+            </div>
+          ))}
+          {customInterests.length > 0 && (
+            <div className="options">
+              {customInterests.map((tag) => (
+                <button
+                  type="button"
+                  key={tag}
+                  className="chip sel"
+                  onClick={() => toggleInterest(tag)}
+                >
+                  {tag} ✕
+                </button>
+              ))}
             </div>
           )}
           <div className="composer inline-add">
@@ -802,7 +932,7 @@ function ProfileEditor({
                   addInterest(newInterest)
                 }
               }}
-              placeholder="aggiungi un interesse…"
+              placeholder="Altro (specifica)…"
               maxLength={24}
               disabled={interests.length >= MAX_INTERESTS}
             />
@@ -815,6 +945,108 @@ function ProfileEditor({
               Aggiungi
             </button>
           </div>
+        </fieldset>
+
+        <fieldset className="field">
+          <legend>Alimentazione</legend>
+          <div className="options">
+            {DIET_OPTIONS.map((opt) => (
+              <label key={opt.value} className="chip">
+                <input
+                  type="radio"
+                  name="diet"
+                  checked={diet === opt.value}
+                  onChange={() => setDiet(opt.value)}
+                />
+                <span>{opt.label}</span>
+              </label>
+            ))}
+            {diet && (
+              <button
+                type="button"
+                className="link clear-sel"
+                onClick={() => setDiet(null)}
+              >
+                pulisci
+              </button>
+            )}
+          </div>
+          <label className="declare mini">
+            <input
+              type="checkbox"
+              checked={vis.show_diet}
+              onChange={(e) => setVisFlag('show_diet', e.target.checked)}
+            />
+            <span>Mostra nel profilo</span>
+          </label>
+        </fieldset>
+
+        <fieldset className="field">
+          <legend>Religione & credo</legend>
+          <div className="options">
+            {RELIGION_OPTIONS.map((opt) => (
+              <label key={opt.value} className="chip">
+                <input
+                  type="radio"
+                  name="religion"
+                  checked={religion === opt.value}
+                  onChange={() => setReligion(opt.value)}
+                />
+                <span>{opt.label}</span>
+              </label>
+            ))}
+            {religion && (
+              <button
+                type="button"
+                className="link clear-sel"
+                onClick={() => setReligion(null)}
+              >
+                pulisci
+              </button>
+            )}
+          </div>
+          <label className="declare mini">
+            <input
+              type="checkbox"
+              checked={vis.show_religion}
+              onChange={(e) => setVisFlag('show_religion', e.target.checked)}
+            />
+            <span>Mostra nel profilo</span>
+          </label>
+        </fieldset>
+
+        <fieldset className="field">
+          <legend>Orientamento politico</legend>
+          <div className="options">
+            {POLITICS_OPTIONS.map((opt) => (
+              <label key={opt.value} className="chip">
+                <input
+                  type="radio"
+                  name="politics"
+                  checked={politics === opt.value}
+                  onChange={() => setPolitics(opt.value)}
+                />
+                <span>{opt.label}</span>
+              </label>
+            ))}
+            {politics && (
+              <button
+                type="button"
+                className="link clear-sel"
+                onClick={() => setPolitics(null)}
+              >
+                pulisci
+              </button>
+            )}
+          </div>
+          <label className="declare mini">
+            <input
+              type="checkbox"
+              checked={vis.show_politics}
+              onChange={(e) => setVisFlag('show_politics', e.target.checked)}
+            />
+            <span>Mostra nel profilo</span>
+          </label>
         </fieldset>
 
         <fieldset className="field">
@@ -852,7 +1084,7 @@ function ProfileEditor({
         </fieldset>
 
         <fieldset className="field">
-          <legend>Sport / attività fisica</legend>
+          <legend>Attività fisica</legend>
           <div className="options">
             {SPORT_OPTIONS.map((opt) => (
               <label key={opt.value} className="chip">
@@ -911,7 +1143,7 @@ function ProfileEditor({
               onChange={(e) => setSearchable(e.target.checked)}
             />
             <span>
-              Sono cercabile (gli altri possono trovarmi nella ricerca)
+              Sono cercabile (le altre persone possono trovarmi nella ricerca)
             </span>
           </label>
           <label className="declare mini">
@@ -958,7 +1190,7 @@ function PhotoManager({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
-  const fileRef = useRef<HTMLInputElement | null>(null)
+  const [adding, setAdding] = useState(false)
 
   async function reload() {
     const list = await listMyPhotos(userId)
@@ -986,15 +1218,13 @@ function PhotoManager({ userId }: { userId: string }) {
     }
   }, [userId])
 
-  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
+  async function onCropped(blob: Blob) {
     setErr(null)
     setBusy(true)
     try {
-      await uploadPhoto(userId, file)
+      await uploadPhotoFromBlob(userId, blob)
       await reload()
+      setAdding(false)
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : 'Caricamento non riuscito.')
     } finally {
@@ -1068,7 +1298,7 @@ function PhotoManager({ userId }: { userId: string }) {
             <button
               type="button"
               className="photo-add"
-              onClick={() => fileRef.current?.click()}
+              onClick={() => setAdding(true)}
               disabled={busy}
             >
               <span className="photo-add-plus">{busy ? '…' : '+'}</span>
@@ -1077,16 +1307,15 @@ function PhotoManager({ userId }: { userId: string }) {
           )}
         </div>
       )}
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/*"
-        hidden
-        onChange={onPick}
-      />
+      {adding && (
+        <PhotoUploadDialog
+          onClose={() => setAdding(false)}
+          onComplete={onCropped}
+        />
+      )}
       <span className="hint">
         La prima è la principale (★). Le foto restano <em>in revisione</em>{' '}
-        finché non vengono approvate: gli altri le vedono solo dopo l’ok.
+        finché non vengono approvate: le altre persone le vedono solo dopo l’ok.
       </span>
       {err && <p className="err">{err}</p>}
     </fieldset>

@@ -5,6 +5,7 @@ import { ChatScreen } from './ChatScreen'
 import { ProfileScreen } from './ProfileScreen'
 import { BlockedUsersScreen } from './BlockedUsersScreen'
 import { PublicProfileScreen } from './PublicProfileScreen'
+import { SearchScreen } from './SearchScreen'
 import { AdminScreen } from './AdminScreen'
 
 // Shell post-login: gestisce la navigazione fra la lobby (elenco stanze), la
@@ -15,6 +16,7 @@ export function Home() {
   const [showProfile, setShowProfile] = useState(false)
   const [showAdmin, setShowAdmin] = useState(false)
   const [showBlocked, setShowBlocked] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
   // Id dell'utente di cui stiamo guardando il profilo pubblico (da chat).
   const [viewUserId, setViewUserId] = useState<string | null>(null)
 
@@ -33,6 +35,14 @@ export function Home() {
   }
   if (showBlocked) {
     return <BlockedUsersScreen onBack={() => setShowBlocked(false)} />
+  }
+  if (showSearch) {
+    return (
+      <SearchScreen
+        onBack={() => setShowSearch(false)}
+        onOpenProfile={setViewUserId}
+      />
+    )
   }
   if (showProfile) {
     return (
@@ -56,6 +66,7 @@ export function Home() {
       onOpen={setRoom}
       onOpenProfile={() => setShowProfile(true)}
       onOpenAdmin={() => setShowAdmin(true)}
+      onOpenSearch={() => setShowSearch(true)}
     />
   )
 }

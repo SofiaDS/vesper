@@ -1,11 +1,17 @@
-// Tipi e costanti allineati allo schema DB (Fase 1 + campi profilo completi).
+// Tipi e costanti allineati allo schema DB (profilo esteso).
 // Vedi profilo_utente.md e i CHECK constraint sulla tabella `profiles`.
+// Le etichette UI usano la schwa (ə) per un linguaggio gender-neutral.
 
 export type IdentityCategory =
   | 'donna_cis'
   | 'donna_trans'
   | 'uomo_trans'
   | 'nonbinary_afab'
+  | 'nonbinary'
+  | 'genderqueer'
+  | 'agender'
+  | 'bigender'
+  | 'altro'
   | 'preferisco_non_specificare'
 
 export type Orientation =
@@ -13,7 +19,14 @@ export type Orientation =
   | 'bisessuale'
   | 'queer'
   | 'pan'
+  | 'pansessuale'
+  | 'asessuale'
+  | 'polisessuale'
+  | 'demisessuale'
+  | 'bicurious'
   | 'questioning'
+  | 'non_etichettata'
+  | 'altro'
   | 'preferisco_non_dire'
 
 export type Intent =
@@ -23,6 +36,44 @@ export type Intent =
   | 'networking'
   | 'confronto'
   | 'solo_chattare'
+
+export type RelationshipStatus = 'single' | 'in_relazione' | 'non_dico'
+
+export type RelationshipType =
+  | 'monogama'
+  | 'poliamorosa'
+  | 'aperta'
+  | 'nme'
+  | 'complicato'
+
+export type Diet =
+  | 'vegetariana'
+  | 'vegana'
+  | 'flexitariana'
+  | 'onnivora'
+  | 'onnivora_consapevole'
+  | 'altro'
+
+export type Religion =
+  | 'cattolicesimo'
+  | 'islam'
+  | 'ebraismo'
+  | 'buddismo'
+  | 'induismo'
+  | 'spiritualita'
+  | 'ateismo'
+  | 'agnosticismo'
+  | 'altro'
+
+export type Politics =
+  | 'progressista'
+  | 'conservatrice'
+  | 'moderata'
+  | 'libertaria'
+  | 'anarchica'
+  | 'socialista'
+  | 'comunista'
+  | 'altro'
 
 export type Smoking = 'fuma' | 'no' | 'occasionalmente' | 'non_dico'
 
@@ -60,6 +111,11 @@ export interface Profile {
   pronouns: string | null
   interests: string[]
   intents: Intent[]
+  relationship_status: RelationshipStatus | null
+  relationship_type: RelationshipType | null
+  diet: Diet | null
+  religion: Religion | null
+  politics: Politics | null
   smoking: Smoking | null
   sport: Sport | null
   dm_filter: DmFilter
@@ -73,6 +129,10 @@ export interface Profile {
   show_city: boolean
   show_pronouns: boolean
   show_intents: boolean
+  show_relationship: boolean
+  show_diet: boolean
+  show_religion: boolean
+  show_politics: boolean
   show_smoking: boolean
   show_sport: boolean
   show_zodiac: boolean
@@ -87,25 +147,64 @@ export interface Profile {
 // Limiti allineati ai CHECK del DB.
 export const BIO_MAX = 300
 export const PRONOUNS_MAX = 40
-export const MAX_INTERESTS = 5
+export const MAX_INTERESTS = 4
 
-// --- Etichette in italiano per la UI ---
+// --- Etichette in italiano per la UI (gender-neutral con schwa) ---
 
+// Etichette complete (incluse quelle legacy) per la sola visualizzazione.
+export const IDENTITY_LABELS: Record<IdentityCategory, string> = {
+  donna_cis: 'Donna cis',
+  donna_trans: 'Donna trans',
+  uomo_trans: 'Uomo trans',
+  nonbinary_afab: 'Non-binary AFAB',
+  nonbinary: 'Non binarie',
+  genderqueer: 'Genderqueer',
+  agender: 'Agender',
+  bigender: 'Bigender',
+  altro: 'Altro',
+  preferisco_non_specificare: 'Preferisco non specificare',
+}
+
+// Opzioni selezionabili (spec profilo definitivo).
 export const IDENTITY_OPTIONS: { value: IdentityCategory; label: string }[] = [
   { value: 'donna_cis', label: 'Donna cis' },
   { value: 'donna_trans', label: 'Donna trans' },
   { value: 'uomo_trans', label: 'Uomo trans' },
-  { value: 'nonbinary_afab', label: 'Non-binary AFAB' },
+  { value: 'nonbinary', label: 'Non binarie' },
+  { value: 'genderqueer', label: 'Genderqueer' },
+  { value: 'agender', label: 'Agender' },
+  { value: 'bigender', label: 'Bigender' },
+  { value: 'altro', label: 'Altro' },
   { value: 'preferisco_non_specificare', label: 'Preferisco non specificare' },
 ]
+
+export const ORIENTATION_LABELS: Record<Orientation, string> = {
+  lesbica: 'Lesbica',
+  bisessuale: 'Bisessuale',
+  queer: 'Queer',
+  pan: 'Pansessuale',
+  pansessuale: 'Pansessuale',
+  asessuale: 'Asessuale',
+  polisessuale: 'Polisessuale',
+  demisessuale: 'Demisessuale',
+  bicurious: 'Bi-curious',
+  questioning: 'Questioning',
+  non_etichettata: 'Non etichettatə',
+  altro: 'Altro',
+  preferisco_non_dire: 'Preferisco non dire',
+}
 
 export const ORIENTATION_OPTIONS: { value: Orientation; label: string }[] = [
   { value: 'lesbica', label: 'Lesbica' },
   { value: 'bisessuale', label: 'Bisessuale' },
-  { value: 'queer', label: 'Queer' },
-  { value: 'pan', label: 'Pan' },
+  { value: 'pansessuale', label: 'Pansessuale' },
+  { value: 'asessuale', label: 'Asessuale' },
+  { value: 'polisessuale', label: 'Polisessuale' },
+  { value: 'demisessuale', label: 'Demisessuale' },
+  { value: 'bicurious', label: 'Bi-curious' },
   { value: 'questioning', label: 'Questioning' },
-  { value: 'preferisco_non_dire', label: 'Preferisco non dire' },
+  { value: 'non_etichettata', label: 'Non etichettatə' },
+  { value: 'altro', label: 'Altro' },
 ]
 
 export const INTENT_OPTIONS: { value: Intent; label: string }[] = [
@@ -117,19 +216,83 @@ export const INTENT_OPTIONS: { value: Intent; label: string }[] = [
   { value: 'solo_chattare', label: 'Solo chattare' },
 ]
 
-export const SMOKING_OPTIONS: { value: Smoking; label: string }[] = [
-  { value: 'fuma', label: 'Fumo' },
-  { value: 'no', label: 'Non fumo' },
-  { value: 'occasionalmente', label: 'Occasionalmente' },
-  { value: 'non_dico', label: 'Preferisco non dire' },
+export const RELATIONSHIP_STATUS_OPTIONS: {
+  value: RelationshipStatus
+  label: string
+}[] = [
+  { value: 'single', label: 'Single' },
+  { value: 'in_relazione', label: 'In una relazione' },
+  { value: 'non_dico', label: 'Preferisco non specificare' },
 ]
 
-export const SPORT_OPTIONS: { value: Sport; label: string }[] = [
-  { value: 'regolarmente', label: 'Sì, regolarmente' },
-  { value: 'saltuariamente', label: 'Saltuariamente' },
-  { value: 'no', label: 'No' },
-  { value: 'non_dico', label: 'Preferisco non dire' },
+export const RELATIONSHIP_TYPE_OPTIONS: {
+  value: RelationshipType
+  label: string
+}[] = [
+  { value: 'monogama', label: 'Monogama' },
+  { value: 'poliamorosa', label: 'Poliamorosa' },
+  { value: 'aperta', label: 'Aperta' },
+  { value: 'nme', label: 'Non monogamia etica' },
+  { value: 'complicato', label: 'Complicato' },
 ]
+
+export const DIET_OPTIONS: { value: Diet; label: string }[] = [
+  { value: 'vegetariana', label: 'Vegetarianə' },
+  { value: 'vegana', label: 'Veganə' },
+  { value: 'flexitariana', label: 'Flexitarianə' },
+  { value: 'onnivora', label: 'Onnivorə' },
+  { value: 'onnivora_consapevole', label: 'Onnivorə consapevole' },
+  { value: 'altro', label: 'Altro' },
+]
+
+export const RELIGION_OPTIONS: { value: Religion; label: string }[] = [
+  { value: 'cattolicesimo', label: 'Cattolicesimə' },
+  { value: 'islam', label: 'Islam' },
+  { value: 'ebraismo', label: 'Ebraismə' },
+  { value: 'buddismo', label: 'Buddismə' },
+  { value: 'induismo', label: 'Induismə' },
+  { value: 'spiritualita', label: 'Spiritualità personale' },
+  { value: 'ateismo', label: 'Ateə' },
+  { value: 'agnosticismo', label: 'Agnosticə' },
+  { value: 'altro', label: 'Altro' },
+]
+
+export const POLITICS_OPTIONS: { value: Politics; label: string }[] = [
+  { value: 'progressista', label: 'Progressistə' },
+  { value: 'conservatrice', label: 'Conservatorə' },
+  { value: 'moderata', label: 'Moderatə' },
+  { value: 'libertaria', label: 'Libertariə' },
+  { value: 'anarchica', label: 'Anarchicə' },
+  { value: 'socialista', label: 'Socialista' },
+  { value: 'comunista', label: 'Comunista' },
+  { value: 'altro', label: 'Altro' },
+]
+
+export const SMOKING_OPTIONS: { value: Smoking; label: string }[] = [
+  { value: 'fuma', label: 'Fumo regolarmente' },
+  { value: 'occasionalmente', label: 'Fumo occasionalmente' },
+  { value: 'no', label: 'Non fumo' },
+]
+
+export const SMOKING_LABELS: Record<Smoking, string> = {
+  fuma: 'Fumo regolarmente',
+  occasionalmente: 'Fumo occasionalmente',
+  no: 'Non fumo',
+  non_dico: 'Preferisco non dire',
+}
+
+export const SPORT_OPTIONS: { value: Sport; label: string }[] = [
+  { value: 'regolarmente', label: 'Regolare' },
+  { value: 'saltuariamente', label: 'Saltuaria' },
+  { value: 'no', label: 'No' },
+]
+
+export const SPORT_LABELS: Record<Sport, string> = {
+  regolarmente: 'Regolare',
+  saltuariamente: 'Saltuaria',
+  no: 'No',
+  non_dico: 'Preferisco non dire',
+}
 
 export const DM_FILTER_OPTIONS: { value: DmFilter; label: string }[] = [
   { value: 'tutte', label: 'Tutte' },
@@ -153,28 +316,45 @@ export const ZODIAC_LABELS: Record<Zodiac, string> = {
   pesci: 'Pesci',
 }
 
-// Tag interessi suggeriti (l'utente puo' anche aggiungerne di liberi).
-// Memorizzati in minuscolo.
-export const INTEREST_SUGGESTIONS: string[] = [
-  'musica',
-  'libri',
-  'cinema',
-  'serie tv',
-  'arte',
-  'viaggi',
-  'cucina',
-  'natura',
-  'fotografia',
-  'videogiochi',
-  'attivismo',
-  'animali',
-  'teatro',
-  'tecnologia',
-  'yoga',
-  'scrittura',
-  'fumetti',
-  'moda',
+// Interessi raggruppati per categoria (max MAX_INTERESTS selezionati in totale).
+// I valori sono memorizzati in minuscolo; ogni categoria consente anche un
+// valore libero tramite "Altro (specifica)".
+export interface InterestCategory {
+  label: string
+  options: string[]
+}
+
+export const INTEREST_CATEGORIES: InterestCategory[] = [
+  {
+    label: 'Tecnologia & Gaming',
+    options: ['videogiochi', 'programmazione', 'hardware', 'intelligenza artificiale'],
+  },
+  {
+    label: 'Tempo Libero & Natura',
+    options: ['escursionismo', 'viaggi', 'giardinaggio', 'animali'],
+  },
+  {
+    label: 'Cultura & Spettacolo',
+    options: ['cinema', 'serie tv', 'musica', 'arte'],
+  },
+  {
+    label: 'Sport & Benessere',
+    options: ['yoga', 'palestra', 'ciclismo', 'meditazione'],
+  },
+  {
+    label: 'Gastronomia',
+    options: ['cucina locale', 'cucina etnica', 'sperimentazione culinaria', 'aperitivi'],
+  },
+  {
+    label: 'Stile di Vita',
+    options: ['volontariato', 'minimalismo', 'sostenibilità', 'fai-da-te'],
+  },
 ]
+
+// Elenco piatto di tutti gli interessi suggeriti (per ricerca/filtri).
+export const INTEREST_SUGGESTIONS: string[] = INTEREST_CATEGORIES.flatMap(
+  (c) => c.options,
+)
 
 // Slug della chatroom globale a cui si fa auto-join dopo l'onboarding.
 export const FOYER_SLUG = 'foyer'
