@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   IDENTITY_OPTIONS,
   ORIENTATION_OPTIONS,
@@ -22,6 +22,19 @@ import {
 import { glyphFor } from './ProfileScreen'
 
 type Tab = 'nickname' | 'filtri'
+
+// Debounce hook: ritarda l'esecuzione di una funzione fino a quando
+// il valore non rimane stabile per il delay specificato.
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay)
+    return () => clearTimeout(timer)
+  }, [value, delay])
+
+  return debouncedValue
+}
 
 // Chip multi-selezione riusabile.
 function ChipGroup({
@@ -119,6 +132,7 @@ export function SearchScreen({
 
   // Stato nickname.
   const [nick, setNick] = useState('')
+  const debouncedNick = useDebounce(nick, 500) // 500ms debounce
 
   // Stato filtri.
   const [filters, setFilters] = useState<SearchFilters>({})
@@ -132,6 +146,10 @@ export function SearchScreen({
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  
+  // Traccia se è in corso una ricerca manuale (Enter o tasto Cerca) per non
+  // sovrascrivere i risultati durante il debounce.
+  const manualSearchRef = useRef(false)
 
   function toggle(key: keyof SearchFilters, v: string) {
     setFilters((f) => {
@@ -149,10 +167,12 @@ export function SearchScreen({
     }
   }
 
-  async function runNickname() {
-    const q = nick.trim()
+  async function runNickname(q: string) {
     if (q.length < 2) {
-      setErr('Inserisci almeno 2 caratteri.')
+      // Cancella risultati se la query è troppo corta.
+      setResults([])
+      setErr(null)
+      setSearched(false)
       return
     }
     setErr(null)
@@ -168,6 +188,15 @@ export function SearchScreen({
       setLoading(false)
     }
   }
+
+  // Esegui ricerca automatica quando il valore debounced cambia
+  // (ma non se l'utente ha appena fatto una ricerca manuale).
+  useEffect(() => {
+    if (tab === 'nickname' && !manualSearchRef.current) {
+      runNickname(debouncedNick)
+    }
+    manualSearchRef.current = false
+  }, [debouncedNick, tab])
 
   async function runFilters() {
     const f = builtFilters()
@@ -215,6 +244,11 @@ export function SearchScreen({
     setHasMore(false)
   }
 
+  function handleNicknameSubmit() {
+    manualSearchRef.current = true
+    runNickname(nick.trim())
+  }
+
   return (
     <main className="app profile search-screen">
       <header className="rooms-header">
@@ -227,8 +261,8 @@ export function SearchScreen({
 
       <p className="search-intro">
         Qui trovi altre utenti che hanno scelto di essere cercabili. Non è
-        un’app di dating: niente swipe, niente match. Vedi solo ciò che ognuna
-        ha reso pubblico. Per essere trovata, attiva “sono cercabile” dal tuo
+        un'app di dating: niente swipe, niente match. Vedi solo ciò che ognuna
+        ha reso pubblico. Per essere trovata, attiva "sono cercabile" dal tuo
         profilo.
       </p>
 
@@ -257,12 +291,12 @@ export function SearchScreen({
             placeholder="Cerca un nickname…"
             value={nick}
             onChange={(e) => setNick(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && runNickname()}
+            onKeyDown={(e) => e.key === 'Enter' && handleNicknameSubmit()}
           />
           <button
             type="button"
             className="btn-primary"
-            onClick={runNickname}
+            onClick={handleNicknameSubmit}
             disabled={loading}
           >
             Cerca
