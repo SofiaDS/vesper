@@ -721,3 +721,190 @@ code {
   flex: 1;
   color: var(--cream);
 }
+
+/* ===== Foto profilo: griglia di gestione (editor) ===== */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 0.6rem;
+}
+
+.photo-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  background: rgba(247, 239, 221, 0.04);
+}
+
+.photo-cell.primary {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(232, 177, 78, 0.35);
+}
+
+.photo-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-thumb.ph {
+  background: rgba(247, 239, 221, 0.08);
+}
+
+.photo-badge {
+  position: absolute;
+  left: 0.3rem;
+  bottom: 0.3rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: rgba(247, 239, 221, 0.85);
+}
+
+.photo-badge.approved {
+  background: #7fb7a3;
+  color: var(--ink);
+}
+
+.photo-badge.pending {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.photo-badge.rejected {
+  background: var(--coral);
+  color: var(--cream);
+}
+
+.photo-actions {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.photo-star,
+.photo-del {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23, 21, 32, 0.72);
+  color: var(--cream);
+}
+
+.photo-star:disabled {
+  cursor: default;
+}
+
+.photo-cell.primary .photo-star {
+  color: var(--gold);
+}
+
+.photo-del:hover {
+  background: var(--coral);
+}
+
+.photo-add {
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  border: 1px dashed rgba(232, 177, 78, 0.5);
+  background: transparent;
+  color: var(--cream);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+}
+
+.photo-add:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.photo-add-plus {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* ===== Carosello foto in anteprima ===== */
+.carousel {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(232, 177, 78, 0.3);
+  background: rgba(247, 239, 221, 0.05);
+  flex: 0 0 auto;
+}
+
+.carousel.loading {
+  background: rgba(247, 239, 221, 0.08);
+}
+
+.carousel-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 0;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--cream);
+  background: rgba(23, 21, 32, 0.6);
+}
+
+.carousel-nav.prev {
+  left: 0.25rem;
+}
+
+.carousel-nav.next {
+  right: 0.25rem;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 0.3rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.carousel-dots .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(247, 239, 221, 0.5);
+}
+
+.carousel-dots .dot.on {
+  background: var(--gold);
+}
