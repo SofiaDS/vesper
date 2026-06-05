@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import type { Chatroom } from '../lib/types'
+import { ReportDialog } from '../components/ReportDialog'
+import { listBlockedIds } from '../lib/blocks'
 
 interface ChatMessage {
   id: number
@@ -25,9 +27,11 @@ function formatTime(iso: string): string {
 export function ChatScreen({
   room,
   onBack,
+  onOpenProfile,
 }: {
   room: Chatroom
   onBack: () => void
+  onOpenProfile: (userId: string) => void
 }) {
   const { session, profile } = useAuth()
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -38,9 +42,13 @@ export function ChatScreen({
   // C'e' ancora storia piu' vecchia da caricare?
   const [hasMore, setHasMore] = useState(false)
   const [loadingOlder, setLoadingOlder] = useState(false)
+  // Messaggio per cui e' aperta la modale di segnalazione.
+  const [reportMsg, setReportMsg] = useState<ChatMessage | null>(null)
 
   // Cache id-profilo -> nickname, per non interrogare il DB a ogni messaggio.
   const nicknameCache = useRef<Map<string, string>>(new Map())
+  // Id degli utenti che ho bloccato: i loro messaggi non vengono mostrati.
+  const blockedIds = useRef<Set<string>>(new Set())
   const bottomRef = useRef<HTMLDivElement>(null)
   // Evita l'auto-scroll quando stiamo prependendo messaggi vecchi.
   const skipAutoScroll = useRef(false)
@@ -110,7 +118,15 @@ export function ChatScreen({
         return
       }
 
-      const ordered = (rows ?? []).slice().reverse()
+      try {
+        blockedIds.current = await listBlockedIds()
+      } catch {
+        blockedIds.current = new Set()
+      }
+      const ordered = (rows ?? [])
+        .slice()
+        .reverse()
+        .filter((r) => !blockedIds.current.has(r.sender_id))
       await cacheNicknames([...new Set(ordered.map((r) => r.sender_id))])
 
       if (!active) return
@@ -144,6 +160,7 @@ export function ChatScreen({
               created_at: string
               sender_id: string
             }
+            if (blockedIds.current.has(r.sender_id)) return
             const nickname = await resolveNickname(r.sender_id)
             appendMessage({
               id: r.id,
@@ -191,7 +208,10 @@ export function ChatScreen({
         .limit(PAGE_SIZE)
       if (olderErr) throw olderErr
 
-      const older = (rows ?? []).slice().reverse()
+      const older = (rows ?? [])
+        .slice()
+        .reverse()
+        .filter((r) => !blockedIds.current.has(r.sender_id))
       await cacheNicknames([...new Set(older.map((r) => r.sender_id))])
 
       skipAutoScroll.current = true
@@ -287,10 +307,29 @@ export function ChatScreen({
             className={m.sender_id === myId ? 'msg msg-mine' : 'msg'}
           >
             {m.sender_id !== myId && (
-              <span className="msg-author">{m.nickname}</span>
+              <button
+                type="button"
+                className="msg-author"
+                onClick={() => onOpenProfile(m.sender_id)}
+              >
+                {m.nickname}
+              </button>
             )}
             <span className="msg-body">{m.body}</span>
-            <span className="msg-time">{formatTime(m.created_at)}</span>
+            <span className="msg-footer">
+              <span className="msg-time">{formatTime(m.created_at)}</span>
+              {m.sender_id !== myId && (
+                <button
+                  type="button"
+                  className="msg-report"
+                  title="Segnala messaggio"
+                  aria-label="Segnala messaggio"
+                  onClick={() => setReportMsg(m)}
+                >
+                  ⚑
+                </button>
+              )}
+            </span>
           </div>
         ))}
         <div ref={bottomRef} />
@@ -315,6 +354,16 @@ export function ChatScreen({
           Invia
         </button>
       </form>
+
+      {reportMsg && (
+        <ReportDialog
+          targetType="message"
+          targetUserId={reportMsg.sender_id}
+          targetMessageId={reportMsg.id}
+          targetLabel="messaggio"
+          onClose={() => setReportMsg(null)}
+        />
+      )}
     </main>
   )
 }
