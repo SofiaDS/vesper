@@ -1,30 +1,26 @@
 import { useState } from 'react'
-import type { Chatroom } from '../lib/types'
+import type { Chatroom } from '../types'
 import { RoomsScreen } from './RoomsScreen'
 import { ChatScreen } from './ChatScreen'
-import { ProfileScreen } from './ProfileScreen'
+import { ProfileScreen } from './profile/ProfileScreen'
 import { BlockedUsersScreen } from './BlockedUsersScreen'
 import { PublicProfileScreen } from './PublicProfileScreen'
 import { SearchScreen } from './SearchScreen'
-import { AdminScreen } from './AdminScreen'
+import { AdminScreen } from './admin/AdminScreen'
 
-// Shell post-login: gestisce la navigazione fra la lobby (elenco stanze), la
-// chat di una singola stanza, il proprio profilo, il profilo di altri utenti
-// e l'area di moderazione. Nessun router esterno: basta uno stato locale.
+// Shell post-login: gestisce la navigazione fra lobby, chat, profilo e moderazione.
+// Nessun router esterno: basta uno stato locale.
 export function Home() {
   const [room, setRoom] = useState<Chatroom | null>(null)
   const [showProfile, setShowProfile] = useState(false)
   const [showAdmin, setShowAdmin] = useState(false)
   const [showBlocked, setShowBlocked] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
-  // Id dell'utente di cui stiamo guardando il profilo pubblico (da chat).
   const [viewUserId, setViewUserId] = useState<string | null>(null)
 
   if (showAdmin) {
     return <AdminScreen onBack={() => setShowAdmin(false)} />
   }
-  // Il profilo altrui si sovrappone alla chat: tornando indietro la stanza
-  // resta selezionata e si rientra nella conversazione.
   if (viewUserId) {
     return (
       <PublicProfileScreen

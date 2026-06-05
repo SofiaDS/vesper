@@ -34,7 +34,7 @@ export function UpdatePasswordScreen() {
       // quindi l'app prosegue verso la lobby (o l'onboarding).
       clearRecovery()
     } catch (err) {
-      mapSupabaseAuthError(err).userMessage
+      setError(mapSupabaseAuthError(err).userMessage)
       setBusy(false)
     }
   }
