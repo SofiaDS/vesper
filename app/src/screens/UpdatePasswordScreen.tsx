@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
-import { translateAuthError, validatePassword } from '../lib/authErrors'
+import { mapSupabaseAuthError, validatePassword } from '../lib/authErrors'
 
 // Mostrata quando si arriva dal link "reimposta password" (evento recovery).
 // Qui la sessione e' gia' valida: basta impostare la nuova password.
@@ -34,11 +34,7 @@ export function UpdatePasswordScreen() {
       // quindi l'app prosegue verso la lobby (o l'onboarding).
       clearRecovery()
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? translateAuthError(err.message)
-          : 'Aggiornamento non riuscito.',
-      )
+      mapSupabaseAuthError(err).userMessage
       setBusy(false)
     }
   }

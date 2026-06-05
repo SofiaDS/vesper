@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
-import { translateAuthError, validatePassword } from '../lib/authErrors'
+import { mapSupabaseAuthError, validatePassword } from '../lib/authErrors'
 
 type Mode = 'login' | 'signup' | 'reset'
 
@@ -68,13 +68,10 @@ export function AuthScreen() {
         })
         if (error) throw error
       }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? translateAuthError(err.message)
-          : 'Errore imprevisto.',
-      )
-    } finally {
+    } catch(error){
+      throw mapSupabaseAuthError(error)
+    
+    }finally {
       setBusy(false)
     }
   }
