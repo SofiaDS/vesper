@@ -3,11 +3,12 @@ import { useAuth } from '../../auth/AuthProvider'
 import { PhotoModeration } from './PhotoModeration'
 import { ReportsModeration } from './ReportsModeration'
 import { ModeratorManagement } from './ModeratorManagement'
+import { ReputationModeration } from './ReputationModeration'
 
-type Tab = 'foto' | 'segnalazioni' | 'moderatori'
+type Tab = 'foto' | 'segnalazioni' | 'reputazione' | 'moderatori'
 
 export function AdminScreen({ onBack }: { onBack: () => void }) {
-  const { isAdmin } = useAuth()
+  const { isAdmin, isStaff } = useAuth()
   const [tab, setTab] = useState<Tab>('foto')
 
   return (
@@ -35,6 +36,15 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
         >
           Segnalazioni
         </button>
+        {isStaff && (
+          <button
+            type="button"
+            className={tab === 'reputazione' ? 'admin-tab on' : 'admin-tab'}
+            onClick={() => setTab('reputazione')}
+          >
+            Reputazione
+          </button>
+        )}
         {isAdmin && (
           <button
             type="button"
@@ -48,6 +58,7 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
 
       {tab === 'foto' && <PhotoModeration />}
       {tab === 'segnalazioni' && <ReportsModeration />}
+      {tab === 'reputazione' && isStaff && <ReputationModeration />}
       {tab === 'moderatori' && isAdmin && <ModeratorManagement />}
     </main>
   )
