@@ -1401,3 +1401,64 @@ code {
   align-self: center;
   margin-top: 0.4rem;
 }
+
+/* ===== DM (messaggi privati) ===== */
+
+.dm-section {
+  margin-bottom: 1.25rem;
+}
+
+.dm-section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cream);
+  opacity: 0.45;
+  margin: 0 0 0.5rem;
+}
+
+.dm-conv {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  border-radius: 12px;
+  background: rgba(247, 239, 221, 0.04);
+  margin-bottom: 0.5rem;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+button.dm-conv {
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+button.dm-conv:hover {
+  background: rgba(247, 239, 221, 0.08);
+}
+
+.dm-conv-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.dm-conv-meta {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+}
+
+.dm-request-actions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.15rem;
+}
+

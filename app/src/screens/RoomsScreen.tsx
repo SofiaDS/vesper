@@ -8,11 +8,13 @@ export function RoomsScreen({
   onOpenProfile,
   onOpenAdmin,
   onOpenSearch,
+  onOpenDm,
 }: {
   onOpen: (room: Chatroom) => void
   onOpenProfile: () => void
   onOpenAdmin: () => void
   onOpenSearch: () => void
+  onOpenDm: () => void
 }) {
   const { session, profile, signOut, isStaff } = useAuth()
   const myId = session?.user.id
@@ -40,6 +42,11 @@ export function RoomsScreen({
           {isStaff && (
             <button type="button" className="link" onClick={onOpenAdmin}>
               Moderazione
+            </button>
+          )}
+          {(profile?.strato ?? 0) >= 2 && (
+            <button type="button" className="link" onClick={onOpenDm}>
+              Messaggi
             </button>
           )}
           <button type="button" className="link" onClick={onOpenSearch}>

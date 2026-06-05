@@ -7,6 +7,7 @@ import { BlockedUsersScreen } from './BlockedUsersScreen'
 import { PublicProfileScreen } from './PublicProfileScreen'
 import { SearchScreen } from './SearchScreen'
 import { AdminScreen } from './admin/AdminScreen'
+import { DmScreen } from './DmScreen'
 
 // Shell post-login: gestisce la navigazione fra lobby, chat, profilo e moderazione.
 // Nessun router esterno: basta uno stato locale.
@@ -16,6 +17,7 @@ export function Home() {
   const [showAdmin, setShowAdmin] = useState(false)
   const [showBlocked, setShowBlocked] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
+  const [showDm, setShowDm] = useState(false)
   const [viewUserId, setViewUserId] = useState<string | null>(null)
 
   if (showAdmin) {
@@ -36,6 +38,14 @@ export function Home() {
     return (
       <SearchScreen
         onBack={() => setShowSearch(false)}
+        onOpenProfile={setViewUserId}
+      />
+    )
+  }
+  if (showDm) {
+    return (
+      <DmScreen
+        onBack={() => setShowDm(false)}
         onOpenProfile={setViewUserId}
       />
     )
@@ -63,6 +73,7 @@ export function Home() {
       onOpenProfile={() => setShowProfile(true)}
       onOpenAdmin={() => setShowAdmin(true)}
       onOpenSearch={() => setShowSearch(true)}
+      onOpenDm={() => setShowDm(true)}
     />
   )
 }
