@@ -6,7 +6,6 @@ export type IdentityCategory =
   | 'donna_cis'
   | 'donna_trans'
   | 'uomo_trans'
-  | 'nonbinary_afab'
   | 'nonbinary'
   | 'genderqueer'
   | 'agender'
@@ -19,7 +18,6 @@ export type Orientation =
   | 'bisessuale'
   | 'queer'
   | 'pan'
-  | 'pansessuale'
   | 'asessuale'
   | 'polisessuale'
   | 'demisessuale'
@@ -36,6 +34,13 @@ export type Intent =
   | 'networking'
   | 'confronto'
   | 'solo_chattare'
+  | 'monogamia'
+  | 'poliamore'
+  | 'mge'
+  | 'relazione_aperta'
+  | 'relazione_platonica'
+  | 'altro' 
+  | 'supporto'
 
 export type RelationshipStatus = 'single' | 'in_relazione' | 'non_dico'
 
@@ -45,6 +50,7 @@ export type RelationshipType =
   | 'aperta'
   | 'nme'
   | 'complicato'
+  | 'preferisco_non_specificare'
 
 export type Diet =
   | 'vegetariana'
@@ -156,8 +162,7 @@ export const IDENTITY_LABELS: Record<IdentityCategory, string> = {
   donna_cis: 'Donna cis',
   donna_trans: 'Donna trans',
   uomo_trans: 'Uomo trans',
-  nonbinary_afab: 'Non-binary AFAB',
-  nonbinary: 'Non binarie',
+  nonbinary: 'Non binary',
   genderqueer: 'Genderqueer',
   agender: 'Agender',
   bigender: 'Bigender',
@@ -182,8 +187,7 @@ export const ORIENTATION_LABELS: Record<Orientation, string> = {
   lesbica: 'Lesbica',
   bisessuale: 'Bisessuale',
   queer: 'Queer',
-  pan: 'Pansessuale',
-  pansessuale: 'Pansessuale',
+  pan: 'Pan',
   asessuale: 'Asessuale',
   polisessuale: 'Polisessuale',
   demisessuale: 'Demisessuale',
@@ -197,7 +201,8 @@ export const ORIENTATION_LABELS: Record<Orientation, string> = {
 export const ORIENTATION_OPTIONS: { value: Orientation; label: string }[] = [
   { value: 'lesbica', label: 'Lesbica' },
   { value: 'bisessuale', label: 'Bisessuale' },
-  { value: 'pansessuale', label: 'Pansessuale' },
+  { value: 'queer', label: 'Queer'},
+  { value: 'pan', label: 'Pan' },
   { value: 'asessuale', label: 'Asessuale' },
   { value: 'polisessuale', label: 'Polisessuale' },
   { value: 'demisessuale', label: 'Demisessuale' },
@@ -205,15 +210,21 @@ export const ORIENTATION_OPTIONS: { value: Orientation; label: string }[] = [
   { value: 'questioning', label: 'Questioning' },
   { value: 'non_etichettata', label: 'Non etichettatə' },
   { value: 'altro', label: 'Altro' },
+  { value: 'preferisco_non_dire', label: 'Preferisco non dire'},
 ]
 
 export const INTENT_OPTIONS: { value: Intent; label: string }[] = [
+  { value: 'monogamia', label: 'relazione monogama'},
+  { value: 'poliamore', label: 'relazione poliamorosa'},
+  { value: 'mge', label: 'relazione non monogama etica'},
+  { value: 'relazione_aperta', label: 'relazione aperta'},
+  { value: 'relazione_platonica', label: 'relazione platonica'},
+  { value: 'altro', label: 'altro'}, 
   { value: 'amicizia', label: 'Amicizia' },
-  { value: 'dating', label: 'Dating' },
-  { value: 'relazione', label: 'Relazione' },
   { value: 'networking', label: 'Networking' },
   { value: 'confronto', label: 'Confronto' },
   { value: 'solo_chattare', label: 'Solo chattare' },
+  { value: 'supporto', label: 'supporto' },
 ]
 
 export const RELATIONSHIP_STATUS_OPTIONS: {

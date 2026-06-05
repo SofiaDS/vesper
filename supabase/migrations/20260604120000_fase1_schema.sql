@@ -32,7 +32,7 @@ create table public.profiles (
                       check (char_length(nickname) between 3 and 24),
   identity_category text not null
                       check (identity_category in
-                        ('donna_cis','donna_trans','uomo_trans','nonbinary_afab')),
+                        ('donna_cis','donna_trans','uomo_trans','nonbinary','genderqueer','agender','bigender','altro','preferisco_non_specificare')),
   orientations      text[] not null default '{}'::text[]
                       check (orientations <@
                         array['lesbica','bisessuale','queer','pan','questioning']::text[]),

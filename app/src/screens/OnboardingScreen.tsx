@@ -157,7 +157,7 @@ export function OnboardingScreen() {
               Dichiaro di appartenere a una delle categorie sopra indicate e di{' '}
               <strong>non essere un uomo cis</strong>. Vesper è uno spazio per
               donne lesbiche, bi e queer, donne trans, uomini trans e persone
-              non-binary AFAB.
+              non-binary.
             </span>
           </label>
 
