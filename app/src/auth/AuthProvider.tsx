@@ -23,6 +23,11 @@ interface AuthState {
   clearRecovery: () => void
   // ricarica il profilo dal DB (es. dopo averlo creato in onboarding)
   refreshProfile: () => Promise<void>
+  // ruoli dello staff (admin/moderator); vuoto per gli utenti normali
+  roles: string[]
+  isAdmin: boolean
+  isStaff: boolean
+  refreshRoles: () => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -33,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [recovering, setRecovering] = useState(false)
+  const [roles, setRoles] = useState<string[]>([])
 
   // Tiene traccia dell'utente per cui il profilo e' gia' stato risolto, cosi'
   // da NON ricaricarlo a ogni evento auth (es. refresh del token).
@@ -62,6 +68,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Carica i ruoli dell'utente (admin/moderator). La RLS consente di leggere
+  // solo le proprie righe, quindi e' sicuro anche per gli utenti normali.
+  async function loadRoles(userId: string): Promise<void> {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+    if (!active.current) return
+    if (error) {
+      console.error('Errore nel caricamento dei ruoli:', error.message)
+      setRoles([])
+      return
+    }
+    setRoles(((data as { role: string }[]) ?? []).map((r) => r.role))
+  }
+
+  async function refreshRoles(): Promise<void> {
+    if (session?.user) {
+      await loadRoles(session.user.id)
+    }
+  }
+
   async function signOut(): Promise<void> {
     await supabase.auth.signOut()
   }
@@ -77,7 +105,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(data.session)
       currentUserId.current = data.session?.user?.id ?? null
       if (data.session?.user) {
-        await loadProfile(data.session.user.id)
+        await Promise.all([
+          loadProfile(data.session.user.id),
+          loadRoles(data.session.user.id),
+        ])
       }
       if (active.current) setLoading(false)
     }
@@ -107,12 +138,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Utente cambiato (login): mostra "loading" finche' il profilo non
           // e' risolto, cosi' non lampeggia l'onboarding prima della chat.
           setLoading(true)
-          loadProfile(newSession.user.id).finally(() => {
+          Promise.all([
+            loadProfile(newSession.user.id),
+            loadRoles(newSession.user.id),
+          ]).finally(() => {
             if (active.current) setLoading(false)
           })
         } else {
           // Logout.
           setProfile(null)
+          setRoles([])
         }
       },
     )
@@ -131,6 +166,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     recovering,
     clearRecovery: () => setRecovering(false),
     refreshProfile,
+    roles,
+    isAdmin: roles.includes('admin'),
+    isStaff: roles.includes('admin') || roles.includes('moderator'),
+    refreshRoles,
     signOut,
   }
 
