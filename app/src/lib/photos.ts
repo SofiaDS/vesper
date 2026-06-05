@@ -86,23 +86,17 @@ async function resizeImage(file: File): Promise<Blob> {
   return blob
 }
 
-// Carica una nuova foto: valida, ridimensiona, salva su storage e inserisce il record.
-export async function uploadPhoto(
+// Carica un Blob JPEG gia' pronto (es. dal ritaglio quadrato): salva su storage e
+// inserisce il record. Condivide la logica con uploadPhoto, senza ri-comprimere.
+async function uploadBlob(
   userId: string,
-  file: File,
+  blob: Blob,
 ): Promise<ProfilePhoto> {
-  if (!file.type.startsWith('image/')) {
-    throw new Error('Seleziona un file immagine.')
-  }
-  if (file.size > MAX_UPLOAD_BYTES) {
-    throw new Error('Immagine troppo grande (max 12MB).')
-  }
   const existing = await listMyPhotos(userId)
   if (existing.length >= MAX_PHOTOS) {
     throw new Error(`Puoi caricare al massimo ${MAX_PHOTOS} foto.`)
   }
 
-  const blob = await resizeImage(file)
   const path = `${userId}/${crypto.randomUUID()}.jpg`
 
   const { error: upErr } = await supabase.storage
@@ -130,6 +124,33 @@ export async function uploadPhoto(
     throw insErr
   }
   return data as ProfilePhoto
+}
+
+// Carica una nuova foto da File: valida, ridimensiona, poi delega a uploadBlob.
+export async function uploadPhoto(
+  userId: string,
+  file: File,
+): Promise<ProfilePhoto> {
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Seleziona un file immagine.')
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error('Immagine troppo grande (max 12MB).')
+  }
+  const blob = await resizeImage(file)
+  return uploadBlob(userId, blob)
+}
+
+// Carica una foto da un Blob gia' ritagliato/compresso (selfie o crop).
+// Il chiamante e' responsabile di produrre un JPEG di dimensioni ragionevoli.
+export async function uploadPhotoFromBlob(
+  userId: string,
+  blob: Blob,
+): Promise<ProfilePhoto> {
+  if (blob.size > MAX_UPLOAD_BYTES) {
+    throw new Error('Immagine troppo grande (max 12MB).')
+  }
+  return uploadBlob(userId, blob)
 }
 
 // Elimina una foto (record + file). Se era la principale, promuove la prima rimasta.

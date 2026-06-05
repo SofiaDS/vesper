@@ -47,7 +47,7 @@ Quando A blocca B, scatta una **invisibilità reciproca totale**:
 | Area | Effetto del block |
 |---|---|
 | **DM** | B non può scrivere ad A. Nuovi messaggi falliscono lato client (vedi sezione 3). A non riceve nulla |
-| **Profilo** | B non può vedere il profilo di A. Tentativo di accesso → schermata "profilo non disponibile" generica |
+| **Profilo** | B non può vedere il profilo di A. Tentativo di accesso → schermata "profilo non esistente" generica |
 | **Ricerca per nickname** | B che cerca "A" non la trova mai, anche con nickname esatto |
 | **Ricerca a filtri** | A non compare mai nei risultati di B, e viceversa |
 | **Chatroom** | A non vede i messaggi di B nelle chatroom condivise. B non vede i messaggi di A. Entrambe restano nella chatroom (nessuna espulsione), ma sono reciprocamente invisibili lato UI |

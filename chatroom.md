@@ -63,10 +63,6 @@ La struttura iniziale prevedeva **1 globale + 2 tematiche**, con un ballottaggio
 
 **Scelta finale**: 1 globale + 3 tematiche — **Wander** (viaggi & eventi), **Pulse** (fitness/sport), **Cult** (arte/cultura).
 
-Conseguenze da registrare:
-- La chat **"Relazioni & affetti"**, che nel ballottaggio era data come presente "in ogni caso", **non è inclusa** nella terna di lancio. Resta come possibile tematica futura (vedi sezione 4).
-- Le terne "Intima + ampia" e "Intima + pratica" sono **scartate** ma conservate qui a fini di tracciabilità delle decisioni.
-
 ---
 
 ## 4. Espansione e principio di potatura
@@ -76,7 +72,6 @@ Conseguenze da registrare:
 Nuove chat tematiche specifiche verranno aggiunte quando la community crescerà e mostrerà bisogni chiari.
 
 Esempi di chat che potrebbero nascere col tempo (ma NON al lancio):
-- **Relazioni & affetti** (single, dating, fidanzate, ex, amore) — accantonata dalla terna di lancio, candidata naturale per la prima espansione se la community la richiede.
 - Coming out / questioning
 - Attivismo & politica LGBTQ+
 - Maternità & genitorialità queer

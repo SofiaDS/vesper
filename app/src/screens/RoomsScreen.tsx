@@ -7,10 +7,12 @@ export function RoomsScreen({
   onOpen,
   onOpenProfile,
   onOpenAdmin,
+  onOpenSearch,
 }: {
   onOpen: (room: Chatroom) => void
   onOpenProfile: () => void
   onOpenAdmin: () => void
+  onOpenSearch: () => void
 }) {
   const { session, profile, signOut, isStaff } = useAuth()
   const [rooms, setRooms] = useState<Chatroom[]>([])
@@ -132,6 +134,9 @@ export function RoomsScreen({
               Moderazione
             </button>
           )}
+          <button type="button" className="link" onClick={onOpenSearch}>
+            Esplora
+          </button>
           <button type="button" className="link" onClick={onOpenProfile}>
             Profilo
           </button>
