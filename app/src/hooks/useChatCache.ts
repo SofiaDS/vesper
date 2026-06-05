@@ -2,9 +2,15 @@ import { useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { listBlockedIds } from '../lib/blocks'
 
+export interface AvatarData {
+  preset: string | null
+  color: string | null
+}
+
 export function useChatCache() {
   const nicknameCache = useRef<Map<string, string>>(new Map())
-  const blockedIds = useRef<Set<string>>(new Set())
+  const avatarCache   = useRef<Map<string, AvatarData>>(new Map())
+  const blockedIds    = useRef<Set<string>>(new Set())
 
   async function loadBlockedIds(): Promise<void> {
     try {
@@ -19,10 +25,16 @@ export function useChatCache() {
     if (missing.length === 0) return
     const { data: profs } = await supabase
       .from('public_profiles')
-      .select('id, nickname')
+      .select('id, nickname, avatar_preset, accent_color')
       .in('id', missing)
-    for (const p of profs ?? []) {
+    for (const p of (profs ?? []) as {
+      id: string
+      nickname: string
+      avatar_preset: string | null
+      accent_color: string | null
+    }[]) {
       nicknameCache.current.set(p.id, p.nickname)
+      avatarCache.current.set(p.id, { preset: p.avatar_preset, color: p.accent_color })
     }
   }
 
@@ -31,13 +43,17 @@ export function useChatCache() {
     if (cached) return cached
     const { data } = await supabase
       .from('public_profiles')
-      .select('nickname')
+      .select('nickname, avatar_preset, accent_color')
       .eq('id', senderId)
       .maybeSingle()
-    const nick = data?.nickname ?? '—'
+    const nick = (data as { nickname: string } | null)?.nickname ?? '—'
     nicknameCache.current.set(senderId, nick)
+    avatarCache.current.set(senderId, {
+      preset: (data as { avatar_preset: string | null } | null)?.avatar_preset ?? null,
+      color:  (data as { accent_color: string | null } | null)?.accent_color ?? null,
+    })
     return nick
   }
 
-  return { nicknameCache, blockedIds, loadBlockedIds, cacheNicknames, resolveNickname }
+  return { nicknameCache, avatarCache, blockedIds, loadBlockedIds, cacheNicknames, resolveNickname }
 }

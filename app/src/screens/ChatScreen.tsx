@@ -6,6 +6,7 @@ import { useChatMessages } from '../hooks/useChatMessages'
 import { useChatRealtime } from '../hooks/useChatRealtime'
 import { ReportDialog } from '../components/ReportDialog'
 import { promoteLayer } from '../lib/layers'
+import { glyphFor } from '../lib/profile/formatters'
 import type { Chatroom } from '../types'
 import type { ChatMessage } from '../hooks/useChatMessages'
 
@@ -32,7 +33,7 @@ export function ChatScreen({
   const bottomRef = useRef<HTMLDivElement>(null)
   const myId = session?.user.id
 
-  const { blockedIds, nicknameCache, loadBlockedIds, cacheNicknames, resolveNickname } =
+  const { blockedIds, nicknameCache, avatarCache, loadBlockedIds, cacheNicknames, resolveNickname } =
     useChatCache()
 
   const {
@@ -140,6 +141,12 @@ export function ChatScreen({
                 className="msg-author"
                 onClick={() => onOpenProfile(m.sender_id)}
               >
+                <span
+                  className="msg-avatar"
+                  style={{ background: avatarCache.current.get(m.sender_id)?.color ?? 'var(--gold)' }}
+                >
+                  {glyphFor(avatarCache.current.get(m.sender_id)?.preset ?? null, m.nickname)}
+                </span>
                 {m.nickname}
               </button>
             )}

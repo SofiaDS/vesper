@@ -283,12 +283,6 @@ code {
   background: rgba(232, 177, 78, 0.16);
 }
 
-.msg-author {
-  font-size: 0.72rem;
-  color: var(--gold);
-  opacity: 0.85;
-}
-
 .msg-body {
   font-size: 0.95rem;
   line-height: 1.4;
@@ -1068,18 +1062,32 @@ code {
 
 /* --- Autore messaggio cliccabile + footer con segnala --- */
 .msg-author {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   margin: 0 0 2px;
   padding: 0;
   border: none;
   background: none;
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--coral);
+  color: var(--gold);
   cursor: pointer;
 }
 .msg-author:hover {
   text-decoration: underline;
+}
+.msg-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  color: var(--ink);
+  flex-shrink: 0;
+  line-height: 1;
 }
 .msg-footer {
   display: flex;
@@ -1156,22 +1164,22 @@ code {
   width: 100%;
   box-sizing: border-box;
   resize: vertical;
-  border: 1px solid rgba(232, 177, 78, 0.25);
+  border: 1px solid rgba(23, 21, 32, 0.2);
   border-radius: 9px;
   padding: 0.65rem 0.75rem;
   font: inherit;
-  background: rgba(247, 239, 221, 0.04);
-  color: var(--cream);
+  background: rgba(23, 21, 32, 0.06);
+  color: var(--ink);
 }
 
 .report-note::placeholder {
-  color: var(--cream);
-  opacity: 0.35;
+  color: var(--ink);
+  opacity: 0.4;
 }
 
 .report-note:focus {
   outline: none;
-  border-color: var(--gold);
+  border-color: rgba(23, 21, 32, 0.5);
 }
 
 /* --- Segnala foto sul carosello --- */
