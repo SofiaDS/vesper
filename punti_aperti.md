@@ -2,7 +2,7 @@
 
 Tutte le decisioni ancora da prendere, organizzate per priorità.
 
-Ultimo aggiornamento: 4 giugno 2026
+Ultimo aggiornamento: 4 giugno 2026 (aggiunto T9 — allowlist redirect Supabase)
 
 ---
 
@@ -80,6 +80,7 @@ Vedi [`stack_tecnico.md`](./stack_tecnico.md) per i dettagli completi:
 - **T3**: Monitoraggio errori e crash reporting — direzione provvisoria **Sentry**, da confermare in Tappa 4 (preparazione lancio store)
 - ~~**T4**: CI/CD (Expo Application Services o GitHub Actions)~~ ✅ Decisione presa il 20 maggio 2026: EAS per build nativi + GitHub Actions per CI codice (vedi punto 12 di `stack_tecnico.md`)
 - **T5**: Strumenti di analytics — decisione rimandata a Tappa 5 (post-lancio), criterio: scegliere lo strumento in base a *cosa* si vuole misurare, non prima
+- **T9 (config deploy/auth)**: in produzione bisogna aggiungere l'URL dell'app su Vercel alla **allowlist dei redirect** di Supabase (Authentication → URL Configuration: *Site URL* + *Redirect URLs*). Serve perché i link via email che riportano all'app — conferma registrazione e **reset password** (`redirectTo: window.location.origin`) — funzionino fuori da `localhost`. In dev `localhost` è già ammesso. Da fare quando si fissa il dominio definitivo. Collegato a T1 (SMTP/email applicative).
 
 ---
 
