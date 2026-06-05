@@ -11,8 +11,8 @@ Ultimo aggiornamento: 22 maggio 2026
 1. Principi guida del profilo
 2. Tabella campi del profilo
 3. Campi esplicitamente esclusi
-4. Identità visiva — avatar preset (v1)
-5. Evoluzione v2 — foto reali con permessi granulari
+4. Identità visiva — avatar preset + foto personali (v1)
+5. Evoluzione v2 — preset avatar + cool
 
 Vedi anche:
 - [`utenti_e_identita.md`](./utenti_e_identita.md) per come si compilano i campi identità/orientamento durante l'iscrizione
@@ -81,35 +81,23 @@ Campi che sono stati discussi e **decisi di non includere**, con motivazione:
 - ❌ **Nome e cognome reali**: rischio doxxing, outing involontario, incoerenza con modello nickname-based.
 - ❌ **Contatti social esterni** (Instagram, ecc.): si vuole che le utenti restino nell'app, riduce rischio doxxing/stalking.
 - ❌ **Email pubblica**: vulnerabilità a phishing, può rivelare identità reale.
-- ❌ **Stato relazione**: troppo invasivo, può creare situazioni complicate.
-- ❌ **Religione, politica**: polarizzanti, non utili al profilo (se ne può parlare in chat).
-- ❌ **Stato lavorativo dettagliato** (azienda, posizione): rivela troppo sull'identità reale.
-- ❌ **Numero di telefono**: mai, in nessuna forma.
-
 ---
 
 ## 4. Identità visiva — avatar preset (solo v1)
 
 ### Scelta v1
 
-**Solo avatar preset, niente foto reali**.
-
-### Motivazione
-
-- **Coerenza con la natura dell'app**: ci si conosce attraverso parole, non immagini. Opposto del modello Tinder.
-- **Massima sicurezza per utenti vulnerabili**: niente screenshot rubati, niente reverse image search, niente outing involontario.
-- **Egualitarismo visivo**: nessuna gerarchia implicita basata sull'aspetto.
+**avatar preset + foto a scelta libera utente**.
 
 ### Implementazione
 
 - Set di ~20-30 avatar preset disegnati per la community, stilizzati, colorati, non realistici.
 - L'utente sceglie un avatar all'iscrizione e può cambiarlo in qualsiasi momento.
 - Stesso avatar usato in chatroom, DM, profilo.
-- Comunicazione del principio nei TOS: "questa è un'app dove ci si conosce dalle parole, non dalle foto".
 
 ---
 
-## 5. Evoluzione v2 — foto reali con permessi granulari (idea futura, non v1)
+## 5. Evoluzione v2 — preset avatar + carini
 
 ### Caratteristiche previste
 
