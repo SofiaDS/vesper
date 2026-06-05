@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import {
@@ -46,6 +46,7 @@ import {
   type PhotoStatus,
 } from '../lib/photos'
 import { PhotoUploadDialog } from '../components/PhotoUploadDialog'
+import { ErrorBoundary } from '../components/ErrorBoundary'
 
 // Avatar preset: placeholder funzionanti finche' non arriva l'art definitiva
 // (vedi profilo_utente.md sez. 4 / branding.md). La chiave viene salvata; il
@@ -312,8 +313,8 @@ function ProfilePreview({
           <div className="pf-rows">{rows}</div>
         ) : (
           <p className="hint">
-            Per ora le altre persone vedono solo il tuo nickname e l’avatar.
-            Tocca “Modifica” per scegliere cosa mostrare.
+            Per ora le altre persone vedono solo il tuo nickname e l'avatar.
+            Tocca "Modifica" per scegliere cosa mostrare.
           </p>
         )}
       </div>
@@ -508,7 +509,7 @@ function ProfileEditor({
     }
     // La città deve essere scelta dall'elenco (o lasciata vuota).
     if (cityQuery.trim() && !citySelected.current) {
-      setError('Seleziona la città dall’elenco dei suggerimenti.')
+      setError('Seleziona la città dall'elenco dei suggerimenti.')
       return
     }
 
@@ -560,6 +561,18 @@ function ProfileEditor({
 
   const avatarGlyph = glyphFor(avatar, nickname)
 
+  // Memoize filtered option lists to prevent unnecessary re-renders
+  const identityOpts = useMemo(() => IDENTITY_OPTIONS, [])
+  const orientationOpts = useMemo(() => ORIENTATION_OPTIONS, [])
+  const intentOpts = useMemo(() => INTENT_OPTIONS, [])
+  const relStatusOpts = useMemo(() => RELATIONSHIP_STATUS_OPTIONS, [])
+  const relTypeOpts = useMemo(() => RELATIONSHIP_TYPE_OPTIONS, [])
+  const dietOpts = useMemo(() => DIET_OPTIONS, [])
+  const religionOpts = useMemo(() => RELIGION_OPTIONS, [])
+  const politicsOpts = useMemo(() => POLITICS_OPTIONS, [])
+  const smokingOpts = useMemo(() => SMOKING_OPTIONS, [])
+  const sportOpts = useMemo(() => SPORT_OPTIONS, [])
+
   return (
     <main className="app profile">
       <header className="rooms-header">
@@ -599,7 +612,7 @@ function ProfileEditor({
             ))}
           </div>
           <span className="hint">
-            Avatar provvisori: l’illustrazione definitiva arriverà col branding.
+            Avatar provvisori: l'illustrazione definitiva arriverà col branding.
           </span>
         </fieldset>
 
@@ -757,7 +770,7 @@ function ProfileEditor({
         <fieldset className="field">
           <legend>Come ti identifichi</legend>
           <div className="options">
-            {IDENTITY_OPTIONS.map((opt) => (
+            {identityOpts.map((opt) => (
               <label key={opt.value} className="chip">
                 <input
                   type="radio"
@@ -782,7 +795,7 @@ function ProfileEditor({
         <fieldset className="field">
           <legend>Orientamento</legend>
           <div className="options">
-            {ORIENTATION_OPTIONS.map((opt) => (
+            {orientationOpts.map((opt) => (
               <label key={opt.value} className="chip">
                 <input
                   type="checkbox"
@@ -806,7 +819,7 @@ function ProfileEditor({
         <fieldset className="field">
           <legend>Stato relazionale</legend>
           <div className="options">
-            {RELATIONSHIP_STATUS_OPTIONS.map((opt) => (
+            {relStatusOpts.map((opt) => (
               <label key={opt.value} className="chip">
                 <input
                   type="radio"
@@ -832,7 +845,7 @@ function ProfileEditor({
           </div>
           {relStatus === 'in_relazione' && (
             <div className="options sub-options">
-              {RELATIONSHIP_TYPE_OPTIONS.map((opt) => (
+              {relTypeOpts.map((opt) => (
                 <label key={opt.value} className="chip">
                   <input
                     type="radio"
@@ -858,7 +871,7 @@ function ProfileEditor({
         <fieldset className="field">
           <legend>Cosa cerchi</legend>
           <div className="options">
-            {INTENT_OPTIONS.map((opt) => (
+            {intentOpts.map((opt) => (
               <label key={opt.value} className="chip">
                 <input
                   type="checkbox"
@@ -950,7 +963,7 @@ function ProfileEditor({
         <fieldset className="field">
           <legend>Alimentazione</legend>
           <div className="options">
-            {DIET_OPTIONS.map((opt) => (
+            {dietOpts.map((opt) => (
               <label key={opt.value} className="chip">
                 <input
                   type="radio"
@@ -984,7 +997,7 @@ function ProfileEditor({
         <fieldset className="field">
           <legend>Religione & credo</legend>
           <div className="options">
-            {RELIGION_OPTIONS.map((opt) => (
+            {religionOpts.map((opt) => (
               <label key={opt.value} className="chip">
                 <input
                   type="radio"
@@ -1018,7 +1031,7 @@ function ProfileEditor({
         <fieldset className="field">
           <legend>Orientamento politico</legend>
           <div className="options">
-            {POLITICS_OPTIONS.map((opt) => (
+            {politicsOpts.map((opt) => (
               <label key={opt.value} className="chip">
                 <input
                   type="radio"
@@ -1052,7 +1065,7 @@ function ProfileEditor({
         <fieldset className="field">
           <legend>Fumo</legend>
           <div className="options">
-            {SMOKING_OPTIONS.map((opt) => (
+            {smokingOpts.map((opt) => (
               <label key={opt.value} className="chip">
                 <input
                   type="radio"
@@ -1086,7 +1099,7 @@ function ProfileEditor({
         <fieldset className="field">
           <legend>Attività fisica</legend>
           <div className="options">
-            {SPORT_OPTIONS.map((opt) => (
+            {sportOpts.map((opt) => (
               <label key={opt.value} className="chip">
                 <input
                   type="radio"
@@ -1308,14 +1321,34 @@ function PhotoManager({ userId }: { userId: string }) {
         </div>
       )}
       {adding && (
-        <PhotoUploadDialog
-          onClose={() => setAdding(false)}
-          onComplete={onCropped}
-        />
+        <ErrorBoundary
+          fallback={(error, retry) => (
+            <div className="error-boundary">
+              <p>
+                Errore nel caricamento: {error.message}
+              </p>
+              <button type="button" className="link" onClick={retry}>
+                Riprova
+              </button>
+              <button
+                type="button"
+                className="link"
+                onClick={() => setAdding(false)}
+              >
+                Chiudi
+              </button>
+            </div>
+          )}
+        >
+          <PhotoUploadDialog
+            onClose={() => setAdding(false)}
+            onComplete={onCropped}
+          />
+        </ErrorBoundary>
       )}
       <span className="hint">
         La prima è la principale (★). Le foto restano <em>in revisione</em>{' '}
-        finché non vengono approvate: le altre persone le vedono solo dopo l’ok.
+        finché non vengono approvate: le altre persone le vedono solo dopo l'ok.
       </span>
       {err && <p className="err">{err}</p>}
     </fieldset>
