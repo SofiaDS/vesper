@@ -1,6 +1,5 @@
 import { useRef, useState, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
-import { ThemeToggle } from '../../components/ThemeToggle'
 import { NotificationSettings } from '../../components/NotificationSettings'
 import {
   BIO_MAX,
@@ -501,10 +500,14 @@ export function ProfileEditor({
 
         <label className="field">
           <span>
-            Bio <span className="muted">({bio.length}/{BIO_MAX})</span>
+            Bio{' '}
+            {bio.length >= BIO_MAX
+              ? <span className="limit-warning">raggiunto limite caratteri</span>
+              : <span className="muted">({bio.length}/{BIO_MAX})</span>
+            }
           </span>
           <textarea
-            className="textarea"
+            className={bio.length >= BIO_MAX ? 'textarea textarea--limit' : 'textarea'}
             maxLength={BIO_MAX}
             rows={4}
             value={bio}
@@ -922,7 +925,6 @@ export function ProfileEditor({
 
       <section className="card" style={{ marginTop: '1rem' }}>
         <h2 className="pf-section-title">Preferenze app</h2>
-        <ThemeToggle />
         <NotificationSettings />
       </section>
     </main>

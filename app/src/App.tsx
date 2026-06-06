@@ -1,6 +1,7 @@
 import { useAuth } from './auth/AuthProvider'
 import { isSupabaseConfigured } from './lib/supabase'
 import { InstallBanner } from './components/InstallBanner'
+import { ThemeToggle } from './components/ThemeToggle'
 import { AuthScreen } from './screens/AuthScreen'
 import { OnboardingScreen } from './screens/OnboardingScreen'
 import { UpdatePasswordScreen } from './screens/UpdatePasswordScreen'
@@ -51,6 +52,7 @@ function App() {
   return (
     <>
       <InstallBanner />
+      <ThemeToggle />
       {screen}
     </>
   )
