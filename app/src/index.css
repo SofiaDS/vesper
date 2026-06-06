@@ -1831,3 +1831,147 @@ button.dm-conv:hover {
   font-size: 0.88rem;
 }
 
+
+
+/* ── Install banner (PWA) ─────────────────────────────── */
+.install-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--ink);
+  border-top: 1px solid rgba(232, 177, 78, 0.3);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+.install-banner-body {
+  flex: 1;
+}
+.install-banner-text {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--cream);
+  opacity: 0.9;
+  line-height: 1.4;
+}
+.install-share-icon {
+  font-style: normal;
+  font-size: 1rem;
+}
+.install-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+.install-banner-dismiss {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+/* ── Light theme ──────────────────────────────────────── */
+[data-theme="light"] {
+  --ink:   #f0ece0;
+  --gold:  #9a6a00;
+  --cream: #1a1626;
+  --coral: #c04030;
+  color-scheme: light;
+  background-color: var(--ink);
+  color: var(--cream);
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .roster,
+[data-theme="light"] .install-banner,
+[data-theme="light"] .rep-prompt {
+  background: rgba(23, 21, 32, 0.07);
+  border-color: rgba(130, 90, 0, 0.25);
+}
+
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background: rgba(23, 21, 32, 0.05);
+  border-color: rgba(130, 90, 0, 0.25);
+  color: var(--cream);
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder { color: rgba(26, 22, 38, 0.45); }
+
+[data-theme="light"] .msg-bubble { background: rgba(23, 21, 32, 0.09); }
+[data-theme="light"] .msg-bubble.mine { background: var(--gold); color: var(--ink); }
+
+[data-theme="light"] .rooms-header,
+[data-theme="light"] .chat-header { border-color: rgba(130, 90, 0, 0.18); }
+
+[data-theme="light"] .admin-tabs,
+[data-theme="light"] .admin-tab { border-color: rgba(130, 90, 0, 0.18); }
+
+[data-theme="light"] .report-card,
+[data-theme="light"] .mod-photo { 
+  background: rgba(23, 21, 32, 0.06);
+  border-color: rgba(130, 90, 0, 0.2);
+}
+
+[data-theme="light"] .btn-ghost {
+  border-color: rgba(130, 90, 0, 0.35);
+  color: var(--cream);
+}
+
+[data-theme="light"] .options .chip,
+[data-theme="light"] .chip-group .chip {
+  background: rgba(23, 21, 32, 0.07);
+  border-color: rgba(130, 90, 0, 0.2);
+  color: var(--cream);
+}
+
+[data-theme="light"] .chip.sel {
+  background: rgba(154, 106, 0, 0.18);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ── Theme toggle pill ────────────────────────────────── */
+.theme-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+.toggle-label {
+  font-size: 0.9rem;
+  color: var(--cream);
+}
+.toggle-pill {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  background: rgba(232, 177, 78, 0.2);
+  border: 1.5px solid rgba(232, 177, 78, 0.4);
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+.toggle-pill.on {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.toggle-pill:disabled { opacity: 0.5; cursor: default; }
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: var(--cream);
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle-pill.on .toggle-knob { transform: translateX(20px); }
