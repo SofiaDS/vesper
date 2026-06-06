@@ -18,7 +18,7 @@ DONE
 P2. VerificationScreen — restituisce null. Senza di essa nessuna utente può completare l'onboarding. Flusso già documentato nel file.
 DONE
 P3. Block → DM — Se A blocca B, la conversazione DM rimane visibile e scrivibile. Va filtrata in DmScreen e bloccato sendDmMessage.
-
+DONE
 P4. promote_my_layer al login — La promozione scatta solo mandando un messaggio. Va aggiunta una chiamata silenziosa in AuthProvider all'init del profilo.
 
 Priorità media
@@ -33,3 +33,7 @@ P8. Vouching system — lib/vouching/index.ts tutto TODO (non bloccante al lanci
 P9. Lista utenti iscritti/online alla chat — TODO esplicito in chatroom.md
 P10. decayExpiredEvents come Edge Function schedulata — cleanup GDPR mensile
 P11. Da capire: salvare messaggi delle chatroom su server ha senso? Nel caso di molti utenti, non ri rischia di fare troppe chiamate al be ?
+P12. Moderazione - cambiare bottoni:
+    - conferma segnalazione
+    - rigetta segnalazione
+    - richiedi ulteriore verifica

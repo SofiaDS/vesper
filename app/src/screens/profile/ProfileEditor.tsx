@@ -18,6 +18,7 @@ import {
   POLITICS_OPTIONS,
   SMOKING_OPTIONS,
   SPORT_OPTIONS,
+  DM_FILTER_OPTIONS,
 } from '../../constants/options'
 import { ZODIAC_LABELS } from '../../constants/labels'
 import { glyphFor, normalize, AVATAR_PRESETS } from '../../lib/profile/formatters'
@@ -220,6 +221,7 @@ export function ProfileEditor({
   const [sport, setSport] = useState<Sport | null>(profile.sport ?? null)
   const [avatar, setAvatar] = useState<string | null>(profile.avatar_preset ?? null)
   const [accent, setAccent] = useState<string | null>(profile.accent_color ?? null)
+  const [dmFilter, setDmFilter] = useState(profile.dm_filter)
 
   const [cityName, setCityName] = useState(profile.city ?? '')
   const [cityProvince, setCityProvince] = useState(profile.city_province ?? '')
@@ -375,6 +377,7 @@ export function ProfileEditor({
           sport,
           avatar_preset: avatar,
           accent_color: accent,
+          dm_filter: dmFilter,
           ...vis,
           is_searchable: searchable,
           updated_at: new Date().toISOString(),
@@ -879,6 +882,29 @@ export function ProfileEditor({
             <span>Mostra quando sono online</span>
           </label>
         </fieldset>
+
+        {profile.strato >= 2 && (
+          <fieldset className="field">
+            <legend>Chi può scrivermi in privato</legend>
+            <div className="options">
+              {DM_FILTER_OPTIONS.map((opt) => (
+                <label key={opt.value} className="chip">
+                  <input
+                    type="radio"
+                    name="dm_filter"
+                    value={opt.value}
+                    checked={dmFilter === opt.value}
+                    onChange={() => setDmFilter(opt.value)}
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+            </div>
+            <p className="hint">
+              Filtra le richieste di messaggio privato che ricevi.
+            </p>
+          </fieldset>
+        )}
 
         {error && <p className="err">{error}</p>}
 
