@@ -107,9 +107,8 @@ export async function annulReputationEvent(eventId: string): Promise<void> {
   if (error) throw error
 }
 
-// Gli eventi scaduti restano nello storico ~12 mesi per GDPR (gdpr_e_legale.md).
-// Questa funzione restituisce il conteggio degli eventi scaduti ancora visibili.
-// La DELETE effettiva è rimandata a un job schedulato post-lancio.
+// Conta gli eventi scaduti ancora visibili nello storico (utile per la dashboard).
+// La DELETE effettiva è gestita dall'Edge Function decay-expired-events (mensile).
 export async function decayExpiredEvents(userId: string): Promise<number> {
   const now = new Date().toISOString()
   const { count, error } = await supabase
