@@ -1,5 +1,7 @@
 import { useRef, useState, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
+import { ThemeToggle } from '../../components/ThemeToggle'
+import { NotificationSettings } from '../../components/NotificationSettings'
 import {
   BIO_MAX,
   PRONOUNS_MAX,
@@ -917,6 +919,12 @@ export function ProfileEditor({
           </button>
         </div>
       </form>
+
+      <section className="card" style={{ marginTop: '1rem' }}>
+        <h2 className="pf-section-title">Preferenze app</h2>
+        <ThemeToggle />
+        <NotificationSettings />
+      </section>
     </main>
   )
 }

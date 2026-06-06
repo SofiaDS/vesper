@@ -7,9 +7,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // Usa il manifest.webmanifest esistente in public/
+      // Usa manifest.webmanifest esistente in public/
       manifest: false,
-      workbox: {
+      // injectManifest: usa src/sw.ts come entry point del SW (gestisce push + precache)
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
       },
     }),
