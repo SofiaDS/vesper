@@ -1,10 +1,9 @@
 // Ricerca utenti: wrapper sulla RPC server-side `search_users`.
-// La RPC applica is_searchable, l'asimmetria del block e il masking dei campi
-// privati; qui costruiamo solo i parametri e tipizziamo il risultato.
+// La RPC applica is_searchable, l'asimmetria del block e il masking dei campi privati.
 import { supabase } from './supabase'
 
-export const SEARCH_PAGE = 10 // risultati per pagina
-export const SEARCH_MAX = 50 // tetto massimo complessivo (vedi ricerca_utenti.md)
+export const SEARCH_PAGE = 10
+export const SEARCH_MAX = 50
 
 export interface SearchResult {
   id: string
@@ -37,7 +36,6 @@ function orNull<T>(arr: T[] | undefined): T[] | null {
   return arr && arr.length > 0 ? arr : null
 }
 
-// Numero di filtri attivi: utile per la UI ("N cose in comune" e validazione).
 export function activeFilterCount(f: SearchFilters): number {
   let n = 0
   if (f.ageMin != null) n++
@@ -53,10 +51,7 @@ export function activeFilterCount(f: SearchFilters): number {
   return n
 }
 
-export async function searchByNickname(
-  nickname: string,
-  offset = 0,
-): Promise<SearchResult[]> {
+export async function searchByNickname(nickname: string, offset = 0): Promise<SearchResult[]> {
   const { data, error } = await supabase.rpc('search_users', {
     p_nickname: nickname,
     p_limit: SEARCH_PAGE,
@@ -66,10 +61,7 @@ export async function searchByNickname(
   return (data as SearchResult[]) ?? []
 }
 
-export async function searchByFilters(
-  f: SearchFilters,
-  offset = 0,
-): Promise<SearchResult[]> {
+export async function searchByFilters(f: SearchFilters, offset = 0): Promise<SearchResult[]> {
   const { data, error } = await supabase.rpc('search_users', {
     p_age_min: f.ageMin ?? null,
     p_age_max: f.ageMax ?? null,
@@ -89,26 +81,5 @@ export async function searchByFilters(
   return (data as SearchResult[]) ?? []
 }
 
-// Regioni italiane (formato identico ai valori in `comuni.regione`).
-export const REGIONS: string[] = [
-  'Abruzzo',
-  'Basilicata',
-  'Calabria',
-  'Campania',
-  'Emilia-Romagna',
-  'Friuli-Venezia Giulia',
-  'Lazio',
-  'Liguria',
-  'Lombardia',
-  'Marche',
-  'Molise',
-  'Piemonte',
-  'Puglia',
-  'Sardegna',
-  'Sicilia',
-  'Toscana',
-  'Trentino-Alto Adige/Südtirol',
-  'Umbria',
-  "Valle d'Aosta/Vallée d'Aoste",
-  'Veneto',
-]
+// REGIONS spostato in constants/regions.ts — re-export per retrocompatibilità.
+export { REGIONS } from '../constants/regions'
