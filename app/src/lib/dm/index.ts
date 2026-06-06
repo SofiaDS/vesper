@@ -2,6 +2,7 @@
 // La destinataria deve accettare la richiesta prima che i messaggi possano fluire.
 
 import { supabase } from '../supabase'
+import { isBlocked } from '../blocks'
 
 export interface DmConversation {
   id: string
@@ -118,7 +119,11 @@ export async function sendDmMessage(
   conversationId: string,
   senderId: string,
   body: string,
+  receiverId?: string,
 ): Promise<DmMessage> {
+  if (receiverId && (await isBlocked(receiverId))) {
+    throw new Error('Non puoi inviare messaggi a questa utente.')
+  }
   const { data, error } = await supabase
     .from('dm_messages')
     .insert({ conversation_id: conversationId, sender_id: senderId, body })

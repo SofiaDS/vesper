@@ -16,7 +16,7 @@ DONE
 P1. Migrations mancanti — public_profiles (view), user_blocks, user_roles, reports esistono nel DB ma non come file migration. Il progetto non si ricostruisce da zero.
 DONE
 P2. VerificationScreen — restituisce null. Senza di essa nessuna utente può completare l'onboarding. Flusso già documentato nel file.
-
+DONE
 P3. Block → DM — Se A blocca B, la conversazione DM rimane visibile e scrivibile. Va filtrata in DmScreen e bloccato sendDmMessage.
 
 P4. promote_my_layer al login — La promozione scatta solo mandando un messaggio. Va aggiunta una chiamata silenziosa in AuthProvider all'init del profilo.

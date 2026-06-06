@@ -10,6 +10,7 @@ import {
   type DmConversation,
   type DmMessage,
 } from '../lib/dm'
+import { isBlocked } from '../lib/blocks'
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
@@ -39,6 +40,7 @@ function ConversationView({
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [otherBlocked, setOtherBlocked] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const skipScroll = useRef(false)
 
@@ -51,11 +53,12 @@ function ConversationView({
     let alive = true
     setLoading(true)
     setMessages([])
-    getDmMessages(conversation.id)
-      .then((msgs) => {
+    Promise.all([getDmMessages(conversation.id), isBlocked(otherId)])
+      .then(([msgs, blocked]) => {
         if (!alive) return
         setMessages(msgs)
         setHasMore(msgs.length === 50)
+        setOtherBlocked(blocked)
         setLoading(false)
       })
       .catch(() => {
@@ -64,7 +67,7 @@ function ConversationView({
     return () => {
       alive = false
     }
-  }, [conversation.id])
+  }, [conversation.id, otherId])
 
   useEffect(() => {
     const ch = supabase
@@ -119,11 +122,11 @@ function ConversationView({
   async function handleSend(e: React.FormEvent) {
     e.preventDefault()
     const body = text.trim()
-    if (!body) return
+    if (!body || otherBlocked) return
     setSending(true)
     setError(null)
     try {
-      const msg = await sendDmMessage(conversation.id, myId, body)
+      const msg = await sendDmMessage(conversation.id, myId, body, otherId)
       setMessages((prev) =>
         prev.some((m) => m.id === msg.id) ? prev : [...prev, msg],
       )
@@ -182,23 +185,31 @@ function ConversationView({
 
       {error && <p className="err chat-error">{error}</p>}
 
-      <form className="composer" onSubmit={handleSend}>
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Scrivi un messaggio…"
-          maxLength={2000}
-          aria-label="Messaggio"
-        />
-        <button
-          type="submit"
-          className="btn-primary"
-          disabled={sending || !text.trim()}
-        >
-          Invia
-        </button>
-      </form>
+      {otherBlocked ? (
+        <div className="composer composer-blocked">
+          <p className="muted" style={{ margin: 0, textAlign: 'center', fontSize: '0.85rem' }}>
+            Hai bloccato questa utente. Non puoi inviare messaggi.
+          </p>
+        </div>
+      ) : (
+        <form className="composer" onSubmit={handleSend}>
+          <input
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Scrivi un messaggio…"
+            maxLength={2000}
+            aria-label="Messaggio"
+          />
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={sending || !text.trim()}
+          >
+            Invia
+          </button>
+        </form>
+      )}
     </main>
   )
 }
