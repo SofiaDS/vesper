@@ -5,6 +5,7 @@ import { useChatCache } from '../hooks/useChatCache'
 import { useChatMessages } from '../hooks/useChatMessages'
 import { useChatRealtime } from '../hooks/useChatRealtime'
 import { ReportDialog } from '../components/ReportDialog'
+import { RoomRoster } from '../components/RoomRoster'
 import { promoteLayer } from '../lib/layers'
 import { glyphFor } from '../lib/profile/formatters'
 import type { Chatroom } from '../types'
@@ -113,6 +114,12 @@ export function ChatScreen({
           <h1>{room.name}</h1>
           <p className="muted small-inline">Ciao {profile?.nickname}</p>
         </div>
+        <RoomRoster
+          room={room}
+          myId={myId}
+          myNickname={profile?.nickname}
+          showOnline={profile?.show_online ?? true}
+        />
       </header>
 
       <section className="messages">

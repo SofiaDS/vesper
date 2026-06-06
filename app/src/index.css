@@ -436,6 +436,55 @@ code {
   min-width: 0;
 }
 
+/* --- Chat: roster (utenti online / iscritte) --- */
+.roster-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.roster-toggle {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.roster {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  z-index: 20;
+  min-width: 180px;
+  max-width: 240px;
+  background: var(--ink);
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.roster-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.roster-title {
+  margin: 0 0 0.3rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.roster-user {
+  font-size: 0.85rem;
+  color: var(--cream);
+  opacity: 0.9;
+}
+
 .load-older {
   align-self: center;
   margin: 0 0 0.5rem;
