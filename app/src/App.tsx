@@ -1,5 +1,6 @@
 import { useAuth } from './auth/AuthProvider'
 import { isSupabaseConfigured } from './lib/supabase'
+import { InstallBanner } from './components/InstallBanner'
 import { AuthScreen } from './screens/AuthScreen'
 import { OnboardingScreen } from './screens/OnboardingScreen'
 import { UpdatePasswordScreen } from './screens/UpdatePasswordScreen'
@@ -10,7 +11,6 @@ import { Home } from './screens/Home'
 function App() {
   const { loading, session, profile, needsOnboarding, recovering } = useAuth()
 
-  // Guardrail: variabili d'ambiente mancanti (vedi .env.example).
   if (!isSupabaseConfigured) {
     return (
       <main className="app">
@@ -33,33 +33,27 @@ function App() {
         <header className="brand">
           <h1>Vesper</h1>
         </header>
-        <p className="muted">Caricamento…</p>
+        <p className="muted">Caricamento&hellip;</p>
       </main>
     )
   }
 
-  // Arrivo dal link di reset password -> imposta nuova password.
-  // (ha priorita': la sessione recovery e' valida ma serve solo a questo)
   if (recovering) return <UpdatePasswordScreen />
 
-  // Non loggata -> login/signup
-  if (!session) return <AuthScreen />
+  let screen: React.ReactNode
+  if (!session) screen = <AuthScreen />
+  else if (needsOnboarding) screen = <OnboardingScreen />
+  else if (!profile?.verification_status || profile.verification_status === 'rejected')
+    screen = <VerificationScreen />
+  else if (profile.verification_status === 'pending') screen = <VerificationPendingScreen />
+  else screen = <Home />
 
-  // Loggata ma senza profilo -> onboarding
-  if (needsOnboarding) return <OnboardingScreen />
-
-  // Profilo creato ma verifica non ancora inviata o rifiutata -> verifica
-  if (!profile?.verification_status || profile.verification_status === 'rejected') {
-    return <VerificationScreen />
-  }
-
-  // Verifica inviata, in attesa di revisione
-  if (profile.verification_status === 'pending') {
-    return <VerificationPendingScreen />
-  }
-
-  // Verificata e approvata -> app
-  return <Home />
+  return (
+    <>
+      <InstallBanner />
+      {screen}
+    </>
+  )
 }
 
 export default App
