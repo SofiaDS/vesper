@@ -43,10 +43,7 @@ export function VerificationScreen() {
         audio: false,
       })
       streamRef.current = stream
-      if (liveRef.current) {
-        liveRef.current.srcObject = stream
-        await liveRef.current.play()
-      }
+      // setStep triggera il render del <video>; l'useEffect sotto aggancia lo stream
       setStep('camera')
     } catch {
       setError(
@@ -113,7 +110,7 @@ export function VerificationScreen() {
 
       const { error: upErr } = await supabase.storage
         .from(BUCKET)
-        .upload(path, blob, { contentType: blob.type, upsert: true })
+        .upload(path, blob, { contentType: blob.type })
       if (upErr) throw upErr
 
       const { error: rpcErr } = await supabase.rpc('submit_verification', {
@@ -124,10 +121,26 @@ export function VerificationScreen() {
       await refreshProfile()
       // App.tsx gestisce il redirect alla schermata "In attesa"
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Upload non riuscito. Riprova.')
+      const msg = e instanceof Error ? e.message : ''
+      const friendly =
+        msg.includes('row-level security') || msg.includes('policy')
+          ? 'Errore di autorizzazione. Esci e rientra nell\'app, poi riprova.'
+          : msg.includes('network') || msg.includes('fetch')
+          ? 'Errore di rete. Controlla la connessione e riprova.'
+          : 'Caricamento non riuscito. Riprova.'
+      setError(friendly)
       setStep('review')
     }
   }
+
+  // Aggancia lo stream al <video> dopo che React ha montato l'elemento.
+  // liveRef.current è null finché step !== 'camera'/'recording'.
+  useEffect(() => {
+    if ((step === 'camera' || step === 'recording') && liveRef.current && streamRef.current) {
+      liveRef.current.srcObject = streamRef.current
+      liveRef.current.play().catch(() => {})
+    }
+  }, [step])
 
   // Cleanup stream alla chiusura del componente
   useEffect(() => () => stopCamera(), [])
