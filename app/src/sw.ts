@@ -1,6 +1,7 @@
+/// <reference lib="webworker" />
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
 
-declare let self: ServiceWorkerGlobalScope & typeof globalThis
+declare let self: ServiceWorkerGlobalScope
 
 cleanupOutdatedCaches()
 // __WB_MANIFEST viene iniettato da vite-plugin-pwa al build
