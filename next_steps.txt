@@ -36,9 +36,10 @@ DONE
 P9. Lista utenti iscritti/online alla chat — TODO esplicito in chatroom.md
 DONE
 P10. decayExpiredEvents come Edge Function schedulata — cleanup GDPR mensile
-
-P11. Da capire: salvare messaggi delle chatroom su server ha senso? Nel caso di molti utenti, non ri rischia di fare troppe chiamate al be ?
-P12. Moderazione - cambiare bottoni:
+DONE
+P11. quando si apre schermata per verifica video il riquadro è nero e non si vede la fotocamera cosa inquadra.
+P12. Da capire: salvare messaggi delle chatroom su server ha senso? Nel caso di molti utenti, non ri rischia di fare troppe chiamate al be ?
+P13. Moderazione - cambiare bottoni:
     - conferma segnalazione
     - rigetta segnalazione
     - richiedi ulteriore verifica
