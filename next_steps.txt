@@ -32,10 +32,11 @@ P7. Annullamento reputazione in appello — Il DB supporta annulled_appeal ma no
 Priorità bassa
 DONE
 P8. Vouching system — lib/vouching/index.ts tutto TODO (non bloccante al lancio)
-
+DONE
 P9. Lista utenti iscritti/online alla chat — TODO esplicito in chatroom.md
-
+DONE
 P10. decayExpiredEvents come Edge Function schedulata — cleanup GDPR mensile
+
 P11. Da capire: salvare messaggi delle chatroom su server ha senso? Nel caso di molti utenti, non ri rischia di fare troppe chiamate al be ?
 P12. Moderazione - cambiare bottoni:
     - conferma segnalazione
