@@ -6,12 +6,13 @@ Il <textarea> in ReportDialog probabilmente manca della classe .textarea o della
 BUG-2: Avatar non visibile accanto al nome in chat DONE
 ChatScreen mostra solo il nickname testuale nel .msg-author. Il sistema avatar (emoji/glifo da avatar_preset + accent_color) esiste già in formatters.ts — serve estendere useChatCache con un avatarCache e affiancare il mini-bubble al nickname.
 
-BUG-1: in moderazione i pulsanti "azione presa, rivista archivia" non sono molto chiari. Vorrei che la scelta fosse tra:
+BUG-1: in moderazione i pulsanti "azione presa, rivista archivia" non sono molto chiari. Vorrei che la scelta fosse tra: DONE
 - segnalazione confermata
 - segnalazione rigettata
 - segnalazione che richiede ulteriore revisione (possibilmente da altro moderatore / founder)
 
 Priorità alta
+DONE
 P1. Migrations mancanti — public_profiles (view), user_blocks, user_roles, reports esistono nel DB ma non come file migration. Il progetto non si ricostruisce da zero.
 
 P2. VerificationScreen — restituisce null. Senza di essa nessuna utente può completare l'onboarding. Flusso già documentato nel file.
