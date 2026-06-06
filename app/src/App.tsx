@@ -8,7 +8,7 @@ import { VerificationPendingScreen } from './screens/VerificationPendingScreen'
 import { Home } from './screens/Home'
 
 function App() {
-  const { loading, session, needsOnboarding, recovering } = useAuth()
+  const { loading, session, profile, needsOnboarding, recovering } = useAuth()
 
   // Guardrail: variabili d'ambiente mancanti (vedi .env.example).
   if (!isSupabaseConfigured) {
