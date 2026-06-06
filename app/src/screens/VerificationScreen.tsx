@@ -43,10 +43,7 @@ export function VerificationScreen() {
         audio: false,
       })
       streamRef.current = stream
-      if (liveRef.current) {
-        liveRef.current.srcObject = stream
-        await liveRef.current.play()
-      }
+      // setStep triggera il render del <video>; il useEffect sotto aggancia lo stream
       setStep('camera')
     } catch {
       setError(
@@ -128,6 +125,15 @@ export function VerificationScreen() {
       setStep('review')
     }
   }
+
+  // Aggancia lo stream al <video> dopo che React ha montato l'elemento.
+  // Necessario perché liveRef.current è null finché step !== 'camera'/'recording'.
+  useEffect(() => {
+    if ((step === 'camera' || step === 'recording') && liveRef.current && streamRef.current) {
+      liveRef.current.srcObject = streamRef.current
+      liveRef.current.play().catch(() => {})
+    }
+  }, [step])
 
   // Cleanup stream alla chiusura del componente
   useEffect(() => () => stopCamera(), [])
