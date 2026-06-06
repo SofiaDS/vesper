@@ -48,8 +48,9 @@ P13. Moderazione - cambiare bottoni:
 P14. Retention messaggi: i messaggi crescono per sempre. Una cleanup mensile (simile a quella di P10) che cancella messaggi più vecchi di N mesi ridurrebbe la crescita della tabella. Non urgente al lancio.
 DONE
 P15. quando si apre url in mobile vorrei il messaggio ''installa su home''
-
+DONE
 P16. creazione tema chiaro, e toggle switch tra chiaro e scuro
+DONE
 P17. notifiche push per:
     - mesaggi privati
     - messaggi in chatroom

@@ -1975,3 +1975,42 @@ button.dm-conv:hover {
   transition: transform 0.2s;
 }
 .toggle-pill.on .toggle-knob { transform: translateX(20px); }
+
+/* ── Theme icon button (fixed, tutte le schermate) ────── */
+.theme-btn {
+  position: fixed;
+  top: 0.85rem;
+  right: 0.9rem;
+  z-index: 300;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(232, 177, 78, 0.12);
+  border: 1.5px solid rgba(232, 177, 78, 0.28);
+  color: var(--cream);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s, border-color 0.18s;
+}
+.theme-btn:hover { background: rgba(232, 177, 78, 0.24); }
+
+[data-theme="light"] .theme-btn {
+  background: rgba(23, 21, 32, 0.08);
+  border-color: rgba(130, 90, 0, 0.28);
+}
+[data-theme="light"] .theme-btn:hover { background: rgba(23, 21, 32, 0.15); }
+
+/* ── Bio limit feedback ───────────────────────────────── */
+.textarea--limit {
+  border-color: var(--coral) !important;
+  outline-color: var(--coral);
+}
+.limit-warning {
+  color: var(--coral);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
