@@ -283,12 +283,6 @@ code {
   background: rgba(232, 177, 78, 0.16);
 }
 
-.msg-author {
-  font-size: 0.72rem;
-  color: var(--gold);
-  opacity: 0.85;
-}
-
 .msg-body {
   font-size: 0.95rem;
   line-height: 1.4;
@@ -442,6 +436,55 @@ code {
   min-width: 0;
 }
 
+/* --- Chat: roster (utenti online / iscritte) --- */
+.roster-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.roster-toggle {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.roster {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  z-index: 20;
+  min-width: 180px;
+  max-width: 240px;
+  background: var(--ink);
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.roster-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.roster-title {
+  margin: 0 0 0.3rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.roster-user {
+  font-size: 0.85rem;
+  color: var(--cream);
+  opacity: 0.9;
+}
+
 .load-older {
   align-self: center;
   margin: 0 0 0.5rem;
@@ -492,6 +535,24 @@ code {
   display: flex;
   gap: 0.85rem;
   align-items: center;
+}
+
+/* Badge numerico generico (notifiche) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--coral);
+  color: var(--cream);
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-left: 0.3rem;
+  vertical-align: middle;
 }
 
 /* Link "‹ Stanze" / back in cima al profilo */
@@ -1015,6 +1076,31 @@ code {
 }
 
 /* Segnalazioni */
+.report-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.report-actions .btn-approve,
+.report-actions .btn-reject {
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  text-align: left;
+}
+
+.report-actions .btn-primary {
+  width: 100%;
+  text-align: left;
+  margin-top: 0;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.85rem;
+  border: 1px solid rgba(232, 177, 78, 0.4);
+  background: rgba(232, 177, 78, 0.1);
+  color: var(--gold);
+}
+
 .report-card {
   padding: 0.7rem;
   border-radius: 12px;
@@ -1068,18 +1154,32 @@ code {
 
 /* --- Autore messaggio cliccabile + footer con segnala --- */
 .msg-author {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   margin: 0 0 2px;
   padding: 0;
   border: none;
   background: none;
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--coral);
+  color: var(--gold);
   cursor: pointer;
 }
 .msg-author:hover {
   text-decoration: underline;
+}
+.msg-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  color: var(--ink);
+  flex-shrink: 0;
+  line-height: 1;
 }
 .msg-footer {
   display: flex;
@@ -1157,10 +1257,21 @@ code {
   box-sizing: border-box;
   resize: vertical;
   border: 1px solid rgba(23, 21, 32, 0.2);
-  border-radius: 10px;
-  padding: 8px 10px;
+  border-radius: 9px;
+  padding: 0.65rem 0.75rem;
   font: inherit;
-  background: #fff;
+  background: rgba(23, 21, 32, 0.06);
+  color: var(--ink);
+}
+
+.report-note::placeholder {
+  color: var(--ink);
+  opacity: 0.4;
+}
+
+.report-note:focus {
+  outline: none;
+  border-color: rgba(23, 21, 32, 0.5);
 }
 
 /* --- Segnala foto sul carosello --- */
@@ -1401,3 +1512,322 @@ code {
   align-self: center;
   margin-top: 0.4rem;
 }
+
+/* ===== DM (messaggi privati) ===== */
+
+.dm-section {
+  margin-bottom: 1.25rem;
+}
+
+.dm-section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cream);
+  opacity: 0.45;
+  margin: 0 0 0.5rem;
+}
+
+.dm-conv {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  border-radius: 12px;
+  background: rgba(247, 239, 221, 0.04);
+  margin-bottom: 0.5rem;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+button.dm-conv {
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+button.dm-conv:hover {
+  background: rgba(247, 239, 221, 0.08);
+}
+
+.dm-conv-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.dm-conv-meta {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+}
+
+.dm-request-actions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.15rem;
+}
+
+/* ===== Sistema di reputazione (solo staff) ===== */
+
+.rep-search {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.rep-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 9px;
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  background: rgba(247, 239, 221, 0.04);
+  color: var(--cream);
+  font-size: 0.95rem;
+}
+
+.rep-search input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.rep-card {
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  background: rgba(247, 239, 221, 0.03);
+}
+
+.rep-score-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rep-score {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 3rem;
+  text-align: center;
+}
+
+.rep-nick  { margin: 0; font-weight: 600; }
+.rep-label { margin: 0.15rem 0 0; font-size: 0.82rem; opacity: 0.8; }
+
+.rep-neutral { color: var(--cream); }
+.rep-low     { color: var(--gold); }
+.rep-mid     { color: #e8914e; }
+.rep-high    { color: var(--coral); }
+
+.rep-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border-radius: 10px;
+  background: rgba(247, 239, 221, 0.04);
+  border: 1px solid rgba(232, 177, 78, 0.18);
+}
+
+.rep-add-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.rep-history {
+  margin-top: 1.1rem;
+}
+
+.rep-history-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cream);
+  opacity: 0.45;
+  margin: 0 0 0.6rem;
+}
+
+.rep-event {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 9px;
+  background: rgba(247, 239, 221, 0.04);
+  margin-bottom: 0.4rem;
+}
+
+.rep-event-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.rep-event-type { font-size: 0.9rem; font-weight: 600; }
+.rep-active     { color: var(--coral); }
+.rep-expired    { color: var(--cream); opacity: 0.5; }
+
+.rep-event-meta {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.rep-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.rep-badge-active  { background: rgba(236, 106, 85, 0.18); color: var(--coral); }
+.rep-badge-expired { background: rgba(247, 239, 221, 0.08); color: var(--cream); opacity: 0.6; }
+
+.rep-notes {
+  font-size: 0.82rem;
+  color: var(--cream);
+  opacity: 0.7;
+  margin: 0.15rem 0 0;
+  font-style: italic;
+}
+
+.rep-annul {
+  font-size: 0.75rem;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-top: 0.25rem;
+  padding: 0;
+}
+
+.rep-annul:hover {
+  opacity: 1;
+}
+
+/* Prompt reputazione post-azione nella coda segnalazioni */
+.rep-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: rgba(232, 177, 78, 0.07);
+  border: 1px solid rgba(232, 177, 78, 0.3);
+  margin-bottom: 1rem;
+}
+
+.rep-prompt-title {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.rep-prompt-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ===== Verifica identità ===== */
+
+.verif {
+  text-align: left;
+}
+
+.verif-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  color: var(--cream);
+}
+
+.verif-rejection {
+  background: rgba(236, 106, 85, 0.12);
+  border: 1px solid rgba(236, 106, 85, 0.35);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.88rem;
+  color: var(--coral);
+  margin-bottom: 0.75rem;
+}
+
+.verif-tips {
+  margin: 0.5rem 0 1rem;
+  padding-left: 1.2rem;
+  font-size: 0.88rem;
+  color: var(--cream);
+  opacity: 0.75;
+  line-height: 1.6;
+}
+
+.verif-video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+}
+
+.verif-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.verif-countdown {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.verif-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Player video nella dashboard verifiche */
+.verif-admin-video {
+  width: 100%;
+  max-height: 240px;
+  border-radius: 8px;
+  background: #000;
+  margin: 0.5rem 0;
+  display: block;
+}
+
+.verif-reject-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.verif-reject-form select {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  background: rgba(247, 239, 221, 0.06);
+  color: var(--cream);
+  font: inherit;
+  font-size: 0.88rem;
+}
+

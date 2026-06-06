@@ -3,10 +3,12 @@ import { isSupabaseConfigured } from './lib/supabase'
 import { AuthScreen } from './screens/AuthScreen'
 import { OnboardingScreen } from './screens/OnboardingScreen'
 import { UpdatePasswordScreen } from './screens/UpdatePasswordScreen'
+import { VerificationScreen } from './screens/VerificationScreen'
+import { VerificationPendingScreen } from './screens/VerificationPendingScreen'
 import { Home } from './screens/Home'
 
 function App() {
-  const { loading, session, needsOnboarding, recovering } = useAuth()
+  const { loading, session, profile, needsOnboarding, recovering } = useAuth()
 
   // Guardrail: variabili d'ambiente mancanti (vedi .env.example).
   if (!isSupabaseConfigured) {
@@ -46,7 +48,17 @@ function App() {
   // Loggata ma senza profilo -> onboarding
   if (needsOnboarding) return <OnboardingScreen />
 
-  // Loggata e con profilo -> lobby stanze + chat
+  // Profilo creato ma verifica non ancora inviata o rifiutata -> verifica
+  if (!profile?.verification_status || profile.verification_status === 'rejected') {
+    return <VerificationScreen />
+  }
+
+  // Verifica inviata, in attesa di revisione
+  if (profile.verification_status === 'pending') {
+    return <VerificationPendingScreen />
+  }
+
+  // Verificata e approvata -> app
   return <Home />
 }
 
