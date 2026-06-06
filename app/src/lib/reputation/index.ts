@@ -97,6 +97,16 @@ export async function applyReputationEvent(
   if (error) throw error
 }
 
+// Annulla un evento in seguito ad appello accolto (reputazione.md §6).
+// Solo admin può farlo (RLS UPDATE policy su reputation_events).
+export async function annulReputationEvent(eventId: string): Promise<void> {
+  const { error } = await supabase
+    .from('reputation_events')
+    .update({ status: 'annulled_appeal' })
+    .eq('id', eventId)
+  if (error) throw error
+}
+
 // Gli eventi scaduti restano nello storico ~12 mesi per GDPR (gdpr_e_legale.md).
 // Questa funzione restituisce il conteggio degli eventi scaduti ancora visibili.
 // La DELETE effettiva è rimandata a un job schedulato post-lancio.

@@ -24,7 +24,7 @@ P4. promote_my_layer al login — La promozione scatta solo mandando un messaggi
 Priorità media
 DONE
 P5. Filtro DM nelle impostazioni profilo — dm_filter non ha UI in ProfileEditor, gli utenti non possono cambiarlo.
-
+DONE
 P6. Badge richieste DM non lette — Il bottone "Messaggi" in RoomsScreen non mostra quante richieste in arrivo ci sono.
 
 P7. Annullamento reputazione in appello — Il DB supporta annulled_appeal ma non c'è bottone in ReputationModeration.
