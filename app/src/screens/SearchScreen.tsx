@@ -12,6 +12,7 @@ import { REGIONS } from '../constants/regions'
 import {
   searchByNickname,
   searchByFilters,
+  checkNicknameSearchWarning,
   activeFilterCount,
   SEARCH_PAGE,
   SEARCH_MAX,
@@ -25,7 +26,11 @@ import type { Zodiac } from '../types'
 
 type Tab = 'nickname' | 'filtri'
 
-const STORAGE_KEY = 'vesper_search_filters'
+const STORAGE_KEY        = 'vesper_search_filters'
+const HISTORY_KEY        = 'vesper_search_history'
+const ONBOARDING_KEY     = 'vesper_search_seen'
+const HISTORY_MAX        = 5
+const HISTORY_TTL_DAYS   = 30
 
 interface StoredSearchState {
   tab: Tab
@@ -34,6 +39,31 @@ interface StoredSearchState {
   ageOn: boolean
   ageMin: number
   ageMax: number
+}
+
+interface SavedSearch {
+  id: string
+  label: string
+  tab: Tab
+  nick: string
+  filters: SearchFilters
+  ageOn: boolean
+  ageMin: number
+  ageMax: number
+  savedAt: number
+}
+
+function loadHistory(): SavedSearch[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY)
+    if (!raw) return []
+    const cutoff = Date.now() - HISTORY_TTL_DAYS * 86_400_000
+    return (JSON.parse(raw) as SavedSearch[]).filter((s) => s.savedAt > cutoff)
+  } catch { return [] }
+}
+
+function saveHistory(h: SavedSearch[]) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, HISTORY_MAX))) } catch {}
 }
 
 export function SearchScreen({
@@ -82,6 +112,9 @@ export function SearchScreen({
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [softWarning, setSoftWarning] = useState<string | null>(null)
+  const [history, setHistory] = useState<SavedSearch[]>(loadHistory)
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem(ONBOARDING_KEY))
   const manualSearchRef = useRef(false)
 
   const IDENTITY_F = useMemo(
@@ -120,20 +153,44 @@ export function SearchScreen({
     return { ...filters, ageMin: ageOn ? ageMin : null, ageMax: ageOn ? ageMax : null }
   }
 
+  function pushHistory(entry: Omit<SavedSearch, 'id' | 'savedAt'> & { label: string }) {
+    setHistory((prev) => {
+      const next = [{ ...entry, id: crypto.randomUUID(), savedAt: Date.now() }, ...prev]
+        .slice(0, HISTORY_MAX)
+      saveHistory(next)
+      return next
+    })
+  }
+
+  function deleteHistory(id: string) {
+    setHistory((prev) => { const next = prev.filter((s) => s.id !== id); saveHistory(next); return next })
+  }
+
+  function restoreHistory(s: SavedSearch) {
+    setTab(s.tab); setNick(s.nick); setFilters(s.filters)
+    setAgeOn(s.ageOn); setAgeMin(s.ageMin); setAgeMax(s.ageMax)
+    setResults([]); setSearched(false); setErr(null); setSoftWarning(null)
+  }
+
+  function dismissOnboarding() {
+    try { localStorage.setItem(ONBOARDING_KEY, '1') } catch {}
+    setShowOnboarding(false)
+  }
+
   async function runNickname(q: string) {
     if (q.length < 2) {
-      setResults([])
-      setErr(null)
-      setSearched(false)
+      setResults([]); setErr(null); setSearched(false); setSoftWarning(null)
       return
     }
-    setErr(null)
-    setLoading(true)
-    setSearched(true)
+    setErr(null); setSoftWarning(null); setLoading(true); setSearched(true)
     try {
       const rows = await searchByNickname(q, 0)
       setResults(rows)
       setHasMore(rows.length === SEARCH_PAGE)
+      if (rows.length === 0) {
+        const warn = await checkNicknameSearchWarning(q)
+        if (warn) setSoftWarning('Non stiamo trovando questa persona. Forse non ha attivato la ricercabilità o ha cambiato nickname.')
+      }
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Ricerca non riuscita.')
     } finally {
@@ -150,17 +207,13 @@ export function SearchScreen({
 
   async function runFilters() {
     const f = builtFilters()
-    if (activeFilterCount(f) === 0) {
-      setErr('Seleziona almeno un filtro.')
-      return
-    }
-    setErr(null)
-    setLoading(true)
-    setSearched(true)
+    if (activeFilterCount(f) === 0) { setErr('Seleziona almeno un filtro.'); return }
+    setErr(null); setSoftWarning(null); setLoading(true); setSearched(true)
     try {
       const rows = await searchByFilters(f, 0)
       setResults(rows)
       setHasMore(rows.length === SEARCH_PAGE)
+      pushHistory({ tab: 'filtri', label: `Filtri (${activeFilterCount(f)} attivi)`, nick: '', filters: f, ageOn, ageMin, ageMax })
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Ricerca non riuscita.')
     } finally {
@@ -187,16 +240,14 @@ export function SearchScreen({
   }
 
   function switchTab(t: Tab) {
-    setTab(t)
-    setResults([])
-    setSearched(false)
-    setErr(null)
-    setHasMore(false)
+    setTab(t); setResults([]); setSearched(false); setErr(null); setSoftWarning(null); setHasMore(false)
   }
 
   function handleNicknameSubmit() {
+    const q = nick.trim()
     manualSearchRef.current = true
-    runNickname(nick.trim())
+    if (q.length >= 2) pushHistory({ tab: 'nickname', label: `@${q}`, nick: q, filters: {}, ageOn: false, ageMin: 18, ageMax: 99 })
+    runNickname(q)
   }
 
   return (
@@ -209,12 +260,38 @@ export function SearchScreen({
         <span className="link-placeholder" />
       </header>
 
-      <p className="search-intro">
-        Qui trovi altre utenti che hanno scelto di essere cercabili. Non è
-        un'app di dating: niente swipe, niente match. Vedi solo ciò che ognuna
-        ha reso pubblico. Per essere trovata, attiva "sono cercabile" dal tuo
-        profilo.
-      </p>
+      {showOnboarding && (
+        <div className="search-onboarding card">
+          <p>
+            <strong>Benvenuta in Esplora.</strong> Qui trovi utenti che hanno scelto di
+            essere cercabili. Non è un'app di dating: niente swipe, niente match.
+            Vedi solo ciò che ognuna ha reso pubblico nel suo profilo.
+          </p>
+          <p className="muted">
+            Per essere trovata, attiva <em>Sono cercabile</em> nelle impostazioni del tuo
+            profilo.
+          </p>
+          <button type="button" className="btn-primary btn-sm" onClick={dismissOnboarding}>
+            Capito
+          </button>
+        </div>
+      )}
+
+      {!showOnboarding && history.length > 0 && !searched && (
+        <div className="search-history">
+          <p className="search-history-title muted">Ricerche recenti</p>
+          {history.map((s) => (
+            <div key={s.id} className="search-history-row">
+              <button type="button" className="search-history-item link" onClick={() => restoreHistory(s)}>
+                {s.label}
+              </button>
+              <button type="button" className="search-history-del link muted" onClick={() => deleteHistory(s.id)} aria-label="Rimuovi">
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="search-tabs">
         <button
@@ -344,6 +421,7 @@ export function SearchScreen({
       )}
 
       {err && <p className="err">{err}</p>}
+      {softWarning && <p className="hint search-soft-warn">{softWarning}</p>}
 
       {searched && (
         <div className="search-results">

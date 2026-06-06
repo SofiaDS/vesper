@@ -57,8 +57,21 @@ export async function searchByNickname(nickname: string, offset = 0): Promise<Se
     p_limit: SEARCH_PAGE,
     p_offset: offset,
   })
-  if (error) throw error
+  if (error) {
+    if (error.message === 'SEARCH_RATE_LIMIT_EXCEEDED')
+      throw new Error(error.hint ?? 'Limite di ricerche raggiunto. Riprova più tardi.')
+    throw error
+  }
   return (data as SearchResult[]) ?? []
+}
+
+export async function checkNicknameSearchWarning(nickname: string): Promise<boolean> {
+  try {
+    const { data } = await supabase.rpc('count_nickname_searches', { p_nickname: nickname })
+    return (data as number ?? 0) > 5
+  } catch {
+    return false
+  }
 }
 
 export async function searchByFilters(f: SearchFilters, offset = 0): Promise<SearchResult[]> {

@@ -23,6 +23,7 @@ import {
 } from '../../constants/options'
 import { ZODIAC_LABELS } from '../../constants/labels'
 import { glyphFor, normalize, AVATAR_PRESETS } from '../../lib/profile/formatters'
+import { checkLayerEligibility, type LayerEligibility } from '../../lib/layers'
 import {
   listMyPhotos,
   uploadPhotoFromBlob,
@@ -257,6 +258,13 @@ export function ProfileEditor({
   const [searchable, setSearchable] = useState(profile.is_searchable)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [layerEligibility, setLayerEligibility] = useState<LayerEligibility | null>(null)
+
+  useEffect(() => {
+    checkLayerEligibility(profile.id)
+      .then((e) => setLayerEligibility(e))
+      .catch(() => {})
+  }, [profile.id])
 
   function toggle<T>(list: T[], value: T): T[] {
     return list.includes(value) ? list.filter((x) => x !== value) : [...list, value]
@@ -868,6 +876,34 @@ export function ProfileEditor({
           </fieldset>
         )}
 
+        {layerEligibility && (
+          <fieldset className="field">
+            <legend>Il tuo livello</legend>
+            <p className="hint">
+              Sei al <strong>Strato {layerEligibility.currentLayer}</strong>
+              {layerEligibility.nextLayer
+                ? ` — per avanzare allo Strato ${layerEligibility.nextLayer}:`
+                : ' — hai raggiunto il livello massimo.'}
+            </p>
+            {layerEligibility.nextLayer && (
+              <>
+                {layerEligibility.eligible ? (
+                  <p className="ok">Hai soddisfatto tutti i requisiti. L'avanzamento avviene automaticamente al tuo prossimo accesso.</p>
+                ) : (
+                  <ul className="layer-requirements">
+                    {layerEligibility.missingDays > 0 && (
+                      <li>ancora <strong>{layerEligibility.missingDays} giorni</strong> di permanenza</li>
+                    )}
+                    {layerEligibility.missingMessages > 0 && (
+                      <li>ancora <strong>{layerEligibility.missingMessages} messaggi</strong> in chatroom</li>
+                    )}
+                  </ul>
+                )}
+              </>
+            )}
+          </fieldset>
+        )}
+
         <fieldset className="field">
           <legend>Privacy</legend>
           <label className="declare mini">
@@ -927,6 +963,70 @@ export function ProfileEditor({
         <h2 className="pf-section-title">Preferenze app</h2>
         <NotificationSettings />
       </section>
+
+      <DeleteAccountSection profileId={profile.id} />
     </main>
+  )
+}
+
+function DeleteAccountSection({ profileId }: { profileId: string }) {
+  const [confirm, setConfirm] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+
+  async function handleDelete() {
+    setBusy(true)
+    setErr(null)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session?.access_token ?? ''}` },
+        },
+      )
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error((body as { error?: string }).error ?? 'Errore nella cancellazione.')
+      }
+      await supabase.auth.signOut()
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Errore. Riprova.')
+      setBusy(false)
+    }
+  }
+
+  void profileId
+  return (
+    <section className="card danger-zone" style={{ marginTop: '1rem' }}>
+      <h2 className="pf-section-title">Zona pericolosa</h2>
+      {!confirm ? (
+        <>
+          <p className="hint">
+            La cancellazione dell'account è definitiva. Tutti i tuoi messaggi, foto e dati
+            saranno rimossi in modo permanente.
+          </p>
+          <button type="button" className="btn-danger" onClick={() => setConfirm(true)}>
+            Cancella il mio account
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="err">
+            Sei sicura? Questa operazione è <strong>irreversibile</strong>.
+          </p>
+          {err && <p className="err">{err}</p>}
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button type="button" className="btn-danger" onClick={handleDelete} disabled={busy}>
+              {busy ? 'Cancello…' : 'Sì, cancella definitivamente'}
+            </button>
+            <button type="button" className="btn-ghost" onClick={() => setConfirm(false)} disabled={busy}>
+              Annulla
+            </button>
+          </div>
+        </>
+      )}
+    </section>
   )
 }
