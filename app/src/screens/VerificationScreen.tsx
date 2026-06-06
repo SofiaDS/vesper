@@ -133,15 +133,6 @@ export function VerificationScreen() {
     }
   }
 
-  // Aggancia lo stream al <video> dopo che React ha montato l'elemento.
-  // liveRef.current è null finché step !== 'camera'/'recording'.
-  useEffect(() => {
-    if ((step === 'camera' || step === 'recording') && liveRef.current && streamRef.current) {
-      liveRef.current.srcObject = streamRef.current
-      liveRef.current.play().catch(() => {})
-    }
-  }, [step])
-
   // Cleanup stream alla chiusura del componente
   useEffect(() => () => stopCamera(), [])
 
