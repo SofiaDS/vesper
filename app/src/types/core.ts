@@ -56,6 +56,9 @@ export interface Profile {
   show_online: boolean
   strato: number
   is_searchable: boolean
+  verification_status: 'pending' | 'approved' | 'rejected' | null
+  verification_video_path: string | null
+  verification_rejection_reason: string | null
   created_at: string
   updated_at: string
 }

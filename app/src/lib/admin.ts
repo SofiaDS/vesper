@@ -165,3 +165,60 @@ export async function revokeModerator(userId: string): Promise<void> {
   })
   if (error) throw error
 }
+
+// --- Verifiche identità ---
+export interface PendingVerification {
+  user_id: string
+  nickname: string
+  video_path: string
+  video_url: string | null
+  submitted_at: string
+}
+
+export async function listPendingVerifications(): Promise<PendingVerification[]> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, nickname, verification_video_path, updated_at')
+    .eq('verification_status', 'pending')
+    .not('verification_video_path', 'is', null)
+    .order('updated_at', { ascending: true })
+  if (error) throw error
+
+  const rows = (data ?? []) as {
+    id: string
+    nickname: string
+    verification_video_path: string
+    updated_at: string
+  }[]
+
+  const paths = rows.map((r) => r.verification_video_path)
+  const { data: urlData } = await supabase.storage
+    .from('identity-verifications')
+    .createSignedUrls(paths, 3600)
+
+  const urlMap: Record<string, string> = {}
+  for (const item of urlData ?? []) {
+    if (item.signedUrl && item.path) urlMap[item.path] = item.signedUrl
+  }
+
+  return rows.map((r) => ({
+    user_id:      r.id,
+    nickname:     r.nickname,
+    video_path:   r.verification_video_path,
+    video_url:    urlMap[r.verification_video_path] ?? null,
+    submitted_at: r.updated_at,
+  }))
+}
+
+export async function approveVerification(userId: string): Promise<void> {
+  const { error } = await supabase.rpc('approve_verification', { p_user_id: userId })
+  if (error) throw error
+}
+
+export async function rejectVerification(userId: string, reason: string): Promise<void> {
+  const { error } = await supabase.rpc('reject_verification', {
+    p_user_id: userId,
+    p_reason:  reason,
+  })
+  if (error) throw error
+}

@@ -14,7 +14,7 @@ BUG-1: in moderazione i pulsanti "azione presa, rivista archivia" non sono molto
 Priorità alta
 DONE
 P1. Migrations mancanti — public_profiles (view), user_blocks, user_roles, reports esistono nel DB ma non come file migration. Il progetto non si ricostruisce da zero.
-
+DONE
 P2. VerificationScreen — restituisce null. Senza di essa nessuna utente può completare l'onboarding. Flusso già documentato nel file.
 
 P3. Block → DM — Se A blocca B, la conversazione DM rimane visibile e scrivibile. Va filtrata in DmScreen e bloccato sendDmMessage.
@@ -32,3 +32,4 @@ Priorità bassa
 P8. Vouching system — lib/vouching/index.ts tutto TODO (non bloccante al lancio)
 P9. Lista utenti iscritti/online alla chat — TODO esplicito in chatroom.md
 P10. decayExpiredEvents come Edge Function schedulata — cleanup GDPR mensile
+P11. Da capire: salvare messaggi delle chatroom su server ha senso? Nel caso di molti utenti, non ri rischia di fare troppe chiamate al be ?
