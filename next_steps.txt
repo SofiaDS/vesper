@@ -26,12 +26,15 @@ DONE
 P5. Filtro DM nelle impostazioni profilo — dm_filter non ha UI in ProfileEditor, gli utenti non possono cambiarlo.
 DONE
 P6. Badge richieste DM non lette — Il bottone "Messaggi" in RoomsScreen non mostra quante richieste in arrivo ci sono.
-
+DONE
 P7. Annullamento reputazione in appello — Il DB supporta annulled_appeal ma non c'è bottone in ReputationModeration.
 
 Priorità bassa
+DONE
 P8. Vouching system — lib/vouching/index.ts tutto TODO (non bloccante al lancio)
+
 P9. Lista utenti iscritti/online alla chat — TODO esplicito in chatroom.md
+
 P10. decayExpiredEvents come Edge Function schedulata — cleanup GDPR mensile
 P11. Da capire: salvare messaggi delle chatroom su server ha senso? Nel caso di molti utenti, non ri rischia di fare troppe chiamate al be ?
 P12. Moderazione - cambiare bottoni:
