@@ -14,6 +14,7 @@ import {
   subscribeAuthChanges,
   signOut,
 } from './authService'
+import { promoteLayer } from '../lib/layers'
 
 const AuthContext = createContext<AuthState | undefined>(undefined)
 
@@ -32,6 +33,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!session?.user) return
     const p = await loadProfile(session.user.id)
     if (active.current) setProfile(p)
+  }
+
+  // Controlla silenziosamente se l'utente ha maturato i requisiti per una
+  // promozione di strato. Fire-and-forget: non blocca il caricamento iniziale.
+  // Non va chiamato in refreshProfile per evitare loop con ChatScreen.
+  function tryPromoteLayer(userId: string, currentStrato: number) {
+    promoteLayer()
+      .then((newLayer) => {
+        if (active.current && newLayer !== currentStrato) {
+          return loadProfile(userId)
+        }
+      })
+      .then((updated) => {
+        if (updated && active.current) setProfile(updated)
+      })
+      .catch(() => { /* promozione fallita silenziosamente */ })
   }
 
   async function refreshRoles(): Promise<void> {
@@ -58,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (active.current) {
           setProfile(p)
           setRoles(r)
+          if (p) tryPromoteLayer(s.user.id, p.strato)
         }
       }
       if (active.current) setLoading(false)
@@ -86,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (active.current) {
             setProfile(p)
             setRoles(r)
+            if (p) tryPromoteLayer(newSession.user.id, p.strato)
           }
         }).finally(() => {
           if (active.current) setLoading(false)
