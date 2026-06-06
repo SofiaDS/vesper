@@ -204,7 +204,7 @@ export function ReportsModeration() {
                   disabled={busy === r.id}
                   title="Violazione confermata — verrà applicata un'azione"
                 >
-                  {busy === r.id ? 'Attendi…' : 'Segnalazione confermata'}
+                  {busy === r.id ? 'Attendi…' : 'Conferma segnalazione'}
                 </button>
                 <button
                   type="button"
@@ -213,7 +213,7 @@ export function ReportsModeration() {
                   disabled={busy === r.id}
                   title="Nessuna violazione riscontrata — segnalazione archiviata"
                 >
-                  Segnalazione rigettata
+                  Rigetta segnalazione
                 </button>
                 <button
                   type="button"
@@ -222,7 +222,7 @@ export function ReportsModeration() {
                   disabled={busy === r.id}
                   title="Caso borderline o grave — richiede secondo parere"
                 >
-                  Richiede revisione
+                  Richiedi ulteriore verifica
                 </button>
               </div>
             ) : (

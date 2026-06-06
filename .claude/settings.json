@@ -1,8 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(\\(Get-Content \"c:\\\\vesper\\\\supabase\\\\functions\\\\decay-expired-events\\\\index.ts\"\\).Count; \\(Get-Content \"c:\\\\vesper\\\\supabase\\\\migrations\\\\20260607000000_decay_rpc.sql\"\\).Count)",
-      "Bash(npx tsc *)"
+      "PowerShell(\\(Get-Content \"c:\\\\vesper\\\\supabase\\\\functions\\\\decay-expired-events\\\\index.ts\"\\).Count; \\(Get-Content \"c:\\\\vesper\\\\supabase\\\\migrations\\\\20260607000000_decay_rpc.sql\"\\).Count)"
     ]
   }
 }
