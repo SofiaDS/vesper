@@ -22,6 +22,7 @@ DONE
 P4. promote_my_layer al login — La promozione scatta solo mandando un messaggio. Va aggiunta una chiamata silenziosa in AuthProvider all'init del profilo.
 
 Priorità media
+DONE
 P5. Filtro DM nelle impostazioni profilo — dm_filter non ha UI in ProfileEditor, gli utenti non possono cambiarlo.
 
 P6. Badge richieste DM non lette — Il bottone "Messaggi" in RoomsScreen non mostra quante richieste in arrivo ci sono.
