@@ -4,12 +4,13 @@ import { PhotoModeration } from './PhotoModeration'
 import { ReportsModeration } from './ReportsModeration'
 import { ModeratorManagement } from './ModeratorManagement'
 import { ReputationModeration } from './ReputationModeration'
+import { VerificationModeration } from './VerificationModeration'
 
-type Tab = 'foto' | 'segnalazioni' | 'reputazione' | 'moderatori'
+type Tab = 'verifiche' | 'foto' | 'segnalazioni' | 'reputazione' | 'moderatori'
 
 export function AdminScreen({ onBack }: { onBack: () => void }) {
   const { isAdmin, isStaff } = useAuth()
-  const [tab, setTab] = useState<Tab>('foto')
+  const [tab, setTab] = useState<Tab>('verifiche')
 
   return (
     <main className="app admin">
@@ -22,6 +23,13 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
       </header>
 
       <nav className="admin-tabs">
+        <button
+          type="button"
+          className={tab === 'verifiche' ? 'admin-tab on' : 'admin-tab'}
+          onClick={() => setTab('verifiche')}
+        >
+          Verifiche
+        </button>
         <button
           type="button"
           className={tab === 'foto' ? 'admin-tab on' : 'admin-tab'}
@@ -56,6 +64,7 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
         )}
       </nav>
 
+      {tab === 'verifiche' && <VerificationModeration />}
       {tab === 'foto' && <PhotoModeration />}
       {tab === 'segnalazioni' && <ReportsModeration />}
       {tab === 'reputazione' && isStaff && <ReputationModeration />}
