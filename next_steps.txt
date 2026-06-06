@@ -45,7 +45,9 @@ P13. Moderazione - cambiare bottoni:
     - conferma segnalazione
     - rigetta segnalazione
     - richiedi ulteriore verifica
+DONE
 P14. Retention messaggi: i messaggi crescono per sempre. Una cleanup mensile (simile a quella di P10) che cancella messaggi più vecchi di N mesi ridurrebbe la crescita della tabella. Non urgente al lancio.
+    → run_gdpr_cleanup() estesa: cancella messages >24 mesi (migration 20260608000000). DM esclusi (decisione legale pendente).
 DONE
 P15. quando si apre url in mobile vorrei il messaggio ''installa su home''
 DONE
@@ -56,4 +58,143 @@ P17. notifiche push per:
     - messaggi in chatroom
     - nuovi iscritti in chatroom tematiche
     - ti viene in mente altro?
-P18. 
+
+--- NUOVI ITEM (estratti da .md + codebase, 6 giugno 2026) ---
+
+=== INFRASTRUTTURA / DB ===
+
+DONE
+P18. Edge Function: cancellazione automatica video di verifica dopo 30 giorni
+    → già implementata in decay-expired-events/index.ts (linee 34-70).
+    - Richiesto da GDPR (dati biometrici, art. 9) — vedi gdpr_e_legale.md §2 e utenti_e_identita.md §6
+    - Edge Function schedulata (cron) su Supabase che cancella da Storage i video più vecchi di 30gg
+    - Tabella di riferimento: identity-verifications bucket, filtro per created_at < now() - interval '30 days'
+
+DONE
+P19. Migrations mancanti per vouching
+    → già implementate in 20260606050000_vouching.sql (vouch_requests, vouch_confirmations, respond_to_vouch, record_failed_vouch).
+    - lib/vouching/index.ts usa vouch_requests e vouch_confirmations ma le tabelle non hanno file migration
+    - Mancano anche le RPC: respond_to_vouch, record_failed_vouch
+    - Stessa situazione di P1 (nessun rebuild da zero senza questi file)
+
+DONE
+P20. Rate limiting ricerca utenti (lato server)
+    → migration 20260608010000: search_log table + search_users VOLATILE con 20/h, 100/d.
+DONE
+P21. Anti-stalking nickname (lato server + client)
+    → search_log + count_nickname_searches RPC + SearchScreen mostra warning soft se >5 ricerche stessa nickname in 7gg senza risultati.
+
+=== FUNZIONALITÀ UI NON ANCORA IMPLEMENTATE ===
+
+P22. Vouching nell'onboarding
+    - OnboardingScreen non ha lo step "inserisci 2 garanti (opzionale)" previsto da utenti_e_identita.md §2 punto 6
+    - lib/vouching/index.ts ha già requestVouch() pronta
+    - Serve uno step opzionale nell'onboarding con due campi nickname + messaggio di spiegazione
+    - Bloccante per Strato 3 ma non per lancio (le prime utenti non avranno garanti Strato 3)
+
+DONE
+P23. Progressione strati visibile all'utente
+    → ProfileEditor mostra sezione "Il tuo livello" con missingDays/missingMessages tramite checkLayerEligibility().
+DONE
+P24. Flag "sono cercabile" in ProfileEditor
+    → già implementato in ProfileEditor (sezione Privacy, checkbox is_searchable).
+DONE
+P25. Ricerche salvate in SearchScreen
+    → SearchScreen: storico fino a 5 ricerche in localStorage (HISTORY_KEY), FIFO, scadono dopo 30gg, cancellabili.
+DONE
+P26. Paginazione risultati ricerca
+    → già implementato: SearchScreen usa SEARCH_PAGE=10, SEARCH_MAX=50, loadMore(), search_users ha p_limit/p_offset.
+DONE
+P27. Onboarding prima visita SearchScreen
+    → banner dismissibile al primo accesso (ONBOARDING_KEY in localStorage).
+DONE
+P28. Bottone DM disabilitato con tooltip per Strato 1
+    → PublicProfileScreen: Strato 1 vede il bottone disabilitato con title tooltip esplicativo.
+
+P29. Notifica push quando una segnalazione viene chiusa
+    - moderazione.md §4: l'utente deve ricevere notifica vaga dell'esito ("preso provvedimenti" / "nessuna violazione")
+    - Serve Edge Function webhook su reports UPDATE (status → closed/archived)
+    - Payload vago, nessun dettaglio sull'azione specifica verso l'altro utente
+
+P30. Bottone "Sostieni il progetto"
+    - monetizzazione.md §4: SupporterButton.tsx esiste ma va collegato a destinazione reale (Ko-fi / Liberapay / PayPal)
+    - Da decidere il link prima di implementare; lo scaffold è pronto
+
+=== SAFETY FEATURES (da monetizzazione.md §4 — sempre gratis) ===
+
+P31. Lock app con PIN / biometria
+    - monetizzazione.md §4: protezione da chi prende il telefono in mano
+    - Critico per utenti con familiari/partner ostili
+    - Web app: PIN numerico in localStorage + SessionStorage flag "sbloccata"
+    - Sempre gratis, mai dietro paywall
+
+P32. Icona app discreta (PWA)
+    - monetizzazione.md §4: cambiare l'icona home screen in qualcosa non-riconoscibile
+    - Su PWA si può fare con manifest.json shortcut icons o via AppleWebApp meta
+    - Da studiare la fattibilità tecnica su iOS vs Android
+
+DONE
+P33. Modalità incognito / appari offline
+    → già implementato: ProfileEditor ha toggle show_online, ChatScreen passa profile.show_online a useChatPresence(showOnline).
+
+=== LEGALE / GDPR (da gdpr_e_legale.md — pre-lancio) ===
+
+P34. Pagina Informativa Privacy in-app
+    - gdpr_e_legale.md §1: richiesta da GDPR, con sezione dedicata ai dati biometrici (video liveness)
+    - Deve dichiarare: finalità del trattamento video, tempo conservazione (30gg), diritti utente
+    - Può essere una screen statica con WebView o testo formattato
+
+P35. Pagina Termini di Servizio in-app
+    - gdpr_e_legale.md §3: TOS con clausola "chi può iscriversi", età 18+, regole community, GDPR
+    - Stessa struttura: screen statica accessibile da Impostazioni e al primo login
+
+DONE
+P36. Dichiarazione appartenenza community al primo accesso
+    → AuthScreen: mode 'declare' con testo da utenti_e_identita.md §3 + checkbox obbligatoria. "Registrati" → 'declare' → (checked) → 'signup'.
+DONE
+P37. Cancellazione account
+    → Edge Function delete-account (JWT, cancella Storage + admin.deleteUser cascade DB). ProfileEditor: sezione "Zona pericolosa" con conferma a due step.
+    Nota: esportazione dati (portabilità GDPR) resta da fare (post-lancio).
+
+=== MODERAZIONE AVANZATA ===
+
+P38. Filtro AI messaggi (OpenAI Moderation API — soft mode)
+    - moderazione.md §6: ogni messaggio passa per OpenAI Moderation API + blocklist italiana
+    - Messaggi flaggati vengono pubblicati normalmente ma marcati in DB (flagged_by_ai = true)
+    - Servono: Edge Function webhook su INSERT in messages/dm_messages, chiamata API, update campo flag
+    - Costo: OpenAI Moderation API gratuita
+
+DONE
+P39. Colonna flagged_by_ai + coda Flag AI in admin
+    → migration 20260608020000: flagged_by_ai + ai_flag_archived su messages e dm_messages.
+    → AiFlags.tsx: lista messaggi flaggati con azione "Archivia (falso positivo)". Tab "Flag AI" in AdminScreen (solo staff).
+DONE
+P40. Statistiche base in AdminScreen
+    → AdminStats.tsx: utenti totali, nuove 7gg, verifiche pendenti, segnalazioni aperte/in revisione, flag AI pendenti. Tab "Statistiche" come prima tab in AdminScreen.
+
+=== POST-LANCIO (non bloccante ora) ===
+
+DONE
+P41. Notifiche push garanti (vouching)
+    → Edge Function push-on-vouch deployata. Da collegare: Database Webhook su INSERT in public.vouch_confirmations (Dashboard → Database → Webhooks, stessa procedura degli altri webhook push).
+
+P42. Block screenshots su Android
+    - monetizzazione.md §4: FLAG_SECURE impedisce screenshot dell'app
+    - Non applicabile a web app pura; rilevante solo se si crea wrapper nativo
+    - Tenerlo come reminder per eventuale versione nativa futura
+
+P43. Valutazione DPO (Data Protection Officer)
+    - gdpr_e_legale.md §6: probabilmente necessario oltre qualche migliaia di utenti
+    - Non tecnico: da gestire con consulente legale prima del lancio
+    - Reminder: firmare DPA con Supabase, OpenAI, push provider (gdpr_e_legale.md §4)
+
+P44. Calibrazione soglie strati e reputazione (3 mesi post-lancio)
+    - permessi_e_strati.md §3 e reputazione.md §6: revisione congiunta dopo primi 3 mesi
+    - Non tecnico: è un processo operativo (esporta dati, rivedi soglie, verbale interno)
+
+P45. Ricerca "Esplora per filtri" — UI completa
+    - SearchScreen attuale ha ricerca per nickname ma i filtri avanzati di ricerca_utenti.md §4
+      (età, regione, città, identità, orientamento, interessi, cerco, fuma, sport, segno zodiacale)
+      non sono ancora tutti implementati o rifiniti
+    - Pesi affinità (+1 per filtro), ordinamento casuale a parità (ricerca_utenti.md §5)
+    - "X cose in comune" nella card risultato (non percentuale)

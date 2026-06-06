@@ -5,12 +5,14 @@ import { ReportsModeration } from './ReportsModeration'
 import { ModeratorManagement } from './ModeratorManagement'
 import { ReputationModeration } from './ReputationModeration'
 import { VerificationModeration } from './VerificationModeration'
+import { AiFlags } from './AiFlags'
+import { AdminStats } from './AdminStats'
 
-type Tab = 'verifiche' | 'foto' | 'segnalazioni' | 'reputazione' | 'moderatori'
+type Tab = 'stats' | 'verifiche' | 'foto' | 'segnalazioni' | 'ai' | 'reputazione' | 'moderatori'
 
 export function AdminScreen({ onBack }: { onBack: () => void }) {
   const { isAdmin, isStaff } = useAuth()
-  const [tab, setTab] = useState<Tab>('verifiche')
+  const [tab, setTab] = useState<Tab>('stats')
 
   return (
     <main className="app admin">
@@ -23,6 +25,13 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
       </header>
 
       <nav className="admin-tabs">
+        <button
+          type="button"
+          className={tab === 'stats' ? 'admin-tab on' : 'admin-tab'}
+          onClick={() => setTab('stats')}
+        >
+          Statistiche
+        </button>
         <button
           type="button"
           className={tab === 'verifiche' ? 'admin-tab on' : 'admin-tab'}
@@ -47,6 +56,15 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
         {isStaff && (
           <button
             type="button"
+            className={tab === 'ai' ? 'admin-tab on' : 'admin-tab'}
+            onClick={() => setTab('ai')}
+          >
+            Flag AI
+          </button>
+        )}
+        {isStaff && (
+          <button
+            type="button"
             className={tab === 'reputazione' ? 'admin-tab on' : 'admin-tab'}
             onClick={() => setTab('reputazione')}
           >
@@ -64,9 +82,11 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
         )}
       </nav>
 
+      {tab === 'stats' && <AdminStats />}
       {tab === 'verifiche' && <VerificationModeration />}
       {tab === 'foto' && <PhotoModeration />}
       {tab === 'segnalazioni' && <ReportsModeration />}
+      {tab === 'ai' && isStaff && <AiFlags />}
       {tab === 'reputazione' && isStaff && <ReputationModeration />}
       {tab === 'moderatori' && isAdmin && <ModeratorManagement />}
     </main>
