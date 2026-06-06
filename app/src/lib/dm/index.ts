@@ -115,6 +115,16 @@ export async function getDmMessages(
   return ((data ?? []) as DmMessage[]).reverse()
 }
 
+export async function countPendingDmRequests(userId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('dm_conversations')
+    .select('*', { count: 'exact', head: true })
+    .eq('to_user_id', userId)
+    .eq('status', 'pending')
+  if (error) throw error
+  return count ?? 0
+}
+
 export async function sendDmMessage(
   conversationId: string,
   senderId: string,

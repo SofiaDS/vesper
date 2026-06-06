@@ -1,5 +1,6 @@
 import { useAuth } from '../auth/AuthProvider'
 import { useRooms } from '../hooks/useRooms'
+import { usePendingDmCount } from '../hooks/usePendingDmCount'
 import { MAX_TEMATICHE } from '../constants/limits'
 import type { Chatroom } from '../types'
 
@@ -18,6 +19,7 @@ export function RoomsScreen({
 }) {
   const { session, profile, signOut, isStaff } = useAuth()
   const myId = session?.user.id
+  const pendingDmCount = usePendingDmCount((profile?.strato ?? 0) >= 2 ? myId : undefined)
 
   const {
     rooms,
@@ -47,6 +49,9 @@ export function RoomsScreen({
           {(profile?.strato ?? 0) >= 2 && (
             <button type="button" className="link" onClick={onOpenDm}>
               Messaggi
+              {pendingDmCount > 0 && (
+                <span className="badge">{pendingDmCount}</span>
+              )}
             </button>
           )}
           <button type="button" className="link" onClick={onOpenSearch}>

@@ -488,6 +488,24 @@ code {
   align-items: center;
 }
 
+/* Badge numerico generico (notifiche) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--coral);
+  color: var(--cream);
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+}
+
 /* Link "‹ Stanze" / back in cima al profilo */
 .link.back {
   display: inline-block;
