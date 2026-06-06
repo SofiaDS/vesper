@@ -198,3 +198,22 @@ P45. Ricerca "Esplora per filtri" — UI completa
       non sono ancora tutti implementati o rifiniti
     - Pesi affinità (+1 per filtro), ordinamento casuale a parità (ricerca_utenti.md §5)
     - "X cose in comune" nella card risultato (non percentuale)
+
+=== DA FARE SUL DB (azioni manuali Dashboard Supabase) ===
+
+DB-1. Webhook Database per push-on-vouch
+    - Dashboard → Database → Webhooks → Create new webhook
+    - Name: push-on-vouch
+    - Table: public.vouch_confirmations
+    - Events: INSERT
+    - URL: https://<ref>.supabase.co/functions/v1/push-on-vouch
+    - Headers: Authorization: Bearer <service-role-key>
+    - (stessa procedura degli altri 3 webhook push già configurati)
+
+DB-2. Configurare variabile app.edge_fn_url per il cron GDPR Storage
+    - Se non già fatto: nel SQL Editor eseguire una volta:
+        alter database postgres set app.edge_fn_url =
+          'https://<ref>.supabase.co/functions/v1/decay-expired-events';
+        alter database postgres set app.service_role_key = '<service-role-key>';
+    - Necessario per il job vesper-gdpr-storage (pg_cron → pg_net → Edge Function)
+    - Istruzioni originali in migration 20260607010000_gdpr_cron.sql

@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react'
+import { useRef, useState, useMemo, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { NotificationSettings } from '../../components/NotificationSettings'
 import {
