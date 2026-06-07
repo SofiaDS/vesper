@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthProvider'
 import { useChatCache } from '../hooks/useChatCache'
 import { useChatMessages } from '../hooks/useChatMessages'
 import { useChatRealtime } from '../hooks/useChatRealtime'
+import { AppHeader } from '../components/AppHeader'
 import { ReportDialog } from '../components/ReportDialog'
 import { RoomRoster } from '../components/RoomRoster'
 import { promoteLayer } from '../lib/layers'
@@ -106,20 +107,19 @@ export function ChatScreen({
 
   return (
     <main className="chat">
-      <header className="chat-header">
-        <button type="button" className="link back" onClick={onBack}>
-          ‹ Stanze
-        </button>
-        <div className="chat-title">
-          <h1>{room.name}</h1>
+      <AppHeader
+        backLabel="‹ Stanze"
+        onBack={onBack}
+        title={room.name}
+        extra={
           <RoomRoster
             room={room}
             myId={myId}
             myNickname={profile?.nickname}
             showOnline={profile?.show_online ?? true}
           />
-        </div>
-      </header>
+        }
+      />
 
       <section className="messages">
         {loading && <p className="muted">Carico i messaggi…</p>}

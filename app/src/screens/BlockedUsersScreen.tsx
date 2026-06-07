@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { AppHeader } from '../components/AppHeader'
 import { listBlockedUsers, unblockUser, type BlockedUser } from '../lib/blocks'
 
 // Gestione dei propri blocchi: elenco delle persone bloccate con sblocco.
@@ -39,13 +40,7 @@ export function BlockedUsersScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <main className="app profile">
-      <header className="rooms-header">
-        <button type="button" className="link back" onClick={onBack}>
-          ‹ Profilo
-        </button>
-        <h1 className="rooms-brand">Utenti bloccati</h1>
-        <span className="link-placeholder" />
-      </header>
+      <AppHeader backLabel="‹ Profilo" onBack={onBack} title="Utenti bloccati" />
 
       {loading && <p className="muted">Carico…</p>}
       {error && <p className="err chat-error">{error}</p>}

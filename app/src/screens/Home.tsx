@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Chatroom } from '../types'
 import { useAuth } from '../auth/AuthProvider'
 import { usePendingDmCount } from '../hooks/usePendingDmCount'
+import { useAdminPendingCounts } from '../hooks/useAdminPendingCounts'
 import { BurgerMenu, type BurgerMenuItem } from '../components/BurgerMenu'
 import { RoomsScreen } from './RoomsScreen'
 import { ChatScreen } from './ChatScreen'
@@ -9,52 +10,100 @@ import { ProfileScreen } from './profile/ProfileScreen'
 import { BlockedUsersScreen } from './BlockedUsersScreen'
 import { PublicProfileScreen } from './PublicProfileScreen'
 import { SearchScreen } from './SearchScreen'
-import { AdminScreen } from './admin/AdminScreen'
+import { SettingsScreen } from './SettingsScreen'
+import { AdminScreen, ADMIN_TAB_LABELS, type AdminTab } from './admin/AdminScreen'
 import { DmScreen } from './DmScreen'
+
+const PAYPAL_URL = 'https://paypal.me/vesperapp'
 
 // Shell post-login: gestisce la navigazione fra lobby, chat, profilo e moderazione.
 // Nessun router esterno: basta uno stato locale, raccolto nel burger menu fisso.
 export function Home() {
-  const { session, profile, signOut, isStaff } = useAuth()
+  const { session, profile, signOut, isStaff, isAdmin } = useAuth()
   const myId = session?.user.id
   const pendingDmCount = usePendingDmCount((profile?.strato ?? 0) >= 2 ? myId : undefined)
+  const adminCounts = useAdminPendingCounts(isStaff)
 
   const [room, setRoom] = useState<Chatroom | null>(null)
   const [showProfile, setShowProfile] = useState(false)
   const [showAdmin, setShowAdmin] = useState(false)
+  const [adminTab, setAdminTab] = useState<AdminTab>('stats')
   const [showBlocked, setShowBlocked] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [showDm, setShowDm] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [viewUserId, setViewUserId] = useState<string | null>(null)
 
-  function goToRooms() {
+  // Chiude ogni schermata aperta prima di aprirne (eventualmente) una nuova:
+  // evita che una vecchia voce di stato (es. showSearch) resti "true" e prenda
+  // la precedenza nella catena if/else qui sotto, lasciando la nuova schermata
+  // nascosta "sotto" quella precedente finché non si torna indietro.
+  function openScreen(open?: () => void) {
     setRoom(null)
     setShowProfile(false)
     setShowAdmin(false)
     setShowBlocked(false)
     setShowSearch(false)
     setShowDm(false)
+    setShowSettings(false)
     setViewUserId(null)
+    open?.()
+  }
+
+  function goToRooms() {
+    openScreen()
+  }
+
+  function openAdmin(tab: AdminTab) {
+    openScreen(() => {
+      setAdminTab(tab)
+      setShowAdmin(true)
+    })
   }
 
   const onLobby =
-    !room && !showProfile && !showAdmin && !showBlocked && !showSearch && !showDm && !viewUserId
+    !room &&
+    !showProfile &&
+    !showAdmin &&
+    !showBlocked &&
+    !showSearch &&
+    !showDm &&
+    !showSettings &&
+    !viewUserId
 
   const menuItems: BurgerMenuItem[] = [
     { label: 'Stanze', onClick: goToRooms, active: onLobby },
-    { label: 'Esplora', onClick: () => setShowSearch(true), active: showSearch },
+    { label: 'Ricerca', onClick: () => openScreen(() => setShowSearch(true)), active: showSearch },
     ...((profile?.strato ?? 0) >= 2
-      ? [{ label: 'Messaggi', onClick: () => setShowDm(true), active: showDm, badge: pendingDmCount }]
+      ? [{ label: 'Messaggi', onClick: () => openScreen(() => setShowDm(true)), active: showDm, badge: pendingDmCount }]
       : []),
-    { label: 'Profilo', onClick: () => setShowProfile(true), active: showProfile },
+    { label: 'Il Mio Profilo', onClick: () => openScreen(() => setShowProfile(true)), active: showProfile },
     ...(isStaff
-      ? [{ label: 'Moderazione', onClick: () => setShowAdmin(true), active: showAdmin }]
+      ? [{
+          label: 'Admin Tab',
+          active: showAdmin,
+          children: [
+            { label: ADMIN_TAB_LABELS.stats, onClick: () => openAdmin('stats'), active: showAdmin && adminTab === 'stats' },
+            { label: ADMIN_TAB_LABELS.verifiche, onClick: () => openAdmin('verifiche'), active: showAdmin && adminTab === 'verifiche', badge: adminCounts.verifiche },
+            { label: ADMIN_TAB_LABELS.foto, onClick: () => openAdmin('foto'), active: showAdmin && adminTab === 'foto', badge: adminCounts.foto },
+            { label: ADMIN_TAB_LABELS.segnalazioni, onClick: () => openAdmin('segnalazioni'), active: showAdmin && adminTab === 'segnalazioni', badge: adminCounts.segnalazioni },
+            { label: ADMIN_TAB_LABELS.ai, onClick: () => openAdmin('ai'), active: showAdmin && adminTab === 'ai', badge: adminCounts.ai },
+            { label: ADMIN_TAB_LABELS.reputazione, onClick: () => openAdmin('reputazione'), active: showAdmin && adminTab === 'reputazione' },
+            ...(isAdmin
+              ? [{ label: ADMIN_TAB_LABELS.moderatori, onClick: () => openAdmin('moderatori'), active: showAdmin && adminTab === 'moderatori' }]
+              : []),
+          ],
+        }]
       : []),
+    { label: 'Impostazioni', onClick: () => openScreen(() => setShowSettings(true)), active: showSettings },
+    { label: 'Sostieni Vesper ↗', onClick: () => window.open(PAYPAL_URL, '_blank', 'noopener,noreferrer') },
   ]
 
   let screen: React.ReactNode
   if (showAdmin) {
-    screen = <AdminScreen onBack={() => setShowAdmin(false)} />
+    screen = <AdminScreen tab={adminTab} onBack={() => setShowAdmin(false)} />
+  } else if (showSettings) {
+    screen = <SettingsScreen onBack={() => setShowSettings(false)} />
   } else if (viewUserId) {
     screen = <PublicProfileScreen userId={viewUserId} onBack={() => setViewUserId(null)} />
   } else if (showBlocked) {
@@ -74,9 +123,8 @@ export function Home() {
   }
 
   return (
-    <>
-      <BurgerMenu items={menuItems} onSignOut={signOut} />
+    <BurgerMenu items={menuItems} onSignOut={signOut}>
       {screen}
-    </>
+    </BurgerMenu>
   )
 }
