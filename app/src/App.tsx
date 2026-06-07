@@ -1,4 +1,5 @@
 import { useAuth } from './auth/AuthProvider'
+import { usePinLock } from './hooks/usePinLock'
 import { isSupabaseConfigured } from './lib/supabase'
 import { InstallBanner } from './components/InstallBanner'
 import { ThemeToggle } from './components/ThemeToggle'
@@ -7,10 +8,12 @@ import { OnboardingScreen } from './screens/OnboardingScreen'
 import { UpdatePasswordScreen } from './screens/UpdatePasswordScreen'
 import { VerificationScreen } from './screens/VerificationScreen'
 import { VerificationPendingScreen } from './screens/VerificationPendingScreen'
+import { PinLockScreen } from './screens/PinLockScreen'
 import { Home } from './screens/Home'
 
 function App() {
   const { loading, session, profile, needsOnboarding, recovering } = useAuth()
+  const { locked, unlock } = usePinLock()
 
   if (!isSupabaseConfigured) {
     return (
@@ -40,6 +43,8 @@ function App() {
   }
 
   if (recovering) return <UpdatePasswordScreen />
+
+  if (session && locked) return <PinLockScreen onUnlock={unlock} />
 
   let screen: React.ReactNode
   if (!session) screen = <AuthScreen />
