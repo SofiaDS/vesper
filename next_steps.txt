@@ -124,11 +124,14 @@ P30. Bottone "Sostieni il progetto"
 
 === SAFETY FEATURES (da monetizzazione.md §4 — sempre gratis) ===
 
+DONE
 P31. Lock app con PIN / biometria
-    - monetizzazione.md §4: protezione da chi prende il telefono in mano
-    - Critico per utenti con familiari/partner ostili
-    - Web app: PIN numerico in localStorage + SessionStorage flag "sbloccata"
-    - Sempre gratis, mai dietro paywall
+    → lib/pin.ts: get/set/verify/lock (localStorage + sessionStorage).
+    → hooks/usePinLock.ts: stato reattivo locked/unlock.
+    → screens/PinLockScreen.tsx: gate di sblocco con input numerico.
+    → screens/profile/PinSetupSection.tsx: imposta/cambia/rimuovi/blocca ora.
+    → App.tsx: gate dopo sessione, prima dell'onboarding.
+    → ProfileEditor: PinSetupSection in sezione "Preferenze app".
 
 P32. Icona app discreta (PWA)
     - monetizzazione.md §4: cambiare l'icona home screen in qualcosa non-riconoscibile

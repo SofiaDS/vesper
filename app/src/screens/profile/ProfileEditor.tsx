@@ -2,6 +2,7 @@ import { useRef, useState, useMemo, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { NotificationSettings } from '../../components/NotificationSettings'
 import { SupporterButton } from '../../components/SupporterButton'
+import { PinSetupSection } from './PinSetupSection'
 import {
   BIO_MAX,
   PRONOUNS_MAX,
@@ -963,6 +964,10 @@ export function ProfileEditor({
       <section className="card" style={{ marginTop: '1rem' }}>
         <h2 className="pf-section-title">Preferenze app</h2>
         <NotificationSettings />
+        <div style={{ marginTop: '1.25rem' }}>
+          <p className="pf-section-subtitle">Blocco con PIN</p>
+          <PinSetupSection />
+        </div>
       </section>
 
       <SupporterButton />
