@@ -199,7 +199,7 @@ export function PublicProfileScreen({
               fallback={
                 <span
                   className="avatar-bubble"
-                  style={{ background: p.accent_color ?? 'var(--gold)' }}
+                  style={{ background: p.accent_color ?? 'var(--accent)' }}
                 >
                   {glyphFor(p.avatar_preset, p.nickname)}
                 </span>

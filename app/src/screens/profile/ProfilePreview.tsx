@@ -135,7 +135,7 @@ export function ProfilePreview({
             fallback={
               <span
                 className="avatar-bubble"
-                style={{ background: profile.accent_color ?? 'var(--gold)' }}
+                style={{ background: profile.accent_color ?? 'var(--accent)' }}
               >
                 {glyphFor(profile.avatar_preset, profile.nickname)}
               </span>

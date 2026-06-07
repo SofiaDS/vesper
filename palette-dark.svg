@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="200" viewBox="0 0 780 200" font-family="system-ui, sans-serif">
+  <rect width="780" height="200" rx="12" fill="#171520"/>
+
+  <!-- bg -->
+  <rect x="20" y="20" width="110" height="110" rx="8" fill="#171520" stroke="#f7efdd" stroke-width="1.5"/>
+  <text x="75" y="158" text-anchor="middle" fill="#f7efdd" font-size="12" font-weight="600">--bg</text>
+  <text x="75" y="174" text-anchor="middle" fill="#f7efdd" font-size="11" opacity=".6">#171520</text>
+
+  <!-- surface -->
+  <rect x="150" y="20" width="110" height="110" rx="8" fill="#221f2e"/>
+  <text x="205" y="158" text-anchor="middle" fill="#f7efdd" font-size="12" font-weight="600">--surface</text>
+  <text x="205" y="174" text-anchor="middle" fill="#f7efdd" font-size="11" opacity=".6">#221f2e</text>
+
+  <!-- text -->
+  <rect x="280" y="20" width="110" height="110" rx="8" fill="#f7efdd"/>
+  <text x="335" y="158" text-anchor="middle" fill="#f7efdd" font-size="12" font-weight="600">--text</text>
+  <text x="335" y="174" text-anchor="middle" fill="#f7efdd" font-size="11" opacity=".6">#f7efdd</text>
+
+  <!-- accent -->
+  <rect x="410" y="20" width="110" height="110" rx="8" fill="#e8b14e"/>
+  <text x="465" y="158" text-anchor="middle" fill="#f7efdd" font-size="12" font-weight="600">--accent</text>
+  <text x="465" y="174" text-anchor="middle" fill="#f7efdd" font-size="11" opacity=".6">#e8b14e</text>
+
+  <!-- error -->
+  <rect x="540" y="20" width="110" height="110" rx="8" fill="#D72638"/>
+  <text x="595" y="158" text-anchor="middle" fill="#f7efdd" font-size="12" font-weight="600">--error</text>
+  <text x="595" y="174" text-anchor="middle" fill="#f7efdd" font-size="11" opacity=".6">#D72638</text>
+
+  <!-- success -->
+  <rect x="670" y="20" width="110" height="110" rx="8" fill="#4caf7d"/>
+  <text x="725" y="158" text-anchor="middle" fill="#f7efdd" font-size="12" font-weight="600">--success</text>
+  <text x="725" y="174" text-anchor="middle" fill="#f7efdd" font-size="11" opacity=".6">#4caf7d</text>
+
+  <text x="20" y="196" fill="#f7efdd" font-size="10" opacity=".4">Vesper — dark theme</text>
+</svg>

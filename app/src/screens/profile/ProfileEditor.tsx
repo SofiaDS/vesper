@@ -431,7 +431,7 @@ export function ProfileEditor({
 
       <form className="form profile-form" onSubmit={handleSave}>
         <div className="avatar-preview">
-          <span className="avatar-bubble" style={{ background: accent ?? 'var(--gold)' }}>
+          <span className="avatar-bubble" style={{ background: accent ?? 'var(--accent)' }}>
             {avatarGlyph}
           </span>
           <span className="muted small-inline">@{nickname || '—'}</span>
