@@ -1,6 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { NotificationSettings } from '../../components/NotificationSettings'
+import { SupporterButton } from '../../components/SupporterButton'
 import {
   BIO_MAX,
   PRONOUNS_MAX,
@@ -964,6 +965,7 @@ export function ProfileEditor({
         <NotificationSettings />
       </section>
 
+      <SupporterButton />
       <DeleteAccountSection profileId={profile.id} />
     </main>
   )

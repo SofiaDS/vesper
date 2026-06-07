@@ -1,14 +1,23 @@
-// TODO: bottone "Sostieni il progetto" — decisione acquisita per v1 (monetizzazione.md).
-// Non è una funzionalità a pagamento: è un contributo volontario.
-// Il modello di monetizzazione definitivo (ADV, supporter, ibrido) è ancora in discussione
-// tra i founder (punti_aperti.md §G), ma il bottone va in v1 indipendentemente dal modello scelto.
-//
-// Funzionalità previste:
-// - Pulsante visibile nel profilo o in una sezione dedicata
-// - Link a una pagina di donazione (Stripe, Ko-fi, o altro da decidere)
-// - Nessun beneficio aggiuntivo per chi supporta in v1 (principio: mai feature di safety/discretion a pagamento)
-// - Testo trasparente su chi siamo e perché chiediamo supporto
+// TODO: sostituire con il link PayPal reale prima del lancio
+const PAYPAL_URL = 'https://paypal.me/vesperapp'
 
 export function SupporterButton() {
-  return null
+  return (
+    <section className="card" style={{ marginTop: '1rem' }}>
+      <h2 className="pf-section-title">Sostieni Vesper</h2>
+      <p className="hint">
+        Vesper è un progetto indipendente, senza pubblicità e senza investitori.
+        Se vuoi contribuire a tenerlo in vita, puoi farlo con una donazione libera.
+      </p>
+      <a
+        href={PAYPAL_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn-ghost"
+        style={{ display: 'inline-block', marginTop: '0.5rem' }}
+      >
+        Sostieni con PayPal ↗
+      </a>
+    </section>
+  )
 }
