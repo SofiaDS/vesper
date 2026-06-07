@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../auth/AuthProvider'
+import { AppHeader } from '../../components/AppHeader'
 import { PhotoModeration } from './PhotoModeration'
 import { ReportsModeration } from './ReportsModeration'
 import { ModeratorManagement } from './ModeratorManagement'
@@ -16,13 +17,7 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <main className="app admin">
-      <header className="rooms-header">
-        <button type="button" className="link back" onClick={onBack}>
-          ‹ Stanze
-        </button>
-        <h1 className="rooms-brand">Moderazione</h1>
-        <span className="link-placeholder" />
-      </header>
+      <AppHeader backLabel="‹ Stanze" onBack={onBack} title="Moderazione" />
 
       <nav className="admin-tabs">
         <button

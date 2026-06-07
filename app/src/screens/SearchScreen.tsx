@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
+import { AppHeader } from '../components/AppHeader'
 import {
   IDENTITY_OPTIONS,
   ORIENTATION_OPTIONS,
@@ -252,13 +253,7 @@ export function SearchScreen({
 
   return (
     <main className="app profile search-screen">
-      <header className="rooms-header">
-        <button type="button" className="link" onClick={onBack}>
-          ‹ Indietro
-        </button>
-        <h1 className="rooms-brand">Esplora</h1>
-        <span className="link-placeholder" />
-      </header>
+      <AppHeader onBack={onBack} title="Esplora" />
 
       {showOnboarding && (
         <div className="search-onboarding card">

@@ -28,6 +28,7 @@ body {
 .app {
   width: 100%;
   max-width: 420px;
+  min-width: 0;
   text-align: center;
 }
 
@@ -235,28 +236,9 @@ code {
   text-align: left;
 }
 
-.chat-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(232, 177, 78, 0.18);
-}
-
-.chat-header h1 {
-  margin: 0;
-  font-size: 1.4rem;
-  color: var(--text);
-  letter-spacing: 0.04em;
-}
-
 .small-inline {
   margin: 0.15rem 0 0;
   font-size: 0.8rem;
-}
-
-.chat-header .link {
-  margin-top: 0;
 }
 
 .messages {
@@ -358,23 +340,41 @@ code {
   max-width: 480px;
 }
 
-.rooms-header {
+/* --- Header comune a tutte le schermate post-login: back ‹ titolo › burger --- */
+.app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.6rem;
   padding-bottom: 0.75rem;
   margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(232, 177, 78, 0.18);
 }
 
-.rooms-brand {
+.app-header-center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-header h1 {
+  flex-shrink: 1;
+  min-width: 0;
   margin: 0;
-  font-size: 1.6rem;
-  color: var(--accent);
-  letter-spacing: 0.06em;
+  font-size: 1.2rem;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.rooms-header .link {
-  margin-top: 0;
+.app-header .link.back {
+  flex-shrink: 0;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .room-list {
@@ -474,17 +474,6 @@ code {
    sotto l'overlay invece di farglielo sovrapporre: resta raggiungibile scorrendo. */
 body:has(.install-banner) .rooms-hint {
   margin-bottom: 5.5rem;
-}
-
-/* --- Chat: pulsante indietro, titolo, orario, carica precedenti --- */
-.chat-header .back {
-  margin: 0 0.75rem 0 0;
-  white-space: nowrap;
-}
-
-.chat-title {
-  flex: 1;
-  min-width: 0;
 }
 
 /* --- Chat: roster (utenti online / iscritte) --- */
@@ -2116,10 +2105,7 @@ button.dm-conv:hover {
 
 /* ── Burger menu (fisso, sostituisce il toggle tema nelle schermate Home) */
 .burger-btn {
-  position: fixed;
-  top: 0.85rem;
-  right: 0.9rem;
-  z-index: 310;
+  flex-shrink: 0;
   width: 34px;
   height: 34px;
   border-radius: 50%;
