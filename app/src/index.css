@@ -1453,7 +1453,7 @@ body:has(.install-banner) .rooms-hint {
   accent-color: var(--error, #D72638);
 }
 
-/* --- Ricerca / Esplora utenti --- */
+/* --- Ricerca utenti --- */
 .search-intro {
   font-size: 0.82rem;
   line-height: 1.5;
@@ -2090,9 +2090,11 @@ button.dm-conv:hover {
 
 /* ── Burger menu (fisso, sostituisce il toggle tema nelle schermate Home) */
 .burger-btn {
+  position: relative;
   flex-shrink: 0;
   width: 34px;
   height: 34px;
+  right: 10px;
   border-radius: 50%;
   background: rgba(232, 177, 78, 0.12);
   border: 1.5px solid rgba(232, 177, 78, 0.28);
@@ -2102,7 +2104,7 @@ button.dm-conv:hover {
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
   transition: background 0.18s, border-color 0.18s;
 }
 .burger-btn:hover { background: rgba(232, 177, 78, 0.24); }

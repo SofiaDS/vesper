@@ -253,12 +253,12 @@ export function SearchScreen({
 
   return (
     <main className="app profile search-screen">
-      <AppHeader onBack={onBack} title="Esplora" />
+      <AppHeader onBack={onBack} title="Cerca" />
 
       {showOnboarding && (
         <div className="search-onboarding card">
           <p>
-            <strong>Benvenuta in Esplora.</strong> Qui trovi utenti che hanno scelto di
+            <strong>Benvenuta in in Ricerca.</strong> Qui trovi utenti che hanno scelto di
             essere cercabili. Non è un'app di dating: niente swipe, niente match.
             Vedi solo ciò che ognuna ha reso pubblico nel suo profilo.
           </p>
@@ -410,7 +410,7 @@ export function SearchScreen({
             onClick={runFilters}
             disabled={loading}
           >
-            Esplora
+            Cerca
           </button>
         </div>
       )}
