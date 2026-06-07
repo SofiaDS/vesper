@@ -7,6 +7,18 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISSED_KEY = 'pwa-install-dismissed'
+const DISMISS_DAYS = 14
+
+// Il flag è un timestamp: il "Non ora" vale solo per un periodo, poi l'avviso ricompare.
+// Valori legacy (vecchio flag booleano '1') non sono timestamp plausibili: li ignoriamo
+// così l'avviso torna visibile a chi l'aveva chiuso prima di questa modifica.
+function isDismissed(): boolean {
+  const raw = localStorage.getItem(DISMISSED_KEY)
+  if (!raw) return false
+  const ts = Number(raw)
+  if (!Number.isFinite(ts) || ts < 1_000_000_000_000) return false
+  return Date.now() - ts < DISMISS_DAYS * 86_400_000
+}
 
 function isIOS(): boolean {
   return /iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -28,9 +40,7 @@ export interface InstallPromptState {
 
 export function useInstallPrompt(): InstallPromptState {
   const [nativePrompt, setNativePrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [dismissed, setDismissed] = useState(
-    () => localStorage.getItem(DISMISSED_KEY) === '1',
-  )
+  const [dismissed, setDismissed] = useState(isDismissed)
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -56,7 +66,7 @@ export function useInstallPrompt(): InstallPromptState {
   }
 
   function dismiss() {
-    localStorage.setItem(DISMISSED_KEY, '1')
+    localStorage.setItem(DISMISSED_KEY, String(Date.now()))
     setDismissed(true)
   }
 
