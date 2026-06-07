@@ -10,7 +10,7 @@ function RoomOnlineBadge({ roomId }: { roomId: string }) {
 }
 
 export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
-  const { session, profile } = useAuth()
+  const { session } = useAuth()
   const myId = session?.user.id
 
   const {
@@ -30,7 +30,6 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
       <header className="rooms-header">
         <div>
           <h1 className="rooms-brand">Vesper</h1>
-          <p className="muted small-inline">Ciao {profile?.nickname}</p>
         </div>
       </header>
 

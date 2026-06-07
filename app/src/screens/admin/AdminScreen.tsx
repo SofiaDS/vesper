@@ -21,7 +21,7 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
           ‹ Stanze
         </button>
         <h1 className="rooms-brand">Moderazione</h1>
-        <span />
+        <span className="link-placeholder" />
       </header>
 
       <nav className="admin-tabs">
