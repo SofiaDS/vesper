@@ -175,9 +175,15 @@ function ConversationView({
           <p className="muted">Nessun messaggio. Scrivi il primo.</p>
         )}
         {messages.map((m) => (
-          <div key={m.id} className={m.sender_id === myId ? 'msg msg-mine' : 'msg'}>
-            <span className="msg-body">{m.body}</span>
-            <span className="msg-time">{formatTime(m.created_at)}</span>
+          <div key={m.id} className={m.sender_id === myId ? 'msg-row msg-row-mine' : 'msg-row'}>
+            <div className="msg-col">
+              <div className={m.sender_id === myId ? 'msg msg-mine' : 'msg'}>
+                <span className="msg-body">{m.body}</span>
+              </div>
+              <span className="msg-footer">
+                <span className="msg-time">{formatTime(m.created_at)}</span>
+              </span>
+            </div>
           </div>
         ))}
         <div ref={bottomRef} />

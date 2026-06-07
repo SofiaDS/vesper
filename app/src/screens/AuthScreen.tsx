@@ -2,10 +2,11 @@ import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { mapSupabaseAuthError, validatePassword } from '../lib/authErrors'
 
-type Mode = 'login' | 'signup' | 'reset'
+type Mode = 'login' | 'signup' | 'reset' | 'declare'
 
 export function AuthScreen() {
   const [mode, setMode] = useState<Mode>('login')
+  const [declared, setDeclared] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
@@ -16,6 +17,7 @@ export function AuthScreen() {
     setMode(next)
     setError(null)
     setInfo(null)
+    if (next !== 'declare') setDeclared(false)
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -62,11 +64,54 @@ export function AuthScreen() {
   }
 
   const tagline =
-    mode === 'login'
-      ? 'Accedi'
-      : mode === 'signup'
-        ? 'Crea il tuo account'
-        : 'Reimposta la password'
+    mode === 'login'    ? 'Accedi'
+    : mode === 'signup' ? 'Crea il tuo account'
+    : mode === 'declare'? 'Prima di procedere'
+    :                     'Reimposta la password'
+
+  if (mode === 'declare') {
+    return (
+      <main className="app">
+        <header className="brand"><h1>Vesper</h1><p className="tagline">{tagline}</p></header>
+        <section className="card">
+          <p>
+            Vesper è uno spazio dedicato alla community lesbica, bisessuale e queer femminile.
+          </p>
+          <p>
+            Sono benvenute <strong>donne cis, donne trans, uomini trans e persone non-binary AFAB</strong>.
+          </p>
+          <p>
+            L'iscrizione <strong>non è aperta a uomini cis</strong>, per preservare la natura di questo spazio.
+          </p>
+          <label className="declare">
+            <input
+              type="checkbox"
+              checked={declared}
+              onChange={(e) => setDeclared(e.target.checked)}
+            />
+            <span>
+              Dichiaro sotto la mia responsabilità di riconoscermi tra le categorie ammesse e di non
+              essere un uomo cis. Comprendo che una dichiarazione mendace comporterà il ban definitivo
+              dall'app.
+            </span>
+          </label>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={!declared}
+            onClick={() => switchMode('signup')}
+          >
+            Continua
+          </button>
+          <p className="switch">
+            <button type="button" className="link" onClick={() => switchMode('login')}>
+              Torna ad accedere
+            </button>
+          </p>
+        </section>
+      </main>
+    )
+  }
 
   return (
     <main className="app">
@@ -144,7 +189,7 @@ export function AuthScreen() {
             <button
               type="button"
               className="link"
-              onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
+              onClick={() => switchMode(mode === 'login' ? 'declare' : 'login')}
             >
               {mode === 'login' ? 'Registrati' : 'Accedi'}
             </button>

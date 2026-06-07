@@ -1,9 +1,11 @@
 // Edge Function: cleanup GDPR mensile.
 // Schedulata da pg_cron (migration 20260607010000_gdpr_cron.sql) — nessuna
 // configurazione manuale nel dashboard necessaria.
+// verify_jwt: false — è un job schedulato, non riceve richieste utente.
 //
 // Operazioni:
-//   1. run_gdpr_cleanup() — DB: reputation_events > 12 mesi, vouch_requests scadute
+//   1. run_gdpr_cleanup() — DB: reputation_events > 12 mesi, vouch_requests scadute,
+//      chatroom messages > 24 mesi, search_log > 30 giorni
 //   2. Storage: elimina video di verifica con decisione presa > 30 giorni fa
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
