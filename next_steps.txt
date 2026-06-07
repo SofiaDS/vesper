@@ -116,9 +116,11 @@ P29. Notifica push quando una segnalazione viene chiusa
     → Notifica reporter_id quando status → actioned o dismissed. Payload vago.
     → DA FARE SUL DB: Webhook su UPDATE in public.reports → push-on-report (include old_record).
 
+DONE
 P30. Bottone "Sostieni il progetto"
-    - monetizzazione.md §4: SupporterButton.tsx esiste ma va collegato a destinazione reale (Ko-fi / Liberapay / PayPal)
-    - Da decidere il link prima di implementare; lo scaffold è pronto
+    → SupporterButton.tsx implementato con placeholder paypal.me/vesperapp.
+    → Aggiunto in ProfileEditor tra "Preferenze app" e "Zona pericolosa".
+    → DA FARE: sostituire PAYPAL_URL con il link reale prima del lancio.
 
 === SAFETY FEATURES (da monetizzazione.md §4 — sempre gratis) ===
 
