@@ -34,12 +34,11 @@ export function Home() {
   const [showSettings, setShowSettings] = useState(false)
   const [viewUserId, setViewUserId] = useState<string | null>(null)
 
-  function openAdmin(tab: AdminTab) {
-    setAdminTab(tab)
-    setShowAdmin(true)
-  }
-
-  function goToRooms() {
+  // Chiude ogni schermata aperta prima di aprirne (eventualmente) una nuova:
+  // evita che una vecchia voce di stato (es. showSearch) resti "true" e prenda
+  // la precedenza nella catena if/else qui sotto, lasciando la nuova schermata
+  // nascosta "sotto" quella precedente finché non si torna indietro.
+  function openScreen(open?: () => void) {
     setRoom(null)
     setShowProfile(false)
     setShowAdmin(false)
@@ -48,6 +47,18 @@ export function Home() {
     setShowDm(false)
     setShowSettings(false)
     setViewUserId(null)
+    open?.()
+  }
+
+  function goToRooms() {
+    openScreen()
+  }
+
+  function openAdmin(tab: AdminTab) {
+    openScreen(() => {
+      setAdminTab(tab)
+      setShowAdmin(true)
+    })
   }
 
   const onLobby =
@@ -62,14 +73,14 @@ export function Home() {
 
   const menuItems: BurgerMenuItem[] = [
     { label: 'Stanze', onClick: goToRooms, active: onLobby },
-    { label: 'Esplora', onClick: () => setShowSearch(true), active: showSearch },
+    { label: 'Ricerca', onClick: () => openScreen(() => setShowSearch(true)), active: showSearch },
     ...((profile?.strato ?? 0) >= 2
-      ? [{ label: 'Messaggi', onClick: () => setShowDm(true), active: showDm, badge: pendingDmCount }]
+      ? [{ label: 'Messaggi', onClick: () => openScreen(() => setShowDm(true)), active: showDm, badge: pendingDmCount }]
       : []),
-    { label: 'Profilo', onClick: () => setShowProfile(true), active: showProfile },
+    { label: 'Il Mio Profilo', onClick: () => openScreen(() => setShowProfile(true)), active: showProfile },
     ...(isStaff
       ? [{
-          label: 'Moderazione',
+          label: 'Admin Tab',
           active: showAdmin,
           children: [
             { label: ADMIN_TAB_LABELS.stats, onClick: () => openAdmin('stats'), active: showAdmin && adminTab === 'stats' },
@@ -84,7 +95,7 @@ export function Home() {
           ],
         }]
       : []),
-    { label: 'Impostazioni', onClick: () => setShowSettings(true), active: showSettings },
+    { label: 'Impostazioni', onClick: () => openScreen(() => setShowSettings(true)), active: showSettings },
     { label: 'Sostieni Vesper ↗', onClick: () => window.open(PAYPAL_URL, '_blank', 'noopener,noreferrer') },
   ]
 
