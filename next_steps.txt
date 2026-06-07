@@ -86,11 +86,10 @@ P21. Anti-stalking nickname (lato server + client)
 
 === FUNZIONALITÀ UI NON ANCORA IMPLEMENTATE ===
 
+DONE
 P22. Vouching nell'onboarding
-    - OnboardingScreen non ha lo step "inserisci 2 garanti (opzionale)" previsto da utenti_e_identita.md §2 punto 6
-    - lib/vouching/index.ts ha già requestVouch() pronta
-    - Serve uno step opzionale nell'onboarding con due campi nickname + messaggio di spiegazione
-    - Bloccante per Strato 3 ma non per lancio (le prime utenti non avranno garanti Strato 3)
+    → OnboardingScreen: dopo creazione profilo avanza a step 'vouch' con due campi nickname garante.
+    → Usa requestVouch() da lib/vouching. "Salta" chiama refreshProfile() senza vouch.
 
 DONE
 P23. Progressione strati visibile all'utente
