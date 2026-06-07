@@ -83,7 +83,7 @@ export function AiFlags() {
     finally { setLoading(false) }
   }
 
-  useEffect(() => { let alive = true; load().catch(() => {}); return () => { alive = false } }, [])
+  useEffect(() => { load().catch(() => {}) }, [])
 
   async function archive(id: number, source: 'chatroom' | 'dm') {
     setBusy(id); setErr(null)
