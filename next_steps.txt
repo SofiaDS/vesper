@@ -201,19 +201,12 @@ P45. Ricerca "Esplora per filtri" — UI completa
 
 === DA FARE SUL DB (azioni manuali Dashboard Supabase) ===
 
+DONE
 DB-1. Webhook Database per push-on-vouch
-    - Dashboard → Database → Webhooks → Create new webhook
-    - Name: push-on-vouch
-    - Table: public.vouch_confirmations
-    - Events: INSERT
-    - URL: https://<ref>.supabase.co/functions/v1/push-on-vouch
-    - Headers: Authorization: Bearer <service-role-key>
-    - (stessa procedura degli altri 3 webhook push già configurati)
+    → Configurato nel Dashboard: INSERT su vouch_confirmations → push-on-vouch.
 
-DB-2. Configurare variabile app.edge_fn_url per il cron GDPR Storage
-    - Se non già fatto: nel SQL Editor eseguire una volta:
-        alter database postgres set app.edge_fn_url =
-          'https://ywkttzzkvlemtsuoceke.supabase.co/functions/v1/decay-expired-events';
-        alter database postgres set app.service_role_key = '<service-role-key>';
-    - Necessario per il job vesper-gdpr-storage (pg_cron → pg_net → Edge Function)
-    - Istruzioni originali in migration 20260607010000_gdpr_cron.sql
+DONE
+DB-2. Chiamata HTTP cron GDPR Storage
+    → Il job vesper-gdpr-storage aveva URL corretto ma nessun Authorization header.
+    → Risolto ridispiegando decay-expired-events con verify_jwt: false (job schedulato, nessun utente).
+    → Le variabili app.edge_fn_url e app.service_role_key NON sono necessarie.
