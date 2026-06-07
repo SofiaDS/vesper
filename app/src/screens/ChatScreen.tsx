@@ -150,7 +150,7 @@ export function ChatScreen({
               >
                 <span
                   className="msg-avatar"
-                  style={{ background: avatarCache.current.get(m.sender_id)?.color ?? 'var(--gold)' }}
+                  style={{ background: avatarCache.current.get(m.sender_id)?.color ?? 'var(--accent)' }}
                 >
                   {glyphFor(avatarCache.current.get(m.sender_id)?.preset ?? null, m.nickname)}
                 </span>
