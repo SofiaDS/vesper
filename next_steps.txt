@@ -110,10 +110,11 @@ DONE
 P28. Bottone DM disabilitato con tooltip per Strato 1
     → PublicProfileScreen: Strato 1 vede il bottone disabilitato con title tooltip esplicativo.
 
+DONE
 P29. Notifica push quando una segnalazione viene chiusa
-    - moderazione.md §4: l'utente deve ricevere notifica vaga dell'esito ("preso provvedimenti" / "nessuna violazione")
-    - Serve Edge Function webhook su reports UPDATE (status → closed/archived)
-    - Payload vago, nessun dettaglio sull'azione specifica verso l'altro utente
+    → Edge Function push-on-report deployata (verify_jwt: false).
+    → Notifica reporter_id quando status → actioned o dismissed. Payload vago.
+    → DA FARE SUL DB: Webhook su UPDATE in public.reports → push-on-report (include old_record).
 
 P30. Bottone "Sostieni il progetto"
     - monetizzazione.md §4: SupporterButton.tsx esiste ma va collegato a destinazione reale (Ko-fi / Liberapay / PayPal)
