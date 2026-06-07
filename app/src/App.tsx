@@ -47,17 +47,22 @@ function App() {
   if (session && locked) return <PinLockScreen onUnlock={unlock} />
 
   let screen: React.ReactNode
+  let isHome = false
   if (!session) screen = <AuthScreen />
   else if (needsOnboarding) screen = <OnboardingScreen />
   else if (!profile?.verification_status || profile.verification_status === 'rejected')
     screen = <VerificationScreen />
   else if (profile.verification_status === 'pending') screen = <VerificationPendingScreen />
-  else screen = <Home />
+  else {
+    screen = <Home />
+    isHome = true
+  }
 
   return (
     <>
       <InstallBanner />
-      <ThemeToggle />
+      {/* In Home il toggle tema vive dentro il burger menu: evitiamo il doppione fisso in alto a destra. */}
+      {!isHome && <ThemeToggle />}
       {screen}
     </>
   )

@@ -1,25 +1,17 @@
 import { useAuth } from '../auth/AuthProvider'
 import { useRooms } from '../hooks/useRooms'
-import { usePendingDmCount } from '../hooks/usePendingDmCount'
+import { useRoomOnlineCount } from '../hooks/useRoomOnlineCount'
 import { MAX_TEMATICHE } from '../constants/limits'
 import type { Chatroom } from '../types'
 
-export function RoomsScreen({
-  onOpen,
-  onOpenProfile,
-  onOpenAdmin,
-  onOpenSearch,
-  onOpenDm,
-}: {
-  onOpen: (room: Chatroom) => void
-  onOpenProfile: () => void
-  onOpenAdmin: () => void
-  onOpenSearch: () => void
-  onOpenDm: () => void
-}) {
-  const { session, profile, signOut, isStaff } = useAuth()
+function RoomOnlineBadge({ roomId }: { roomId: string }) {
+  const online = useRoomOnlineCount(roomId)
+  return <span className="room-online">{online} online</span>
+}
+
+export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
+  const { session, profile } = useAuth()
   const myId = session?.user.id
-  const pendingDmCount = usePendingDmCount((profile?.strato ?? 0) >= 2 ? myId : undefined)
 
   const {
     rooms,
@@ -39,30 +31,6 @@ export function RoomsScreen({
         <div>
           <h1 className="rooms-brand">Vesper</h1>
           <p className="muted small-inline">Ciao {profile?.nickname}</p>
-        </div>
-        <div className="rooms-actions">
-          {isStaff && (
-            <button type="button" className="link" onClick={onOpenAdmin}>
-              Moderazione
-            </button>
-          )}
-          {(profile?.strato ?? 0) >= 2 && (
-            <button type="button" className="link" onClick={onOpenDm}>
-              Messaggi
-              {pendingDmCount > 0 && (
-                <span className="badge">{pendingDmCount}</span>
-              )}
-            </button>
-          )}
-          <button type="button" className="link" onClick={onOpenSearch}>
-            Esplora
-          </button>
-          <button type="button" className="link" onClick={onOpenProfile}>
-            Profilo
-          </button>
-          <button type="button" className="link" onClick={signOut}>
-            Esci
-          </button>
         </div>
       </header>
 
@@ -89,6 +57,7 @@ export function RoomsScreen({
                   {room.description && (
                     <span className="room-desc">{room.description}</span>
                   )}
+                  <RoomOnlineBadge roomId={room.id} />
                 </button>
                 <div className="room-action">
                   {canOpen ? (
