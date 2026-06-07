@@ -3,9 +3,12 @@ import { useTheme } from '../hooks/useTheme'
 
 export interface BurgerMenuItem {
   label: string
-  onClick: () => void
+  onClick?: () => void
   active?: boolean
   badge?: number
+  // Sottovoci verticali (es. le sezioni di moderazione sotto "Moderazione"):
+  // se presenti, il click sulla voce apre/chiude il gruppo invece di navigare.
+  children?: BurgerMenuItem[]
 }
 
 interface BurgerMenuContextValue {
@@ -51,12 +54,20 @@ export function BurgerMenu({
   children: ReactNode
 }) {
   const [open, setOpen] = useState(false)
+  const [expanded, setExpanded] = useState<string | null>(null)
   const { theme, toggle: toggleTheme } = useTheme()
   const isDark = theme === 'dark'
 
-  function go(action: () => void) {
+  function go(action?: () => void) {
+    if (!action) return
     action()
     setOpen(false)
+    setExpanded(null)
+  }
+
+  function press(item: BurgerMenuItem) {
+    if (item.children) setExpanded((cur) => (cur === item.label ? null : item.label))
+    else go(item.onClick)
   }
 
   return (
@@ -68,15 +79,39 @@ export function BurgerMenu({
       <nav className={`burger-panel${open ? ' open' : ''}`} aria-hidden={!open}>
         <div className="burger-items">
           {items.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              className={`burger-item${item.active ? ' active' : ''}`}
-              onClick={() => go(item.onClick)}
-            >
-              <span>{item.label}</span>
-              {!!item.badge && <span className="badge">{item.badge}</span>}
-            </button>
+            <div key={item.label} className="burger-group">
+              <button
+                type="button"
+                className={`burger-item${item.active ? ' active' : ''}`}
+                onClick={() => press(item)}
+                aria-expanded={item.children ? expanded === item.label : undefined}
+              >
+                <span>{item.label}</span>
+                <span className="burger-item-end">
+                  {!!item.badge && <span className="badge">{item.badge}</span>}
+                  {item.children && (
+                    <span className="burger-caret" aria-hidden="true">
+                      {expanded === item.label ? '⌃' : '⌄'}
+                    </span>
+                  )}
+                </span>
+              </button>
+              {item.children && expanded === item.label && (
+                <div className="burger-submenu">
+                  {item.children.map((sub) => (
+                    <button
+                      key={sub.label}
+                      type="button"
+                      className={`burger-item burger-subitem${sub.active ? ' active' : ''}`}
+                      onClick={() => go(sub.onClick)}
+                    >
+                      <span>{sub.label}</span>
+                      {!!sub.badge && <span className="badge">{sub.badge}</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
           <button type="button" className="burger-item" onClick={() => go(onSignOut)}>
             <span>Esci</span>
