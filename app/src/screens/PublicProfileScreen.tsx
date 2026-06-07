@@ -199,7 +199,7 @@ export function PublicProfileScreen({
               fallback={
                 <span
                   className="avatar-bubble"
-                  style={{ background: p.accent_color ?? 'var(--gold)' }}
+                  style={{ background: p.accent_color ?? 'var(--accent)' }}
                 >
                   {glyphFor(p.avatar_preset, p.nickname)}
                 </span>
@@ -218,19 +218,32 @@ export function PublicProfileScreen({
 
           {!p.is_self && (
             <div className="pf-actions">
-              {!blocked && (myProfile?.strato ?? 0) >= 2 && (
-                <>
+              {!blocked && (() => {
+                const strato = myProfile?.strato ?? 0
+                if (strato >= 2) return (
+                  <>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      onClick={sendDm}
+                      disabled={dmBusy || dmFeedback === 'Richiesta inviata.'}
+                    >
+                      {dmBusy ? 'Invio…' : 'Manda messaggio'}
+                    </button>
+                    {dmFeedback && <p className="hint">{dmFeedback}</p>}
+                  </>
+                )
+                return (
                   <button
                     type="button"
                     className="btn-primary"
-                    onClick={sendDm}
-                    disabled={dmBusy || dmFeedback === 'Richiesta inviata.'}
+                    disabled
+                    title="Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi"
                   >
-                    {dmBusy ? 'Invio…' : 'Manda messaggio'}
+                    Manda messaggio
                   </button>
-                  {dmFeedback && <p className="hint">{dmFeedback}</p>}
-                </>
-              )}
+                )
+              })()}
               <button
                 type="button"
                 className={blocked ? 'btn-primary' : 'btn-ghost'}

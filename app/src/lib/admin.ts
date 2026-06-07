@@ -192,6 +192,7 @@ export async function listPendingVerifications(): Promise<PendingVerification[]>
   }[]
 
   const paths = rows.map((r) => r.verification_video_path)
+  if (paths.length === 0) return []
   const { data: urlData } = await supabase.storage
     .from('identity-verifications')
     .createSignedUrls(paths, 3600)

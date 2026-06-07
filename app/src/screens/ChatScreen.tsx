@@ -112,14 +112,13 @@ export function ChatScreen({
         </button>
         <div className="chat-title">
           <h1>{room.name}</h1>
-          <p className="muted small-inline">Ciao {profile?.nickname}</p>
+          <RoomRoster
+            room={room}
+            myId={myId}
+            myNickname={profile?.nickname}
+            showOnline={profile?.show_online ?? true}
+          />
         </div>
-        <RoomRoster
-          room={room}
-          myId={myId}
-          myNickname={profile?.nickname}
-          showOnline={profile?.show_online ?? true}
-        />
       </header>
 
       <section className="messages">
@@ -140,38 +139,51 @@ export function ChatScreen({
         {messages.map((m) => (
           <div
             key={m.id}
-            className={m.sender_id === myId ? 'msg msg-mine' : 'msg'}
+            className={m.sender_id === myId ? 'msg-row msg-row-mine' : 'msg-row'}
           >
             {m.sender_id !== myId && (
               <button
                 type="button"
-                className="msg-author"
+                className="msg-avatar-btn"
                 onClick={() => onOpenProfile(m.sender_id)}
+                aria-label={`Apri profilo di ${m.nickname}`}
               >
                 <span
                   className="msg-avatar"
-                  style={{ background: avatarCache.current.get(m.sender_id)?.color ?? 'var(--gold)' }}
+                  style={{ background: avatarCache.current.get(m.sender_id)?.color ?? 'var(--accent)' }}
                 >
                   {glyphFor(avatarCache.current.get(m.sender_id)?.preset ?? null, m.nickname)}
                 </span>
-                {m.nickname}
               </button>
             )}
-            <span className="msg-body">{m.body}</span>
-            <span className="msg-footer">
-              <span className="msg-time">{formatTime(m.created_at)}</span>
+            <div className="msg-col">
               {m.sender_id !== myId && (
                 <button
                   type="button"
-                  className="msg-report"
-                  title="Segnala messaggio"
-                  aria-label="Segnala messaggio"
-                  onClick={() => setReportMsg(m)}
+                  className="msg-author"
+                  onClick={() => onOpenProfile(m.sender_id)}
                 >
-                  ⚑
+                  {m.nickname}
                 </button>
               )}
-            </span>
+              <div className={m.sender_id === myId ? 'msg msg-mine' : 'msg'}>
+                <span className="msg-body">{m.body}</span>
+              </div>
+              <span className="msg-footer">
+                <span className="msg-time">{formatTime(m.created_at)}</span>
+                {m.sender_id !== myId && (
+                  <button
+                    type="button"
+                    className="msg-report"
+                    title="Segnala messaggio"
+                    aria-label="Segnala messaggio"
+                    onClick={() => setReportMsg(m)}
+                  >
+                    ⚑
+                  </button>
+                )}
+              </span>
+            </div>
           </div>
         ))}
         <div ref={bottomRef} />
