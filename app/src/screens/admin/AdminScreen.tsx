@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { useAuth } from '../../auth/AuthProvider'
+import { AppHeader } from '../../components/AppHeader'
 import { PhotoModeration } from './PhotoModeration'
 import { ReportsModeration } from './ReportsModeration'
 import { ModeratorManagement } from './ModeratorManagement'
@@ -8,79 +8,27 @@ import { VerificationModeration } from './VerificationModeration'
 import { AiFlags } from './AiFlags'
 import { AdminStats } from './AdminStats'
 
-type Tab = 'stats' | 'verifiche' | 'foto' | 'segnalazioni' | 'ai' | 'reputazione' | 'moderatori'
+export type AdminTab = 'stats' | 'verifiche' | 'foto' | 'segnalazioni' | 'ai' | 'reputazione' | 'moderatori'
 
-export function AdminScreen({ onBack }: { onBack: () => void }) {
+export const ADMIN_TAB_LABELS: Record<AdminTab, string> = {
+  stats: 'Statistiche',
+  verifiche: 'Verifiche',
+  foto: 'Foto',
+  segnalazioni: 'Segnalazioni',
+  ai: 'Flag AI',
+  reputazione: 'Reputazione',
+  moderatori: 'Moderatori',
+}
+
+// La navigazione fra le sezioni di moderazione vive ora nel burger menu
+// (sottovoci di "Moderazione"): qui mostriamo solo il contenuto della
+// sezione attiva, scelta altrove e passata come prop.
+export function AdminScreen({ tab, onBack }: { tab: AdminTab; onBack: () => void }) {
   const { isAdmin, isStaff } = useAuth()
-  const [tab, setTab] = useState<Tab>('stats')
 
   return (
     <main className="app admin">
-      <header className="rooms-header">
-        <button type="button" className="link back" onClick={onBack}>
-          ‹ Stanze
-        </button>
-        <h1 className="rooms-brand">Moderazione</h1>
-        <span className="link-placeholder" />
-      </header>
-
-      <nav className="admin-tabs">
-        <button
-          type="button"
-          className={tab === 'stats' ? 'admin-tab on' : 'admin-tab'}
-          onClick={() => setTab('stats')}
-        >
-          Statistiche
-        </button>
-        <button
-          type="button"
-          className={tab === 'verifiche' ? 'admin-tab on' : 'admin-tab'}
-          onClick={() => setTab('verifiche')}
-        >
-          Verifiche
-        </button>
-        <button
-          type="button"
-          className={tab === 'foto' ? 'admin-tab on' : 'admin-tab'}
-          onClick={() => setTab('foto')}
-        >
-          Foto
-        </button>
-        <button
-          type="button"
-          className={tab === 'segnalazioni' ? 'admin-tab on' : 'admin-tab'}
-          onClick={() => setTab('segnalazioni')}
-        >
-          Segnalazioni
-        </button>
-        {isStaff && (
-          <button
-            type="button"
-            className={tab === 'ai' ? 'admin-tab on' : 'admin-tab'}
-            onClick={() => setTab('ai')}
-          >
-            Flag AI
-          </button>
-        )}
-        {isStaff && (
-          <button
-            type="button"
-            className={tab === 'reputazione' ? 'admin-tab on' : 'admin-tab'}
-            onClick={() => setTab('reputazione')}
-          >
-            Reputazione
-          </button>
-        )}
-        {isAdmin && (
-          <button
-            type="button"
-            className={tab === 'moderatori' ? 'admin-tab on' : 'admin-tab'}
-            onClick={() => setTab('moderatori')}
-          >
-            Moderatori
-          </button>
-        )}
-      </nav>
+      <AppHeader backLabel="‹ Stanze" onBack={onBack} title={`Moderazione · ${ADMIN_TAB_LABELS[tab]}`} />
 
       {tab === 'stats' && <AdminStats />}
       {tab === 'verifiche' && <VerificationModeration />}

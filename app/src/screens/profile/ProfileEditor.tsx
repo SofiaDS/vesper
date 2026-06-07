@@ -1,7 +1,6 @@
 import { useRef, useState, useMemo, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { NotificationSettings } from '../../components/NotificationSettings'
-import { SupporterButton } from '../../components/SupporterButton'
+import { AppHeader } from '../../components/AppHeader'
 import { PinSetupSection } from './PinSetupSection'
 import {
   BIO_MAX,
@@ -423,13 +422,7 @@ export function ProfileEditor({
 
   return (
     <main className="app profile">
-      <header className="rooms-header">
-        <button type="button" className="link back" onClick={onCancel}>
-          ‹ Anteprima
-        </button>
-        <h1 className="rooms-brand">Modifica profilo</h1>
-        <span />
-      </header>
+      <AppHeader backLabel="‹ Anteprima" onBack={onCancel} title="Modifica profilo" />
 
       <form className="form profile-form" onSubmit={handleSave}>
         <div className="avatar-preview">
@@ -962,15 +955,10 @@ export function ProfileEditor({
       </form>
 
       <section className="card" style={{ marginTop: '1rem' }}>
-        <h2 className="pf-section-title">Preferenze app</h2>
-        <NotificationSettings />
-        <div style={{ marginTop: '1.25rem' }}>
-          <p className="pf-section-subtitle">Blocco con PIN</p>
-          <PinSetupSection />
-        </div>
+        <h2 className="pf-section-title">Blocco con PIN</h2>
+        <PinSetupSection />
       </section>
 
-      <SupporterButton />
       <DeleteAccountSection profileId={profile.id} />
     </main>
   )

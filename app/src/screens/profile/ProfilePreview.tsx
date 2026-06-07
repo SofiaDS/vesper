@@ -1,3 +1,4 @@
+import { AppHeader } from '../../components/AppHeader'
 import {
   IDENTITY_LABELS,
   ORIENTATION_LABELS,
@@ -116,17 +117,18 @@ export function ProfilePreview({
 
   return (
     <main className="app profile">
-      <header className="rooms-header">
-        <button type="button" className="link back" onClick={onBack}>
-          ‹ Stanze
-        </button>
-        <h1 className="rooms-brand">Il mio profilo</h1>
-        <button type="button" className="link" onClick={onEdit}>
-          Modifica
-        </button>
-      </header>
+      <AppHeader backLabel="‹ Stanze" onBack={onBack} title="Il mio profilo" />
 
       <p className="hint">Anteprima: così appari alle altre persone.</p>
+
+      <button
+        type="button"
+        className="link"
+        style={{ display: 'block', marginLeft: 'auto' }}
+        onClick={onEdit}
+      >
+        Modifica
+      </button>
 
       <div className="profile-card">
         <div className="avatar-preview">
