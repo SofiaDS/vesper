@@ -213,7 +213,7 @@ DB-1. Webhook Database per push-on-vouch
 DB-2. Configurare variabile app.edge_fn_url per il cron GDPR Storage
     - Se non già fatto: nel SQL Editor eseguire una volta:
         alter database postgres set app.edge_fn_url =
-          'https://<ref>.supabase.co/functions/v1/decay-expired-events';
+          'https://ywkttzzkvlemtsuoceke.supabase.co/functions/v1/decay-expired-events';
         alter database postgres set app.service_role_key = '<service-role-key>';
     - Necessario per il job vesper-gdpr-storage (pg_cron → pg_net → Edge Function)
     - Istruzioni originali in migration 20260607010000_gdpr_cron.sql
