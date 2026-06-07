@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
+import { AppHeader } from '../components/AppHeader'
 import { sendDmRequest } from '../lib/dm'
 import {
   IDENTITY_OPTIONS,
@@ -173,19 +174,18 @@ export function PublicProfileScreen({
 
   return (
     <main className="app profile">
-      <header className="rooms-header">
-        <button type="button" className="link back" onClick={onBack}>
-          ‹ Indietro
+      <AppHeader onBack={onBack} title="Profilo" />
+
+      {p && !p.is_self && (
+        <button
+          type="button"
+          className="link"
+          style={{ display: 'block', marginLeft: 'auto' }}
+          onClick={() => setReporting(true)}
+        >
+          Segnala ⚑
         </button>
-        <h1 className="rooms-brand">Profilo</h1>
-        {p && !p.is_self ? (
-          <button type="button" className="link" onClick={() => setReporting(true)}>
-            Segnala
-          </button>
-        ) : (
-          <span className="link-placeholder" />
-        )}
-      </header>
+      )}
 
       {loading && <p className="muted">Carico il profilo…</p>}
       {error && <p className="err chat-error">{error}</p>}

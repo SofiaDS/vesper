@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 import { useTheme } from '../hooks/useTheme'
 
 export interface BurgerMenuItem {
@@ -8,17 +8,50 @@ export interface BurgerMenuItem {
   badge?: number
 }
 
-// Menu di navigazione fisso (in alto a destra, dove prima stava il toggle tema):
-// raccoglie i link di navigazione e, in fondo, il toggle chiaro/scuro.
+interface BurgerMenuContextValue {
+  open: boolean
+  toggle: () => void
+}
+
+const BurgerMenuContext = createContext<BurgerMenuContextValue | null>(null)
+
+function useBurgerMenu(): BurgerMenuContextValue {
+  const ctx = useContext(BurgerMenuContext)
+  if (!ctx) throw new Error('useBurgerMenu va usato dentro <BurgerMenu>')
+  return ctx
+}
+
+// Pulsante che apre/chiude il menu: va inserito nell'header di ogni schermata
+// (sostituisce il vecchio toggle fisso in alto a destra).
+export function BurgerMenuButton() {
+  const { open, toggle } = useBurgerMenu()
+  return (
+    <button
+      type="button"
+      className="burger-btn"
+      onClick={toggle}
+      aria-label={open ? 'Chiudi menu' : 'Apri menu'}
+      aria-expanded={open}
+    >
+      {open ? '✕' : '☰'}
+    </button>
+  )
+}
+
+// Provider del menu di navigazione: raccoglie i link e, in fondo, il toggle chiaro/scuro.
+// Espone lo stato "aperto" via contesto così che ogni AppHeader possa avere il proprio
+// pulsante di apertura senza duplicare pannello/overlay.
 export function BurgerMenu({
   items,
   onSignOut,
+  children,
 }: {
   items: BurgerMenuItem[]
   onSignOut: () => void
+  children: ReactNode
 }) {
   const [open, setOpen] = useState(false)
-  const { theme, toggle } = useTheme()
+  const { theme, toggle: toggleTheme } = useTheme()
   const isDark = theme === 'dark'
 
   function go(action: () => void) {
@@ -27,16 +60,8 @@ export function BurgerMenu({
   }
 
   return (
-    <>
-      <button
-        type="button"
-        className="burger-btn"
-        onClick={() => setOpen((v) => !v)}
-        aria-label={open ? 'Chiudi menu' : 'Apri menu'}
-        aria-expanded={open}
-      >
-        {open ? '✕' : '☰'}
-      </button>
+    <BurgerMenuContext.Provider value={{ open, toggle: () => setOpen((v) => !v) }}>
+      {children}
 
       {open && <div className="burger-overlay" onClick={() => setOpen(false)} />}
 
@@ -58,10 +83,10 @@ export function BurgerMenu({
           </button>
         </div>
 
-        <button type="button" className="burger-item burger-theme" onClick={toggle}>
+        <button type="button" className="burger-item burger-theme" onClick={toggleTheme}>
           <span>{isDark ? '☀ Tema chiaro' : '🌙 Tema scuro'}</span>
         </button>
       </nav>
-    </>
+    </BurgerMenuContext.Provider>
   )
 }

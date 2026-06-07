@@ -9,8 +9,11 @@ import { ProfileScreen } from './profile/ProfileScreen'
 import { BlockedUsersScreen } from './BlockedUsersScreen'
 import { PublicProfileScreen } from './PublicProfileScreen'
 import { SearchScreen } from './SearchScreen'
+import { SettingsScreen } from './SettingsScreen'
 import { AdminScreen } from './admin/AdminScreen'
 import { DmScreen } from './DmScreen'
+
+const PAYPAL_URL = 'https://paypal.me/vesperapp'
 
 // Shell post-login: gestisce la navigazione fra lobby, chat, profilo e moderazione.
 // Nessun router esterno: basta uno stato locale, raccolto nel burger menu fisso.
@@ -25,6 +28,7 @@ export function Home() {
   const [showBlocked, setShowBlocked] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [showDm, setShowDm] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [viewUserId, setViewUserId] = useState<string | null>(null)
 
   function goToRooms() {
@@ -34,11 +38,19 @@ export function Home() {
     setShowBlocked(false)
     setShowSearch(false)
     setShowDm(false)
+    setShowSettings(false)
     setViewUserId(null)
   }
 
   const onLobby =
-    !room && !showProfile && !showAdmin && !showBlocked && !showSearch && !showDm && !viewUserId
+    !room &&
+    !showProfile &&
+    !showAdmin &&
+    !showBlocked &&
+    !showSearch &&
+    !showDm &&
+    !showSettings &&
+    !viewUserId
 
   const menuItems: BurgerMenuItem[] = [
     { label: 'Stanze', onClick: goToRooms, active: onLobby },
@@ -50,11 +62,15 @@ export function Home() {
     ...(isStaff
       ? [{ label: 'Moderazione', onClick: () => setShowAdmin(true), active: showAdmin }]
       : []),
+    { label: 'Impostazioni', onClick: () => setShowSettings(true), active: showSettings },
+    { label: 'Sostieni Vesper ↗', onClick: () => window.open(PAYPAL_URL, '_blank', 'noopener,noreferrer') },
   ]
 
   let screen: React.ReactNode
   if (showAdmin) {
     screen = <AdminScreen onBack={() => setShowAdmin(false)} />
+  } else if (showSettings) {
+    screen = <SettingsScreen onBack={() => setShowSettings(false)} />
   } else if (viewUserId) {
     screen = <PublicProfileScreen userId={viewUserId} onBack={() => setViewUserId(null)} />
   } else if (showBlocked) {
@@ -74,9 +90,8 @@ export function Home() {
   }
 
   return (
-    <>
-      <BurgerMenu items={menuItems} onSignOut={signOut} />
+    <BurgerMenu items={menuItems} onSignOut={signOut}>
       {screen}
-    </>
+    </BurgerMenu>
   )
 }

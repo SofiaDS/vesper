@@ -1,4 +1,5 @@
 import { useAuth } from '../auth/AuthProvider'
+import { AppHeader } from '../components/AppHeader'
 import { useRooms } from '../hooks/useRooms'
 import { useRoomOnlineCount } from '../hooks/useRoomOnlineCount'
 import { MAX_TEMATICHE } from '../constants/limits'
@@ -27,11 +28,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
 
   return (
     <main className="app rooms">
-      <header className="rooms-header">
-        <div>
-          <h1 className="rooms-brand">Vesper</h1>
-        </div>
-      </header>
+      <AppHeader title="Vesper" />
 
       {loading && <p className="muted">Carico le stanze…</p>}
       {error && <p className="err chat-error">{error}</p>}

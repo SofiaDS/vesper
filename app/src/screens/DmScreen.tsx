@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
+import { AppHeader } from '../components/AppHeader'
 import {
   listDmConversations,
   acceptDmRequest,
@@ -140,24 +141,20 @@ function ConversationView({
 
   return (
     <main className="chat">
-      <header className="chat-header">
-        <button type="button" className="link back" onClick={onBack}>
-          ‹ Messaggi
-        </button>
-        <div className="chat-title">
-          <h1>
-            <button
-              type="button"
-              className="link"
-              style={{ margin: 0, fontSize: '1.1rem', textDecoration: 'none' }}
-              onClick={() => onOpenProfile(otherId)}
-            >
-              @{conversation.other_nickname}
-            </button>
-          </h1>
-        </div>
-        <span />
-      </header>
+      <AppHeader
+        backLabel="‹ Messaggi"
+        onBack={onBack}
+        title={
+          <button
+            type="button"
+            className="link"
+            style={{ margin: 0, fontSize: '1.1rem', textDecoration: 'none' }}
+            onClick={() => onOpenProfile(otherId)}
+          >
+            @{conversation.other_nickname}
+          </button>
+        }
+      />
 
       <section className="messages">
         {loading && <p className="muted">Carico i messaggi…</p>}
@@ -314,13 +311,7 @@ function ListView({
 
   return (
     <main className="app rooms">
-      <header className="rooms-header">
-        <button type="button" className="link back" onClick={onBack}>
-          ‹ Stanze
-        </button>
-        <h1 className="rooms-brand">Messaggi</h1>
-        <span />
-      </header>
+      <AppHeader backLabel="‹ Stanze" onBack={onBack} title="Messaggi" />
 
       {error && <p className="err">{error}</p>}
 
