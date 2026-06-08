@@ -181,7 +181,7 @@ export function ReportsModeration() {
         <p className="hint">Nessuna segnalazione.</p>
       ) : (
         reports.map((r) => (
-          <div key={r.id} className="report-card">
+          <div key={r.id} className="report-card box-shadow">
             <p className="report-head">
               <span className="report-type">
                 {REPORT_TARGET_LABEL[r.target_type] ?? r.target_type}
@@ -195,7 +195,12 @@ export function ReportsModeration() {
               {r.target_nick && <> · su <strong>@{r.target_nick}</strong></>}
             </p>
             {r.reason && <p className="report-reason">{r.reason}</p>}
-            {r.status === 'open' ? (
+            {r.status === 'reviewed' && (
+              <p className="muted small-inline">
+                Revisione richiesta da <strong>@{r.resolver_nick ?? '—'}</strong>
+              </p>
+            )}
+            {(r.status === 'open' || r.status === 'reviewed') ? (
               <div className="report-actions">
                 <button
                   type="button"
@@ -215,15 +220,17 @@ export function ReportsModeration() {
                 >
                   Rigetta segnalazione
                 </button>
-                <button
-                  type="button"
-                  className="btn-primary btn-sm"
-                  onClick={() => resolve(r.id, 'reviewed')}
-                  disabled={busy === r.id}
-                  title="Caso borderline o grave — richiede secondo parere"
-                >
-                  Richiedi ulteriore verifica
-                </button>
+                {r.status === 'open' && (
+                  <button
+                    type="button"
+                    className="btn-primary btn-sm"
+                    onClick={() => resolve(r.id, 'reviewed')}
+                    disabled={busy === r.id}
+                    title="Caso borderline o grave — richiede secondo parere"
+                  >
+                    Richiedi ulteriore verifica
+                  </button>
+                )}
               </div>
             ) : (
               <p className="muted small-inline">

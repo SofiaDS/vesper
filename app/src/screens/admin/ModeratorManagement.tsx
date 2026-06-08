@@ -73,7 +73,7 @@ export function ModeratorManagement() {
   }
 
   return (
-    <div className="mod-list">
+    <div className="mod-list box-shadow border-radius padding">
       <form className="composer inline-add" onSubmit={add}>
         <input
           type="text"

@@ -110,7 +110,7 @@ export function UserReputation({
   const { text: label, cls } = scoreLabel(score)
 
   return (
-    <div className="rep-card">
+    <div className="rep-card box-shadow">
       <div className="rep-score-row">
         <span className={`rep-score ${cls}`}>{score}</span>
         <div>

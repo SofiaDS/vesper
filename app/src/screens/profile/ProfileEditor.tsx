@@ -1,7 +1,6 @@
 import { useRef, useState, useMemo, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { AppHeader } from '../../components/AppHeader'
-import { PinSetupSection } from './PinSetupSection'
 import {
   BIO_MAX,
   PRONOUNS_MAX,
@@ -953,11 +952,6 @@ export function ProfileEditor({
           </button>
         </div>
       </form>
-
-      <section className="card" style={{ marginTop: '1rem' }}>
-        <h2 className="pf-section-title">Blocco con PIN</h2>
-        <PinSetupSection />
-      </section>
 
       <DeleteAccountSection profileId={profile.id} />
     </main>

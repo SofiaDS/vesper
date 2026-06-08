@@ -79,12 +79,15 @@ export interface Report {
   reason: string | null
   status: ReportStatus
   resolution_note: string | null
+  resolved_by: string | null
+  resolved_at: string | null
   created_at: string
 }
 
 export interface ReportRow extends Report {
   reporter_nick: string
   target_nick: string | null
+  resolver_nick: string | null
 }
 
 export async function listReports(
@@ -101,11 +104,13 @@ export async function listReports(
   const names = await nicknamesFor([
     ...rows.map((r) => r.reporter_id ?? ''),
     ...rows.map((r) => r.target_user_id ?? ''),
+    ...rows.map((r) => r.resolved_by ?? ''),
   ])
   return rows.map((r) => ({
     ...r,
     reporter_nick: (r.reporter_id && names[r.reporter_id]) || '—',
     target_nick: r.target_user_id ? names[r.target_user_id] ?? '—' : null,
+    resolver_nick: r.resolved_by ? names[r.resolved_by] ?? '—' : null,
   }))
 }
 
