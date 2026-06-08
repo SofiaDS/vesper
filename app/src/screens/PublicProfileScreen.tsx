@@ -191,7 +191,7 @@ export function PublicProfileScreen({
       {error && <p className="err chat-error">{error}</p>}
 
       {p && (
-        <div className="profile-card">
+        <div className="profile-card box-shadow">
           <div className="avatar-preview">
             <PhotoCarousel
               userId={p.id}
