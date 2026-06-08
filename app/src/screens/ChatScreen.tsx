@@ -10,7 +10,9 @@ import { ReportDialog } from '../components/ReportDialog'
 import { RoomRoster } from '../components/RoomRoster'
 import { MessageComposer } from '../components/MessageComposer'
 import { MentionText } from '../components/MentionText'
+import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
+import { useMessageReactions } from '../hooks/useMessageReactions'
 import { promoteLayer } from '../lib/layers'
 import { glyphFor } from '../lib/profile/formatters'
 import type { Chatroom } from '../types'
@@ -41,6 +43,7 @@ export function ChatScreen({
   const myId = session?.user.id
 
   const members = useChatMembers(room.id, room.kind)
+  const reactions = useMessageReactions({ scope: 'room', scopeId: room.id, myId })
 
   const { blockedIds, nicknameCache, avatarCache, loadBlockedIds, cacheNicknames, resolveNickname } =
     useChatCache()
@@ -188,6 +191,11 @@ export function ChatScreen({
                   <MentionText body={m.body} members={members} onOpenProfile={onOpenProfile} />
                 </span>
               </div>
+              <MessageReactions
+                reactions={reactions.forMessage(m.id)}
+                myId={myId}
+                onToggle={(emoji) => reactions.toggle(m.id, emoji)}
+              />
               <span className="msg-footer">
                 <span className="msg-time">{formatTime(m.created_at)}</span>
                 <button

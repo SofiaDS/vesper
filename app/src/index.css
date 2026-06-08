@@ -35,6 +35,7 @@ body {
 
 #root {
   height: 100%;
+  width:100%;
   padding-top: 2.5rem;
 }
 
@@ -210,7 +211,7 @@ code {
   margin-top: 0.25rem;
   padding: 0.7rem 1rem;
   border: 0;
-  border-radius: 9px;
+  border-radius: 35px;
   background: var(--accent);
   color: var(--bg);
   font-size: 1rem;
@@ -319,7 +320,7 @@ text-align: left;
 
 .composer {
   display: flex;
-  gap: 0.5rem;
+  justify-content: space-around;
   padding-top: 0.75rem;
   border-top: 1px solid rgba(232, 177, 78, 0.18);
 }
@@ -1434,6 +1435,91 @@ body:has(.install-banner) .rooms-hint {
   text-decoration: underline;
 }
 
+/* --- Reazioni emoji ai messaggi (bolla + selettore) --- */
+.msg-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 3px;
+}
+.msg-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 177, 78, 0.2);
+  background: rgba(247, 239, 221, 0.04);
+  color: var(--text);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.msg-reaction:hover {
+  border-color: var(--accent);
+}
+.msg-reaction-mine {
+  border-color: var(--accent);
+  background: rgba(232, 177, 78, 0.16);
+  color: var(--accent);
+}
+.msg-reaction-count {
+  font-size: 0.72rem;
+  opacity: 0.8;
+}
+.msg-reaction-picker-wrap {
+  position: relative;
+}
+.msg-reaction-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(232, 177, 78, 0.3);
+  background: none;
+  color: var(--text);
+  opacity: 0.45;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.msg-reaction-add:hover {
+  opacity: 0.9;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.reaction-picker {
+  position: absolute;
+  z-index: 20;
+  bottom: calc(100% + 4px);
+  left: 0;
+  display: flex;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0.3rem;
+  list-style: none;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 177, 78, 0.3);
+  background: #1e1b29;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+.reaction-picker-item {
+  border: 0;
+  background: transparent;
+  padding: 0.2rem 0.35rem;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.reaction-picker-item:hover {
+  background: rgba(232, 177, 78, 0.14);
+}
+
 /* --- Modale generica (es. segnalazione) --- */
 .modal-overlay {
   position: fixed;
@@ -2278,8 +2364,8 @@ button.dm-conv:hover {
 
 [data-theme="light"] .card,
 [data-theme="light"] .rep-prompt {
-  /*background: rgba(23, 21, 32, 0.07);*/
-  border-color: rgba(130, 90, 0, 0.25);
+  background: rgba(23, 21, 32, 0.07);
+  /*border-color: rgba(130, 90, 0, 0.25);*/
 }
 
 [data-theme="light"] .roster {
