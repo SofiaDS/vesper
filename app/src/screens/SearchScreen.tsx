@@ -75,6 +75,8 @@ export function SearchScreen({
   onOpenProfile: (userId: string) => void
 }) {
   const [tab, setTab] = useState<Tab>('nickname')
+  const [showFilters, setShowFilters] = useState(true)
+  const [resultsView, setResultsView] = useState<'list' | 'grid'>('list')
   const [nick, setNick] = useState('')
   const [filters, setFilters] = useState<SearchFilters>({})
   const [ageOn, setAgeOn] = useState(false)
@@ -214,6 +216,7 @@ export function SearchScreen({
       const rows = await searchByFilters(f, 0)
       setResults(rows)
       setHasMore(rows.length === SEARCH_PAGE)
+      setShowFilters(false)
       pushHistory({ tab: 'filtri', label: `Filtri (${activeFilterCount(f)} attivi)`, nick: '', filters: f, ageOn, ageMin, ageMax })
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Ricerca non riuscita.')
@@ -242,6 +245,12 @@ export function SearchScreen({
 
   function switchTab(t: Tab) {
     setTab(t); setResults([]); setSearched(false); setErr(null); setSoftWarning(null); setHasMore(false)
+    setShowFilters(true)
+  }
+
+  function clickFiltriTab() {
+    if (tab === 'filtri') setShowFilters((v) => !v)
+    else switchTab('filtri')
   }
 
   function handleNicknameSubmit() {
@@ -299,7 +308,7 @@ export function SearchScreen({
         <button
           type="button"
           className={tab === 'filtri' ? 'seg on' : 'seg'}
-          onClick={() => switchTab('filtri')}
+          onClick={clickFiltriTab}
         >
           Per filtri
         </button>
@@ -324,7 +333,7 @@ export function SearchScreen({
             Cerca
           </button>
         </div>
-      ) : (
+      ) : showFilters ? (
         <div className="search-filters">
           <fieldset className="field">
             <legend>Età</legend>
@@ -413,7 +422,7 @@ export function SearchScreen({
             Cerca
           </button>
         </div>
-      )}
+      ) : null}
 
       {err && <p className="err">{err}</p>}
       {softWarning && <p className="hint search-soft-warn">{softWarning}</p>}
@@ -433,14 +442,32 @@ export function SearchScreen({
             </p>
           ) : (
             <>
-              {results.map((r) => (
-                <UserCard
-                  key={r.id}
-                  result={r}
-                  showAffinity={tab === 'filtri'}
-                  onOpen={() => onOpenProfile(r.id)}
-                />
-              ))}
+              <div className="search-view-toggle">
+                <button
+                  type="button"
+                  className={resultsView === 'list' ? 'seg on' : 'seg'}
+                  onClick={() => setResultsView('list')}
+                >
+                  Lista
+                </button>
+                <button
+                  type="button"
+                  className={resultsView === 'grid' ? 'seg on' : 'seg'}
+                  onClick={() => setResultsView('grid')}
+                >
+                  Griglia
+                </button>
+              </div>
+              <div className={resultsView === 'grid' ? 'search-cards search-cards-grid' : 'search-cards'}>
+                {results.map((r) => (
+                  <UserCard
+                    key={r.id}
+                    result={r}
+                    showAffinity={tab === 'filtri'}
+                    onOpen={() => onOpenProfile(r.id)}
+                  />
+                ))}
+              </div>
               {hasMore && (
                 <button
                   type="button"
