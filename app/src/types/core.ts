@@ -4,6 +4,8 @@ import type {
   Intent,
   RelationshipStatus,
   RelationshipType,
+  Language,
+  ChildrenStatus,
   Diet,
   Religion,
   Politics,
@@ -31,6 +33,10 @@ export interface Profile {
   intents: Intent[]
   relationship_status: RelationshipStatus | null
   relationship_type: RelationshipType | null
+  languages: Language[]
+  children_status: ChildrenStatus | null
+  has_pets: boolean | null
+  pets_detail: string | null
   diet: Diet | null
   religion: Religion | null
   politics: Politics | null
@@ -47,6 +53,9 @@ export interface Profile {
   show_pronouns: boolean
   show_intents: boolean
   show_relationship: boolean
+  show_languages: boolean
+  show_children: boolean
+  show_pets: boolean
   show_diet: boolean
   show_religion: boolean
   show_politics: boolean

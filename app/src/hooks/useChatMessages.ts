@@ -7,6 +7,7 @@ export interface ChatMessage {
   created_at: string
   sender_id: string
   nickname: string
+  reply_to_id: number | null
 }
 
 const PAGE_SIZE = 50
@@ -50,7 +51,7 @@ export function useChatMessages({
     async function init() {
       const { data: rows, error: msgErr } = await supabase
         .from('messages')
-        .select('id, body, created_at, sender_id')
+        .select('id, body, created_at, sender_id, reply_to_id')
         .eq('chatroom_id', roomId)
         .order('created_at', { ascending: false })
         .limit(PAGE_SIZE)
@@ -78,6 +79,7 @@ export function useChatMessages({
           created_at: r.created_at,
           sender_id: r.sender_id,
           nickname: nicknameCache.current.get(r.sender_id) ?? '—',
+          reply_to_id: r.reply_to_id,
         })),
       )
       setHasMore((rows ?? []).length === PAGE_SIZE)
@@ -95,7 +97,7 @@ export function useChatMessages({
     try {
       const { data: rows, error: olderErr } = await supabase
         .from('messages')
-        .select('id, body, created_at, sender_id')
+        .select('id, body, created_at, sender_id, reply_to_id')
         .eq('chatroom_id', roomId)
         .lt('created_at', oldestCreatedAt)
         .order('created_at', { ascending: false })
@@ -119,6 +121,7 @@ export function useChatMessages({
             created_at: r.created_at,
             sender_id: r.sender_id,
             nickname: nicknameCache.current.get(r.sender_id) ?? '—',
+            reply_to_id: r.reply_to_id,
           }))
         return [...prepend, ...prev]
       })

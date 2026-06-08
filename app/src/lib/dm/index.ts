@@ -20,6 +20,7 @@ export interface DmMessage {
   sender_id: string
   body: string
   created_at: string
+  reply_to_id: number | null
 }
 
 const DM_PAGE_SIZE = 50
@@ -103,7 +104,7 @@ export async function getDmMessages(
 ): Promise<DmMessage[]> {
   let q = supabase
     .from('dm_messages')
-    .select('id, conversation_id, sender_id, body, created_at')
+    .select('id, conversation_id, sender_id, body, created_at, reply_to_id')
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: false })
     .limit(DM_PAGE_SIZE)
@@ -130,14 +131,15 @@ export async function sendDmMessage(
   senderId: string,
   body: string,
   receiverId?: string,
+  replyToId?: number | null,
 ): Promise<DmMessage> {
   if (receiverId && (await isBlocked(receiverId))) {
     throw new Error('Non puoi inviare messaggi a questa utente.')
   }
   const { data, error } = await supabase
     .from('dm_messages')
-    .insert({ conversation_id: conversationId, sender_id: senderId, body })
-    .select('id, conversation_id, sender_id, body, created_at')
+    .insert({ conversation_id: conversationId, sender_id: senderId, body, reply_to_id: replyToId ?? null })
+    .select('id, conversation_id, sender_id, body, created_at, reply_to_id')
     .single()
   if (error) throw error
   return data as DmMessage
