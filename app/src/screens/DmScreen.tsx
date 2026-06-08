@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { AppHeader } from '../components/AppHeader'
+import { MessageComposer } from '../components/MessageComposer'
+import { QuotePreview } from '../components/QuotePreview'
 import {
   listDmConversations,
   acceptDmRequest,
@@ -42,6 +44,7 @@ function ConversationView({
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [otherBlocked, setOtherBlocked] = useState(false)
+  const [replyTo, setReplyTo] = useState<DmMessage | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const skipScroll = useRef(false)
 
@@ -127,11 +130,12 @@ function ConversationView({
     setSending(true)
     setError(null)
     try {
-      const msg = await sendDmMessage(conversation.id, myId, body, otherId)
+      const msg = await sendDmMessage(conversation.id, myId, body, otherId, replyTo?.id ?? null)
       setMessages((prev) =>
         prev.some((m) => m.id === msg.id) ? prev : [...prev, msg],
       )
       setText('')
+      setReplyTo(null)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invio non riuscito.')
     } finally {
@@ -171,48 +175,56 @@ function ConversationView({
         {!loading && messages.length === 0 && (
           <p className="muted">Nessun messaggio. Scrivi il primo.</p>
         )}
-        {messages.map((m) => (
-          <div key={m.id} className={m.sender_id === myId ? 'msg-row msg-row-mine' : 'msg-row'}>
-            <div className="msg-col">
-              <div className={m.sender_id === myId ? 'msg msg-mine' : 'msg'}>
-                <span className="msg-body">{m.body}</span>
+        {messages.map((m) => {
+          const nicknameOf = (senderId: string) => (senderId === myId ? 'tu' : conversation.other_nickname)
+          const quoted = m.reply_to_id != null ? messages.find((q) => q.id === m.reply_to_id) : null
+          return (
+            <div key={m.id} className={m.sender_id === myId ? 'msg-row msg-row-mine' : 'msg-row'}>
+              <div className="msg-col">
+                <div className={m.sender_id === myId ? 'msg msg-mine' : 'msg'}>
+                  {m.reply_to_id != null && (
+                    quoted ? (
+                      <QuotePreview nickname={nicknameOf(quoted.sender_id)} body={quoted.body} />
+                    ) : (
+                      <span className="msg-quote msg-quote-missing">Messaggio originale non disponibile</span>
+                    )
+                  )}
+                  <span className="msg-body">{m.body}</span>
+                </div>
+                <span className="msg-footer">
+                  <span className="msg-time">{formatTime(m.created_at)}</span>
+                  <button
+                    type="button"
+                    className="msg-reply"
+                    title="Rispondi citando"
+                    aria-label="Rispondi citando"
+                    onClick={() => setReplyTo(m)}
+                  >
+                    ↩
+                  </button>
+                </span>
               </div>
-              <span className="msg-footer">
-                <span className="msg-time">{formatTime(m.created_at)}</span>
-              </span>
             </div>
-          </div>
-        ))}
+          )
+        })}
         <div ref={bottomRef} />
       </section>
 
       {error && <p className="err chat-error">{error}</p>}
 
-      {otherBlocked ? (
-        <div className="composer composer-blocked">
-          <p className="muted" style={{ margin: 0, textAlign: 'center', fontSize: '0.85rem' }}>
-            Hai bloccato questa utente. Non puoi inviare messaggi.
-          </p>
-        </div>
-      ) : (
-        <form className="composer" onSubmit={handleSend}>
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Scrivi un messaggio…"
-            maxLength={2000}
-            aria-label="Messaggio"
-          />
-          <button
-            type="submit"
-            className="btn-primary"
-            disabled={sending || !text.trim()}
-          >
-            Invia
-          </button>
-        </form>
-      )}
+      <MessageComposer
+        value={text}
+        onChange={setText}
+        onSubmit={handleSend}
+        sending={sending}
+        disabledMessage={otherBlocked ? 'Hai bloccato questa utente. Non puoi inviare messaggi.' : undefined}
+        replyTo={
+          replyTo
+            ? { nickname: replyTo.sender_id === myId ? 'tu' : conversation.other_nickname, body: replyTo.body }
+            : null
+        }
+        onCancelReply={() => setReplyTo(null)}
+      />
     </main>
   )
 }

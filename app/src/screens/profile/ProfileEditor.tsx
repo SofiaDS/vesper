@@ -5,6 +5,7 @@ import {
   BIO_MAX,
   PRONOUNS_MAX,
   MAX_INTERESTS,
+  PETS_DETAIL_MAX,
   INTEREST_CATEGORIES,
   INTEREST_SUGGESTIONS,
 } from '../../constants/limits'
@@ -14,6 +15,8 @@ import {
   INTENT_OPTIONS,
   RELATIONSHIP_STATUS_OPTIONS,
   RELATIONSHIP_TYPE_OPTIONS,
+  LANGUAGE_OPTIONS,
+  CHILDREN_OPTIONS,
   DIET_OPTIONS,
   RELIGION_OPTIONS,
   POLITICS_OPTIONS,
@@ -22,6 +25,7 @@ import {
   DM_FILTER_OPTIONS,
 } from '../../constants/options'
 import { ZODIAC_LABELS } from '../../constants/labels'
+import { SingleChoiceField, MultiChoiceField, ShowInProfileToggle } from './ChoiceField'
 import { glyphFor, normalize, AVATAR_PRESETS } from '../../lib/profile/formatters'
 import { checkLayerEligibility, type LayerEligibility } from '../../lib/layers'
 import {
@@ -43,6 +47,8 @@ import type {
   Intent,
   RelationshipStatus,
   RelationshipType,
+  Language,
+  ChildrenStatus,
   Diet,
   Religion,
   Politics,
@@ -214,6 +220,10 @@ export function ProfileEditor({
   const [intents, setIntents] = useState<Intent[]>(profile.intents ?? [])
   const [relStatus, setRelStatus] = useState<RelationshipStatus | null>(profile.relationship_status ?? null)
   const [relType, setRelType] = useState<RelationshipType | null>(profile.relationship_type ?? null)
+  const [languages, setLanguages] = useState<Language[]>(profile.languages ?? [])
+  const [childrenStatus, setChildrenStatus] = useState<ChildrenStatus | null>(profile.children_status ?? null)
+  const [hasPets, setHasPets] = useState<boolean | null>(profile.has_pets ?? null)
+  const [petsDetail, setPetsDetail] = useState(profile.pets_detail ?? '')
   const [diet, setDiet] = useState<Diet | null>(profile.diet ?? null)
   const [religion, setReligion] = useState<Religion | null>(profile.religion ?? null)
   const [politics, setPolitics] = useState<Politics | null>(profile.politics ?? null)
@@ -247,6 +257,9 @@ export function ProfileEditor({
     show_pronouns: profile.show_pronouns,
     show_intents: profile.show_intents,
     show_relationship: profile.show_relationship,
+    show_languages: profile.show_languages,
+    show_children: profile.show_children,
+    show_pets: profile.show_pets,
     show_diet: profile.show_diet,
     show_religion: profile.show_religion,
     show_politics: profile.show_politics,
@@ -357,6 +370,10 @@ export function ProfileEditor({
       setError(`I pronomi non possono superare i ${PRONOUNS_MAX} caratteri.`)
       return
     }
+    if (hasPets && petsDetail.length > PETS_DETAIL_MAX) {
+      setError(`La specifica sugli animali domestici non può superare i ${PETS_DETAIL_MAX} caratteri.`)
+      return
+    }
     if (cityQuery.trim() && !citySelected.current) {
       setError("Seleziona la città dall'elenco dei suggerimenti.")
       return
@@ -378,6 +395,10 @@ export function ProfileEditor({
           intents,
           relationship_status: relStatus,
           relationship_type: relTypeToSave,
+          languages,
+          children_status: childrenStatus,
+          has_pets: hasPets,
+          pets_detail: hasPets ? petsDetail.trim() || null : null,
           diet,
           religion,
           politics,
@@ -413,6 +434,8 @@ export function ProfileEditor({
   const intentOpts = useMemo(() => INTENT_OPTIONS, [])
   const relStatusOpts = useMemo(() => RELATIONSHIP_STATUS_OPTIONS, [])
   const relTypeOpts = useMemo(() => RELATIONSHIP_TYPE_OPTIONS, [])
+  const languageOpts = useMemo(() => LANGUAGE_OPTIONS, [])
+  const childrenOpts = useMemo(() => CHILDREN_OPTIONS, [])
   const dietOpts = useMemo(() => DIET_OPTIONS, [])
   const religionOpts = useMemo(() => RELIGION_OPTIONS, [])
   const politicsOpts = useMemo(() => POLITICS_OPTIONS, [])
@@ -616,29 +639,17 @@ export function ProfileEditor({
           </label>
         </fieldset>
 
-        <fieldset className="field">
-          <legend>Orientamento</legend>
-          <div className="options">
-            {orientationOpts.map((opt) => (
-              <label key={opt.value} className="chip">
-                <input
-                  type="checkbox"
-                  checked={orientations.includes(opt.value)}
-                  onChange={() => setOrientations(toggle(orientations, opt.value))}
-                />
-                <span>{opt.label}</span>
-              </label>
-            ))}
-          </div>
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={vis.show_orientation}
-              onChange={(e) => setVisFlag('show_orientation', e.target.checked)}
-            />
-            <span>Mostra nel profilo</span>
-          </label>
-        </fieldset>
+        <MultiChoiceField
+          legend="Orientamento"
+          options={orientationOpts}
+          selected={orientations}
+          onToggle={(v) => setOrientations(toggle(orientations, v))}
+        >
+          <ShowInProfileToggle
+            checked={vis.show_orientation}
+            onChange={(v) => setVisFlag('show_orientation', v)}
+          />
+        </MultiChoiceField>
 
         <fieldset className="field">
           <legend>Stato relazionale</legend>
@@ -685,29 +696,17 @@ export function ProfileEditor({
           </label>
         </fieldset>
 
-        <fieldset className="field">
-          <legend>Cosa cerchi</legend>
-          <div className="options">
-            {intentOpts.map((opt) => (
-              <label key={opt.value} className="chip">
-                <input
-                  type="checkbox"
-                  checked={intents.includes(opt.value)}
-                  onChange={() => setIntents(toggle(intents, opt.value))}
-                />
-                <span>{opt.label}</span>
-              </label>
-            ))}
-          </div>
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={vis.show_intents}
-              onChange={(e) => setVisFlag('show_intents', e.target.checked)}
-            />
-            <span>Mostra nel profilo</span>
-          </label>
-        </fieldset>
+        <MultiChoiceField
+          legend="Cosa cerchi"
+          options={intentOpts}
+          selected={intents}
+          onToggle={(v) => setIntents(toggle(intents, v))}
+        >
+          <ShowInProfileToggle
+            checked={vis.show_intents}
+            onChange={(v) => setVisFlag('show_intents', v)}
+          />
+        </MultiChoiceField>
 
         <fieldset className="field">
           <legend>
@@ -761,96 +760,82 @@ export function ProfileEditor({
           </div>
         </fieldset>
 
-        {[
-          { legend: 'Alimentazione', opts: dietOpts, val: diet, name: 'diet', set: setDiet as (v: Diet | null) => void, visKey: 'show_diet' as const },
-          { legend: 'Religione & credo', opts: religionOpts, val: religion, name: 'religion', set: setReligion as (v: Religion | null) => void, visKey: 'show_religion' as const, label: null },
-          { legend: 'Orientamento politico', opts: politicsOpts, val: politics, name: 'politics', set: setPolitics as (v: Politics | null) => void, visKey: 'show_politics' as const, label: null },
-        ].map(({ legend, opts, val, name, set, visKey }) => (
-          <fieldset key={name} className="field">
-            <legend>{legend}</legend>
-            <div className="options">
-              {(opts as { value: string; label: string }[]).map((opt) => (
-                <label key={opt.value} className="chip">
-                  <input
-                    type="radio"
-                    name={name}
-                    checked={val === opt.value}
-                    onChange={() => (set as (v: string) => void)(opt.value)}
-                  />
-                  <span>{opt.label}</span>
-                </label>
-              ))}
-              {val && (
-                <button type="button" className="link clear-sel" onClick={() => (set as (v: null) => void)(null)}>
-                  pulisci
-                </button>
-              )}
-            </div>
-            <label className="declare mini">
+        <MultiChoiceField
+          legend="Lingue parlate"
+          options={languageOpts}
+          selected={languages}
+          onToggle={(v) => setLanguages(toggle(languages, v))}
+        >
+          <ShowInProfileToggle
+            checked={vis.show_languages}
+            onChange={(v) => setVisFlag('show_languages', v)}
+          />
+        </MultiChoiceField>
+
+        <SingleChoiceField legend="Alimentazione" name="diet" options={dietOpts} value={diet} onChange={(v) => setDiet(v)}>
+          <ShowInProfileToggle checked={vis.show_diet} onChange={(v) => setVisFlag('show_diet', v)} />
+        </SingleChoiceField>
+
+        <SingleChoiceField legend="Religione & credo" name="religion" options={religionOpts} value={religion} onChange={(v) => setReligion(v)}>
+          <ShowInProfileToggle checked={vis.show_religion} onChange={(v) => setVisFlag('show_religion', v)} />
+        </SingleChoiceField>
+
+        <SingleChoiceField legend="Orientamento politico" name="politics" options={politicsOpts} value={politics} onChange={(v) => setPolitics(v)}>
+          <ShowInProfileToggle checked={vis.show_politics} onChange={(v) => setVisFlag('show_politics', v)} />
+        </SingleChoiceField>
+
+        <SingleChoiceField legend="Figli" name="children" options={childrenOpts} value={childrenStatus} onChange={(v) => setChildrenStatus(v)}>
+          <ShowInProfileToggle checked={vis.show_children} onChange={(v) => setVisFlag('show_children', v)} />
+        </SingleChoiceField>
+
+        <SingleChoiceField legend="Fumo" name="smoking" options={smokingOpts} value={smoking} onChange={(v) => setSmoking(v)}>
+          <ShowInProfileToggle checked={vis.show_smoking} onChange={(v) => setVisFlag('show_smoking', v)} />
+        </SingleChoiceField>
+
+        <SingleChoiceField legend="Attività fisica" name="sport" options={sportOpts} value={sport} onChange={(v) => setSport(v)}>
+          <ShowInProfileToggle checked={vis.show_sport} onChange={(v) => setVisFlag('show_sport', v)} />
+        </SingleChoiceField>
+
+        <fieldset className="field">
+          <legend>Animali domestici</legend>
+          <div className="options">
+            <label className="chip">
               <input
-                type="checkbox"
-                checked={vis[visKey]}
-                onChange={(e) => setVisFlag(visKey, e.target.checked)}
+                type="radio"
+                name="pets"
+                checked={hasPets === true}
+                onChange={() => setHasPets(true)}
               />
-              <span>Mostra nel profilo</span>
+              <span>Sì</span>
             </label>
-          </fieldset>
-        ))}
-
-        <fieldset className="field">
-          <legend>Fumo</legend>
-          <div className="options">
-            {smokingOpts.map((opt) => (
-              <label key={opt.value} className="chip">
-                <input
-                  type="radio"
-                  name="smoking"
-                  checked={smoking === opt.value}
-                  onChange={() => setSmoking(opt.value)}
-                />
-                <span>{opt.label}</span>
-              </label>
-            ))}
-            {smoking && (
-              <button type="button" className="link clear-sel" onClick={() => setSmoking(null)}>pulisci</button>
+            <label className="chip">
+              <input
+                type="radio"
+                name="pets"
+                checked={hasPets === false}
+                onChange={() => { setHasPets(false); setPetsDetail('') }}
+              />
+              <span>No</span>
+            </label>
+            {hasPets !== null && (
+              <button type="button" className="link clear-sel" onClick={() => { setHasPets(null); setPetsDetail('') }}>
+                pulisci
+              </button>
             )}
           </div>
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={vis.show_smoking}
-              onChange={(e) => setVisFlag('show_smoking', e.target.checked)}
-            />
-            <span>Mostra nel profilo</span>
-          </label>
-        </fieldset>
-
-        <fieldset className="field">
-          <legend>Attività fisica</legend>
-          <div className="options">
-            {sportOpts.map((opt) => (
-              <label key={opt.value} className="chip">
-                <input
-                  type="radio"
-                  name="sport"
-                  checked={sport === opt.value}
-                  onChange={() => setSport(opt.value)}
-                />
-                <span>{opt.label}</span>
-              </label>
-            ))}
-            {sport && (
-              <button type="button" className="link clear-sel" onClick={() => setSport(null)}>pulisci</button>
-            )}
-          </div>
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={vis.show_sport}
-              onChange={(e) => setVisFlag('show_sport', e.target.checked)}
-            />
-            <span>Mostra nel profilo</span>
-          </label>
+          {hasPets === true && (
+            <div className="composer inline-add">
+              <input
+                type="text"
+                value={petsDetail}
+                onChange={(e) => setPetsDetail(e.target.value)}
+                placeholder="Specifica (es. un gatto e un cane)…"
+                maxLength={PETS_DETAIL_MAX}
+              />
+              <span className="muted">{petsDetail.length}/{PETS_DETAIL_MAX}</span>
+            </div>
+          )}
+          <ShowInProfileToggle checked={vis.show_pets} onChange={(v) => setVisFlag('show_pets', v)} />
         </fieldset>
 
         {profile.zodiac && (
@@ -952,70 +937,6 @@ export function ProfileEditor({
           </button>
         </div>
       </form>
-
-      <DeleteAccountSection profileId={profile.id} />
     </main>
-  )
-}
-
-function DeleteAccountSection({ profileId }: { profileId: string }) {
-  const [confirm, setConfirm] = useState(false)
-  const [busy, setBusy] = useState(false)
-  const [err, setErr] = useState<string | null>(null)
-
-  async function handleDelete() {
-    setBusy(true)
-    setErr(null)
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`,
-        {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${session?.access_token ?? ''}` },
-        },
-      )
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error((body as { error?: string }).error ?? 'Errore nella cancellazione.')
-      }
-      await supabase.auth.signOut()
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Errore. Riprova.')
-      setBusy(false)
-    }
-  }
-
-  void profileId
-  return (
-    <section className="card danger-zone" style={{ marginTop: '1rem' }}>
-      <h2 className="pf-section-title">Zona pericolosa</h2>
-      {!confirm ? (
-        <>
-          <p className="hint">
-            La cancellazione dell'account è definitiva. Tutti i tuoi messaggi, foto e dati
-            saranno rimossi in modo permanente.
-          </p>
-          <button type="button" className="btn-danger" onClick={() => setConfirm(true)}>
-            Cancella il mio account
-          </button>
-        </>
-      ) : (
-        <>
-          <p className="err">
-            Sei sicura? Questa operazione è <strong>irreversibile</strong>.
-          </p>
-          {err && <p className="err">{err}</p>}
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button type="button" className="btn-danger" onClick={handleDelete} disabled={busy}>
-              {busy ? 'Cancello…' : 'Sì, cancella definitivamente'}
-            </button>
-            <button type="button" className="btn-ghost" onClick={() => setConfirm(false)} disabled={busy}>
-              Annulla
-            </button>
-          </div>
-        </>
-      )}
-    </section>
   )
 }

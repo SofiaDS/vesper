@@ -150,7 +150,7 @@ export function Home() {
     screen = <AdminScreen tab={adminTab} onBack={goBack} />
   } else if (showSettings) {
     goBack = () => setShowSettings(false)
-    screen = <SettingsScreen onBack={goBack} />
+    screen = <SettingsScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} />
   } else if (legalDoc) {
     goBack = () => setLegalDoc(null)
     screen = <LegalScreen doc={legalDoc} onBack={goBack} />
@@ -168,7 +168,7 @@ export function Home() {
     screen = <DmScreen onBack={goBack} onOpenProfile={setViewUserId} />
   } else if (showProfile) {
     goBack = () => setShowProfile(false)
-    screen = <ProfileScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} />
+    screen = <ProfileScreen onBack={goBack} />
   } else if (room) {
     goBack = () => setRoom(null)
     screen = <ChatScreen room={room} onBack={goBack} onOpenProfile={setViewUserId} />

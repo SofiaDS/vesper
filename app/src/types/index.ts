@@ -4,6 +4,8 @@ export type {
   Intent,
   RelationshipStatus,
   RelationshipType,
+  Language,
+  ChildrenStatus,
   Diet,
   Religion,
   Politics,

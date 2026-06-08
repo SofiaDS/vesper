@@ -46,7 +46,29 @@ export type RelationshipType =
   | 'aperta'
   | 'nme'
   | 'complicato'
+  | 'non_so_ancora'
   | 'preferisco_non_specificare'
+
+export type Language =
+  | 'italiano'
+  | 'inglese'
+  | 'francese'
+  | 'spagnolo'
+  | 'tedesco'
+  | 'portoghese'
+  | 'arabo'
+  | 'cinese'
+  | 'russo'
+  | 'rumeno'
+  | 'hindi'
+  | 'lis'
+  | 'altro'
+
+export type ChildrenStatus =
+  | 'ho_figli'
+  | 'non_ho_figli'
+  | 'vorrei_figli'
+  | 'non_vorrei_figli'
 
 export type Diet =
   | 'vegetariana'

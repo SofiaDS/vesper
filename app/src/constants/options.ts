@@ -4,6 +4,8 @@ import type {
   Intent,
   RelationshipStatus,
   RelationshipType,
+  Language,
+  ChildrenStatus,
   Diet,
   Religion,
   Politics,
@@ -71,6 +73,30 @@ export const RELATIONSHIP_TYPE_OPTIONS: {
   { value: 'aperta', label: 'Aperta' },
   { value: 'nme', label: 'Non monogamia etica' },
   { value: 'complicato', label: 'Complicato' },
+  { value: 'non_so_ancora', label: 'Non so ancora' },
+]
+
+export const LANGUAGE_OPTIONS: { value: Language; label: string }[] = [
+  { value: 'italiano', label: 'Italiano' },
+  { value: 'inglese', label: 'Inglese' },
+  { value: 'francese', label: 'Francese' },
+  { value: 'spagnolo', label: 'Spagnolo' },
+  { value: 'tedesco', label: 'Tedesco' },
+  { value: 'portoghese', label: 'Portoghese' },
+  { value: 'arabo', label: 'Arabo' },
+  { value: 'cinese', label: 'Cinese' },
+  { value: 'russo', label: 'Russo' },
+  { value: 'rumeno', label: 'Rumeno' },
+  { value: 'hindi', label: 'Hindi' },
+  { value: 'lis', label: 'Lingua dei segni italiana (LIS)' },
+  { value: 'altro', label: 'Altra lingua' },
+]
+
+export const CHILDREN_OPTIONS: { value: ChildrenStatus; label: string }[] = [
+  { value: 'ho_figli', label: 'Ho figli' },
+  { value: 'non_ho_figli', label: 'Non ho figli' },
+  { value: 'vorrei_figli', label: 'Vorrei averne' },
+  { value: 'non_vorrei_figli', label: 'Non ne vorrei' },
 ]
 
 export const DIET_OPTIONS: { value: Diet; label: string }[] = [

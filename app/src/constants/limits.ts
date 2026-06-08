@@ -2,6 +2,7 @@
 export const BIO_MAX = 300
 export const PRONOUNS_MAX = 40
 export const MAX_INTERESTS = 4
+export const PETS_DETAIL_MAX = 140
 
 // Slug della chatroom globale a cui si fa auto-join dopo l'onboarding.
 export const FOYER_SLUG = 'foyer'
