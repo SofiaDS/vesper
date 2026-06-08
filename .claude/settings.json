@@ -2,7 +2,16 @@
   "permissions": {
     "allow": [
       "PowerShell(\\(Get-Content \"c:\\\\vesper\\\\supabase\\\\functions\\\\decay-expired-events\\\\index.ts\"\\).Count; \\(Get-Content \"c:\\\\vesper\\\\supabase\\\\migrations\\\\20260607000000_decay_rpc.sql\"\\).Count)",
-      "Bash(./node_modules/.bin/tsc --noEmit -p tsconfig.json)"
+      "Bash(./node_modules/.bin/tsc --noEmit -p tsconfig.json)",
+      "Bash(grep -o \"relazione[^\\\\\"]\\\\{0,200\\\\}\" \"C:\\\\Users\\\\sofia.dellaspora\\\\.claude\\\\projects\\\\c--vesper\\\\767061f6-56ef-4821-b008-a5afb2cdfd53.jsonl\")",
+      "Bash(grep -o '\"text\":\"[^\"]\\\\{0,6000\\\\}[Pp]rofilo[^\"]\\\\{0,3000\\\\}\"' \"C:\\\\Users\\\\sofia.dellaspora\\\\.claude\\\\projects\\\\c--vesper\\\\767061f6-56ef-4821-b008-a5afb2cdfd53.jsonl\")",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(awk 'NR==206{depth=0; start=1} start{ for\\(i=1;i<=length\\($0\\);i++\\){c=substr\\($0,i,1\\); if\\(c==\"{\"\\)depth++; if\\(c==\"}\"\\){depth--; if\\(depth==0 && start && NR>206\\){print \"ProfileEditor ends near line \" NR; exit}}} }' src/screens/profile/ProfileEditor.tsx)",
+      "mcp__claude_ai_Supabase__list_migrations",
+      "Bash(grep -rln \"[Gg]ruppo D\\\\|[Gg]roup D\" --include=\"*.md\" --include=\"*.txt\" .)",
+      "Bash(grep -rln \"[Gg]ruppo D\\\\|[Gg]roup D\" app/src)",
+      "Bash(grep -o \"[Gg]ruppo [A-F][^\\\\\"\\\\\\\\\\\\\\\\]*\" 767061f6-56ef-4821-b008-a5afb2cdfd53.jsonl)",
+      "Bash(python3 -)"
     ]
   }
 }

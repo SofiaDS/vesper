@@ -101,7 +101,7 @@ export function AiFlags() {
         <p className="hint">Nessun messaggio flaggato dall'AI.</p>
       ) : (
         flags.map((f) => (
-          <div key={`${f.source}-${f.id}`} className="report-card">
+          <div key={`${f.source}-${f.id}`} className="report-card box-shadow">
             <p className="report-head">
               <span className="report-type">{f.source === 'chatroom' ? 'Chatroom' : 'DM'}</span>
               {f.chatroom_name && <span className="muted"> · #{f.chatroom_name}</span>}
