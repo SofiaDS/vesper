@@ -3,7 +3,9 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { AppHeader } from '../components/AppHeader'
 import { MessageComposer } from '../components/MessageComposer'
+import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
+import { useMessageReactions } from '../hooks/useMessageReactions'
 import {
   listDmConversations,
   acceptDmRequest,
@@ -52,6 +54,8 @@ function ConversationView({
     conversation.from_user_id === myId
       ? conversation.to_user_id
       : conversation.from_user_id
+
+  const reactions = useMessageReactions({ scope: 'dm', scopeId: conversation.id, myId })
 
   useEffect(() => {
     let alive = true
@@ -191,6 +195,11 @@ function ConversationView({
                   )}
                   <span className="msg-body">{m.body}</span>
                 </div>
+                <MessageReactions
+                  reactions={reactions.forMessage(m.id)}
+                  myId={myId}
+                  onToggle={(emoji) => reactions.toggle(m.id, emoji)}
+                />
                 <span className="msg-footer">
                   <span className="msg-time">{formatTime(m.created_at)}</span>
                   <button

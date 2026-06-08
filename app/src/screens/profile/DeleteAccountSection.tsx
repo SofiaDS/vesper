@@ -33,7 +33,7 @@ export function DeleteAccountSection({ profileId }: { profileId: string }) {
 
   void profileId
   return (
-    <section className="card danger-zone">
+    <section className="card danger-zone box-shadow">
       <h2 className="pf-section-title">Zona pericolosa</h2>
       {!confirm ? (
         <>

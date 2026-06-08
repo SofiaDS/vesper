@@ -73,7 +73,7 @@ export function AuthScreen() {
     return (
       <main className="app">
         <header className="brand"><h1>Vesper</h1><p className="tagline">{tagline}</p></header>
-        <section className="card">
+        <section className="card box-shadow">
           <p>
             Vesper è uno spazio dedicato alla community lesbica, bisessuale e queer femminile.
           </p>
@@ -120,7 +120,7 @@ export function AuthScreen() {
         <p className="tagline">{tagline}</p>
       </header>
 
-      <section className="card">
+      <section className="card box-shadow">
         <form onSubmit={handleSubmit} className="form">
           <label className="field">
             <span>Email</span>
