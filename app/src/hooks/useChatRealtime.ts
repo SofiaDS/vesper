@@ -32,6 +32,7 @@ export function useChatRealtime({
             body: string
             created_at: string
             sender_id: string
+            reply_to_id: number | null
           }
           if (blockedIds.current.has(r.sender_id)) return
           const nickname = await resolveNickname(r.sender_id)
@@ -41,6 +42,7 @@ export function useChatRealtime({
             created_at: r.created_at,
             sender_id: r.sender_id,
             nickname,
+            reply_to_id: r.reply_to_id,
           })
         },
       )

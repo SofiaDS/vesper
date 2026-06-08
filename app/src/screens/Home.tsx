@@ -3,6 +3,7 @@ import type { Chatroom } from '../types'
 import { useAuth } from '../auth/AuthProvider'
 import { usePendingDmCount } from '../hooks/usePendingDmCount'
 import { useAdminPendingCounts } from '../hooks/useAdminPendingCounts'
+import { useBackNavigation } from '../hooks/useBackNavigation'
 import { BurgerMenu, type BurgerMenuItem } from '../components/BurgerMenu'
 import { RoomsScreen } from './RoomsScreen'
 import { ChatScreen } from './ChatScreen'
@@ -13,6 +14,8 @@ import { SearchScreen } from './SearchScreen'
 import { SettingsScreen } from './SettingsScreen'
 import { AdminScreen, ADMIN_TAB_LABELS, type AdminTab } from './admin/AdminScreen'
 import { DmScreen } from './DmScreen'
+import { LegalScreen, LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
+import { openSupportEmail } from '../lib/support'
 
 const PAYPAL_URL = 'https://paypal.me/vesperapp'
 
@@ -33,6 +36,7 @@ export function Home() {
   const [showDm, setShowDm] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [viewUserId, setViewUserId] = useState<string | null>(null)
+  const [legalDoc, setLegalDoc] = useState<LegalDoc | null>(null)
 
   // Chiude ogni schermata aperta prima di aprirne (eventualmente) una nuova:
   // evita che una vecchia voce di stato (es. showSearch) resti "true" e prenda
@@ -47,6 +51,7 @@ export function Home() {
     setShowDm(false)
     setShowSettings(false)
     setViewUserId(null)
+    setLegalDoc(null)
     open?.()
   }
 
@@ -61,6 +66,10 @@ export function Home() {
     })
   }
 
+  function openLegal(doc: LegalDoc) {
+    openScreen(() => setLegalDoc(doc))
+  }
+
   const onLobby =
     !room &&
     !showProfile &&
@@ -69,7 +78,31 @@ export function Home() {
     !showSearch &&
     !showDm &&
     !showSettings &&
-    !viewUserId
+    !viewUserId &&
+    !legalDoc
+
+  // Etichetta della schermata corrente: usata solo per dare contesto a chi
+  // legge le email di "Segnala un bug" / "Dacci un suggerimento" — stessa
+  // catena di precedenza dello switch dello schermo qui sotto.
+  const currentScreenLabel = showAdmin
+    ? `Moderazione · ${ADMIN_TAB_LABELS[adminTab]}`
+    : showSettings
+    ? 'Impostazioni'
+    : viewUserId
+    ? 'Profilo pubblico'
+    : showBlocked
+    ? 'Utenti bloccati'
+    : showSearch
+    ? 'Ricerca'
+    : showDm
+    ? 'Messaggi'
+    : showProfile
+    ? 'Il mio profilo'
+    : legalDoc
+    ? LEGAL_DOC_LABELS[legalDoc]
+    : room
+    ? room.name
+    : 'Stanze'
 
   const menuItems: BurgerMenuItem[] = [
     { label: 'Stanze', onClick: goToRooms, active: onLobby },
@@ -96,31 +129,54 @@ export function Home() {
         }]
       : []),
     { label: 'Impostazioni', onClick: () => openScreen(() => setShowSettings(true)), active: showSettings },
+    { label: LEGAL_DOC_LABELS.privacy, onClick: () => openLegal('privacy'), active: legalDoc === 'privacy' },
+    { label: LEGAL_DOC_LABELS.terms, onClick: () => openLegal('terms'), active: legalDoc === 'terms' },
+    { label: 'Segnala un bug', onClick: () => openSupportEmail({ type: 'bug', screen: currentScreenLabel, userId: myId }) },
+    { label: 'Dacci un suggerimento', onClick: () => openSupportEmail({ type: 'feedback', screen: currentScreenLabel, userId: myId }) },
     { label: 'Sostieni Vesper ↗', onClick: () => window.open(PAYPAL_URL, '_blank', 'noopener,noreferrer') },
   ]
 
+  // Quante "schermate" sono aperte una sull'altra in questo momento (es.
+  // Ricerca → Profilo pubblico = 2): serve a sapere se il prossimo `goBack`
+  // riporta alla lobby, per decidere se ri-armare la guardia sulla history
+  // (vedi useBackNavigation).
+  const stackDepth = [room, showProfile, showAdmin, showBlocked, showSearch, showDm, showSettings, viewUserId, legalDoc]
+    .filter(Boolean).length
+
   let screen: React.ReactNode
+  let goBack = goToRooms
   if (showAdmin) {
-    screen = <AdminScreen tab={adminTab} onBack={() => setShowAdmin(false)} />
+    goBack = () => setShowAdmin(false)
+    screen = <AdminScreen tab={adminTab} onBack={goBack} />
   } else if (showSettings) {
-    screen = <SettingsScreen onBack={() => setShowSettings(false)} />
+    goBack = () => setShowSettings(false)
+    screen = <SettingsScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} />
+  } else if (legalDoc) {
+    goBack = () => setLegalDoc(null)
+    screen = <LegalScreen doc={legalDoc} onBack={goBack} />
   } else if (viewUserId) {
-    screen = <PublicProfileScreen userId={viewUserId} onBack={() => setViewUserId(null)} />
+    goBack = () => setViewUserId(null)
+    screen = <PublicProfileScreen userId={viewUserId} onBack={goBack} />
   } else if (showBlocked) {
-    screen = <BlockedUsersScreen onBack={() => setShowBlocked(false)} />
+    goBack = () => setShowBlocked(false)
+    screen = <BlockedUsersScreen onBack={goBack} />
   } else if (showSearch) {
-    screen = <SearchScreen onBack={() => setShowSearch(false)} onOpenProfile={setViewUserId} />
+    goBack = () => setShowSearch(false)
+    screen = <SearchScreen onBack={goBack} onOpenProfile={setViewUserId} />
   } else if (showDm) {
-    screen = <DmScreen onBack={() => setShowDm(false)} onOpenProfile={setViewUserId} />
+    goBack = () => setShowDm(false)
+    screen = <DmScreen onBack={goBack} onOpenProfile={setViewUserId} />
   } else if (showProfile) {
-    screen = (
-      <ProfileScreen onBack={() => setShowProfile(false)} onOpenBlocked={() => setShowBlocked(true)} />
-    )
+    goBack = () => setShowProfile(false)
+    screen = <ProfileScreen onBack={goBack} />
   } else if (room) {
-    screen = <ChatScreen room={room} onBack={() => setRoom(null)} onOpenProfile={setViewUserId} />
+    goBack = () => setRoom(null)
+    screen = <ChatScreen room={room} onBack={goBack} onOpenProfile={setViewUserId} />
   } else {
     screen = <RoomsScreen onOpen={setRoom} />
   }
+
+  useBackNavigation({ active: !onLobby, exitsOnBack: stackDepth <= 1, onBack: goBack })
 
   return (
     <BurgerMenu items={menuItems} onSignOut={signOut}>

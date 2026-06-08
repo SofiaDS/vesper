@@ -5,10 +5,8 @@ import { ProfileEditor } from './ProfileEditor'
 
 export function ProfileScreen({
   onBack,
-  onOpenBlocked,
 }: {
   onBack: () => void
-  onOpenBlocked: () => void
 }) {
   const { profile, refreshProfile } = useAuth()
   const [mode, setMode] = useState<'view' | 'edit'>('view')
@@ -21,7 +19,6 @@ export function ProfileScreen({
         profile={profile}
         onBack={onBack}
         onEdit={() => setMode('edit')}
-        onOpenBlocked={onOpenBlocked}
       />
     )
   }

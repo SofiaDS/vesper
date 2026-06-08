@@ -71,13 +71,13 @@ export function AdminStats() {
 
   return (
     <div className="mod-list stats-panel">
-      <div className="stats-section">
+      <div className="stats-section box-shadow">
         <h3 className="stats-title">Utenti</h3>
         <StatRow label="Totale iscritte" value={stats.totalUsers} />
         <StatRow label="Nuove (ultimi 7gg)" value={stats.newLast7d} />
         <StatRow label="Verifiche in attesa" value={stats.pendingVerifications} warn />
       </div>
-      <div className="stats-section">
+      <div className="stats-section box-shadow">
         <h3 className="stats-title">Moderazione</h3>
         <StatRow label="Segnalazioni aperte" value={stats.openReports} warn />
         <StatRow label="In revisione (secondo parere)" value={stats.reviewedReports} warn />
