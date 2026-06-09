@@ -928,8 +928,8 @@ export function ProfileEditor({
 
         {error && <p className="err">{error}</p>}
 
-        <div className="composer inline-add">
-          <button type="button" className="link" onClick={onCancel} disabled={saving}>
+        <div className="composer inline-add profile-actions">
+          <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
             Annulla
           </button>
           <button type="submit" className="btn-primary" disabled={saving}>

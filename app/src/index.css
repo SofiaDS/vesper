@@ -224,6 +224,36 @@ code {
   cursor: progress;
 }
 
+/* Per i btn-primary fuori da un .form (che li stenderebbe già a piena
+   larghezza via flex): centra e occupa tutta la larghezza della card,
+   come "Continua" nella schermata di dichiarazione. */
+.btn-wide {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+/* Azione secondaria sotto al btn-primary (es. "Registrati" sotto "Accedi"):
+   stessa forma a pillola, ma senza riempimento, per non competere con essa. */
+.btn-secondary {
+  display: block;
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid rgba(232, 177, 78, 0.4);
+  border-radius: 35px;
+  background: none;
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  background: rgba(232, 177, 78, 0.08);
+}
+
 .switch {
   margin: 1rem 0 0;
   font-size: 0.85rem;
@@ -351,6 +381,22 @@ text-align: left;
   flex-shrink: 0;
 }
 
+/* Annulla / Salva profilo: stesso stile di Accedi/Registrati ma
+   affiancati invece che impilati — i modificatori a piena larghezza
+   di .btn-secondary vanno quindi disattivati qui. */
+.profile-actions {
+  gap: 0.6rem;
+}
+.profile-actions .btn-primary,
+.profile-actions .btn-secondary {
+  flex: 1;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+}
+
 /* --- Lobby / elenco stanze --- */
 .rooms {
   text-align: left;
@@ -397,7 +443,10 @@ text-align: left;
 .app-header .link.back {
   flex-shrink: 0;
   margin: 0;
-  white-space: nowrap;
+  padding: 0.25rem 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  text-decoration: none;
 }
 
 .room-list {
@@ -633,9 +682,9 @@ body:has(.install-banner) .rooms-hint {
   font-size: 0.9rem;
 }
 
-.profile {
+/* .profile {
   padding: 0rem 2.2rem 2.5rem;
-}
+} */
 
 .profile-form {
   gap: 1.4rem;
