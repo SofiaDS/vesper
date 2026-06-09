@@ -8,7 +8,6 @@
 import {
   RELATIONSHIP_STATUS_OPTIONS,
   RELATIONSHIP_TYPE_OPTIONS,
-  LANGUAGE_OPTIONS,
   CHILDREN_OPTIONS,
   DIET_OPTIONS,
   RELIGION_OPTIONS,
@@ -18,6 +17,7 @@ import {
 import {
   IDENTITY_LABELS,
   ORIENTATION_LABELS,
+  LANGUAGE_LABELS,
   SMOKING_LABELS,
   SPORT_LABELS,
   ZODIAC_LABELS,
@@ -94,7 +94,11 @@ export function buildProfileRows(f: ProfileFacts): React.ReactNode[] {
       </ProfileRow>,
     )
   if (f.languages && f.languages.length > 0)
-    rows.push(<ProfileRow key="lang" label="Lingue parlate">{labelsOf(LANGUAGE_OPTIONS, f.languages)}</ProfileRow>)
+    rows.push(
+      <ProfileRow key="lang" label="Lingue parlate">
+        {f.languages.map((l) => LANGUAGE_LABELS[l]).join(', ')}
+      </ProfileRow>,
+    )
   if (f.interests && f.interests.length > 0)
     rows.push(<ProfileRow key="int" label="Interessi">{f.interests.join(', ')}</ProfileRow>)
   if (f.children_status)
