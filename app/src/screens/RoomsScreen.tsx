@@ -31,7 +31,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
       <AppHeader title="Vesper" />
 
       {loading && <p className="muted">Carico le stanze…</p>}
-      {error && <p className="err chat-error">{error}</p>}
+      {error && <p className="err chat-error" role="alert">{error}</p>}
 
       {!loading && (
         <ul className="room-list">

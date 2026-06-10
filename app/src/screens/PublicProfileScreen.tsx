@@ -143,7 +143,7 @@ export function PublicProfileScreen({
       <main className="app profile">
         <AppHeader onBack={onBack} title="Profilo" />
         {loading && <p className="muted">Carico il profilo…</p>}
-        {!loading && <p className="err chat-error">{error ?? 'Profilo non trovato.'}</p>}
+        {!loading && <p className="err chat-error" role="alert">{error ?? 'Profilo non trovato.'}</p>}
       </main>
     )
   }
@@ -207,7 +207,7 @@ export function PublicProfileScreen({
                       >
                         {dmBusy ? 'Invio…' : 'Manda messaggio'}
                       </button>
-                      {dmFeedback && <p className="hint">{dmFeedback}</p>}
+                      {dmFeedback && <p className="hint" role="status">{dmFeedback}</p>}
                     </>
                   )
                   return (

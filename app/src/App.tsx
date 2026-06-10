@@ -22,7 +22,7 @@ function App() {
           <h1>Vesper</h1>
         </header>
         <section className="card">
-          <p className="warn">
+          <p className="warn" role="alert">
             Supabase non configurato. Crea <code>.env.local</code> a partire da{' '}
             <code>.env.example</code> e riavvia <code>npm run dev</code>.
           </p>

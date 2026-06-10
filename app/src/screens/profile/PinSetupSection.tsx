@@ -67,7 +67,7 @@ export function PinSetupSection() {
     <form className="form" onSubmit={handleSet}>
       <PinField label="Nuovo PIN" value={next} onChange={setNext} />
       <PinField label="Conferma PIN" value={confirm} onChange={setConfirm} />
-      {err && <p className="err">{err}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
       <div className="composer inline-add">
         <button type="button" className="link" onClick={() => reset()}>Annulla</button>
         <button type="submit" className="btn-primary">Imposta</button>
@@ -80,7 +80,7 @@ export function PinSetupSection() {
       <PinField label="PIN attuale" value={current} onChange={setCurrent} />
       <PinField label="Nuovo PIN" value={next} onChange={setNext} />
       <PinField label="Conferma nuovo PIN" value={confirm} onChange={setConfirm} />
-      {err && <p className="err">{err}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
       <div className="composer inline-add">
         <button type="button" className="link" onClick={() => reset()}>Annulla</button>
         <button type="submit" className="btn-primary">Aggiorna</button>

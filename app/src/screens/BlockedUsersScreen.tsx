@@ -43,7 +43,7 @@ export function BlockedUsersScreen({ onBack }: { onBack: () => void }) {
       <AppHeader backLabel="‹ Profilo" onBack={onBack} title="Utenti bloccati" />
 
       {loading && <p className="muted">Carico…</p>}
-      {error && <p className="err chat-error">{error}</p>}
+      {error && <p className="err chat-error" role="alert">{error}</p>}
 
       {!loading && !error && users.length === 0 && (
         <p className="hint">Non hai bloccato nessuno.</p>

@@ -183,8 +183,8 @@ export function AuthScreen() {
             </button>
           )}
 
-          {error && <p className="err">{error}</p>}
-          {info && <p className="ok">{info}</p>}
+          {error && <p className="err" role="alert">{error}</p>}
+          {info && <p className="ok" role="status">{info}</p>}
 
           <button type="submit" className="btn-primary" disabled={busy}>
             {busy

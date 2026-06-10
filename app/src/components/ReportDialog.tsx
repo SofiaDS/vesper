@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   createReport,
   REPORT_REASONS,
   type ReportTarget,
 } from '../lib/reports'
+import { useModalA11y } from '../hooks/useModalA11y'
 
 // Modale riusabile per segnalare un utente o un messaggio. Mostra i motivi
 // preset + una nota facoltativa, poi conferma l'invio. Anonima verso la
@@ -29,6 +30,9 @@ export function ReportDialog({
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const modalRef = useRef<HTMLDivElement | null>(null)
+  useModalA11y(modalRef, true, onClose)
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setBusy(true)
@@ -53,13 +57,15 @@ export function ReportDialog({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
+        ref={modalRef}
         className="modal"
         role="dialog"
         aria-modal="true"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
         {done ? (
-          <>
+          <div role="status">
             <h2 className="modal-title">Segnalazione inviata</h2>
             <p className="muted">
               Grazie. Il team di moderazione la esaminerà al più presto.
@@ -69,7 +75,7 @@ export function ReportDialog({
                 Chiudi
               </button>
             </div>
-          </>
+          </div>
         ) : (
           <form onSubmit={submit}>
             <h2 className="modal-title">Segnala {targetLabel}</h2>
@@ -98,7 +104,7 @@ export function ReportDialog({
               maxLength={500}
               rows={3}
             />
-            {error && <p className="err">{error}</p>}
+            {error && <p className="err" role="alert">{error}</p>}
             <div className="modal-actions">
               <button type="button" className="btn-ghost" onClick={onClose}>
                 Annulla

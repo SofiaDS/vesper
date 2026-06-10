@@ -50,7 +50,7 @@ export function DeleteAccountSection({ profileId }: { profileId: string }) {
           <p className="err">
             Sei sicura? Questa operazione è <strong>irreversibile</strong>.
           </p>
-          {err && <p className="err">{err}</p>}
+          {err && <p className="err" role="alert">{err}</p>}
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button type="button" className="btn-danger" onClick={handleDelete} disabled={busy}>
               {busy ? 'Cancello…' : 'Sì, cancella definitivamente'}

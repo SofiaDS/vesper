@@ -90,8 +90,8 @@ export function ModeratorManagement() {
           Nomina
         </button>
       </form>
-      {info && <p className="hint">{info}</p>}
-      {err && <p className="err">{err}</p>}
+      {info && <p className="hint" role="status">{info}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
       {loading ? (
         <p className="muted">Carico i moderatori…</p>
       ) : mods.length === 0 ? (
