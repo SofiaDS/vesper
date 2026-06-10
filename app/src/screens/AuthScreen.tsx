@@ -138,6 +138,8 @@ export function AuthScreen() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@esempio.it"
+              aria-describedby={error ? 'auth-error' : undefined}
+              aria-invalid={error ? true : undefined}
             />
           </label>
 
@@ -156,6 +158,8 @@ export function AuthScreen() {
                     ? 'min 8 caratteri, lettere e numeri'
                     : 'la tua password'
                 }
+                aria-describedby={error ? 'auth-error' : undefined}
+                aria-invalid={error ? true : undefined}
               />
               {mode === 'signup' && (
                 <span className="hint">Almeno 8 caratteri, con lettere e numeri.</span>
@@ -173,6 +177,8 @@ export function AuthScreen() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="ripeti la password"
+                aria-describedby={error ? 'auth-error' : undefined}
+                aria-invalid={error ? true : undefined}
               />
             </label>
           )}
@@ -183,7 +189,7 @@ export function AuthScreen() {
             </button>
           )}
 
-          {error && <p className="err" role="alert">{error}</p>}
+          {error && <p id="auth-error" className="err" role="alert">{error}</p>}
           {info && <p className="ok" role="status">{info}</p>}
 
           <button type="submit" className="btn-primary" disabled={busy}>

@@ -1,11 +1,15 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useRef, useState, type ReactNode } from 'react'
 import { useTheme } from '../hooks/useTheme'
+import { useModalA11y } from '../hooks/useModalA11y'
 
 export interface BurgerMenuItem {
   label: string
   onClick?: () => void
   active?: boolean
   badge?: number
+  // Etichetta accessibile alternativa (es. per voci che aprono link esterni
+  // in una nuova scheda, dove va segnalato esplicitamente).
+  ariaLabel?: string
   // Sottovoci verticali (es. le sezioni di moderazione sotto "Moderazione"):
   // se presenti, il click sulla voce apre/chiude il gruppo invece di navigare.
   children?: BurgerMenuItem[]
@@ -57,6 +61,8 @@ export function BurgerMenu({
   const [expanded, setExpanded] = useState<string | null>(null)
   const { theme, toggle: toggleTheme } = useTheme()
   const isDark = theme === 'dark'
+  const panelRef = useRef<HTMLElement | null>(null)
+  useModalA11y(panelRef, open, () => setOpen(false))
 
   function go(action?: () => void) {
     if (!action) return
@@ -76,7 +82,13 @@ export function BurgerMenu({
 
       {open && <div className="burger-overlay" onClick={() => setOpen(false)} />}
 
-      <nav className={`burger-panel${open ? ' open' : ''}`} aria-hidden={!open}>
+      <nav
+        ref={panelRef}
+        className={`burger-panel${open ? ' open' : ''}`}
+        aria-hidden={!open}
+        tabIndex={-1}
+        inert={!open ? '' : undefined}
+      >
         <div className="burger-items">
           {items.map((item) => (
             <div key={item.label} className="burger-group">
@@ -85,6 +97,7 @@ export function BurgerMenu({
                 className={`burger-item${item.active ? ' active' : ''}`}
                 onClick={() => press(item)}
                 aria-expanded={item.children ? expanded === item.label : undefined}
+                aria-label={item.ariaLabel}
               >
                 <span>{item.label}</span>
                 <span className="burger-item-end">

@@ -135,7 +135,11 @@ export function Home() {
     { label: LEGAL_DOC_LABELS.terms, onClick: () => openLegal('terms'), active: legalDoc === 'terms' },
     { label: 'Segnala un bug', onClick: () => openSupportEmail({ type: 'bug', screen: currentScreenLabel, userId: myId }) },
     { label: 'Dacci un suggerimento', onClick: () => openSupportEmail({ type: 'feedback', screen: currentScreenLabel, userId: myId }) },
-    { label: 'Sostieni Vesper ↗', onClick: () => window.open(SUPPORT_URL, '_blank', 'noopener,noreferrer') },
+    {
+      label: 'Sostieni Vesper ↗',
+      ariaLabel: 'Sostieni Vesper, si apre in una nuova scheda',
+      onClick: () => window.open(SUPPORT_URL, '_blank', 'noopener,noreferrer'),
+    },
   ]
 
   // Quante "schermate" sono aperte una sull'altra in questo momento (es.
