@@ -15,6 +15,12 @@
      --error-text è una variante più chiara per il *testo* (4.5:1+). */
   --error-text: #FF6B7A;
 
+  /* Corallo (branding.md, non ancora wired come accento secondario generale):
+     usato qui per .rep-mid (sistema reputazione staff), per distinguerlo
+     percettivamente da --accent-text (oro) e --error-text (rosso),
+     posizionandosi visivamente "tra" i due. Contrasto ≥4.5:1 su --bg/--surface. */
+  --rep-mid-text: #EC6A55;
+
   color-scheme: dark;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   background-color: var(--bg);
@@ -204,6 +210,13 @@ code {
   font-size: 0.78rem;
   color: var(--text);
   opacity: 0.55;
+}
+
+/* Hint che comunicano un vincolo/azione attivi (es. requisiti per sbloccare
+   un'azione, conteggi limite) — leggermente più visibili di un hint
+   puramente informativo, per non essere percepiti come testo disattivato. */
+.hint-active {
+  opacity: 0.75;
 }
 
 .declare {
@@ -462,8 +475,13 @@ text-align: left;
 
 .app-header .link.back {
   flex-shrink: 0;
-  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 -0.4rem 0 0;
   padding: 0.25rem 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
   font-size: 1.5rem;
   line-height: 1;
   text-decoration: none;
@@ -647,7 +665,7 @@ body:has(.install-banner) .rooms-hint {
   opacity: 0.45;
 }
 
-/* Bottone secondario "fantasma" (es. Esci da una stanza).
+/* Bottone secondario "fantasma" (es. Lascia stanza).
    Stessa forma a pillola di .btn-primary/.btn-secondary, per coerenza
    quando compaiono affiancati (es. azioni su una room-card). */
 .btn-ghost,
@@ -2267,7 +2285,7 @@ button.dm-conv:hover {
 
 .rep-neutral { color: var(--text); }
 .rep-low     { color: var(--accent-text); }
-.rep-mid     { color: #e8914e; }
+.rep-mid     { color: var(--rep-mid-text); }
 .rep-high    { color: var(--error-text); }
 
 .rep-add-form {
@@ -2531,6 +2549,8 @@ button.dm-conv:hover {
      --accent e --error non bastano come colore del testo (contrasto < 4.5:1). */
   --accent-text: #7A5510;
   --error-text:  #B91C3C;
+  /* Corallo scurito per restare ≥4.5:1 su sfondi chiari (vedi nota in :root). */
+  --rep-mid-text: #994537;
 
   color-scheme: light;
   background-color: var(--bg);

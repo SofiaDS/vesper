@@ -123,40 +123,45 @@ Convenzioni priorità:
 
 ## P2 — Bassa priorità / Polish
 
-### 14. `.link.back` (‹) come unico back affordance — buona ma piccola
+### 14. `.link.back` (‹) come unico back affordance — buona ma piccola — RISOLTO
 - **Componente**: `AppHeader.tsx`.
 - **Problema**: `.app-header .link.back` ha `padding: 0.25rem 0.5rem; font-size: 1.5rem` — area cliccabile approssimativamente 24×36px circa, sotto i 44px raccomandati, anche se ha `aria-label`/`title` corretti.
 - **Miglioramento proposto**: aumentare il padding verticale/orizzontale o `min-width`/`min-height: 44px` mantenendo l'icona "‹" piccola e centrata.
+- **Soluzione applicata**: in `index.css`, `.app-header .link.back` è ora `display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px`, con `margin: 0 -0.4rem 0 0` per compensare la larghezza extra e non spostare il titolo centrale rispetto al layout precedente. L'icona "‹" resta a `font-size: 1.5rem`, ora centrata nell'area di tocco ampliata.
 - **Motivazione**: touch target — è il pulsante "indietro" presente in quasi ogni schermata.
 
-### 15. Onboarding ricerca (`search-onboarding`) e history non persistono visivamente la scelta "Capito"
+### 15. Onboarding ricerca (`search-onboarding`) e history non persistono visivamente la scelta "Capito" — nessuna azione necessaria (da audit)
 - **Schermata**: `SearchScreen.tsx`.
 - **Problema**: minore — il box di onboarding scompare definitivamente dopo "Capito" (localStorage), corretto, ma non c'è modo di rivederlo (es. da un futuro "Aiuto"). Non bloccante ora, segnalato per coerenza futura con altre spiegazioni in-app.
 - **Miglioramento proposto**: nessuna azione immediata; se in futuro si aggiunge una sezione "Guida"/FAQ, includere questi testi.
 - **Motivazione**: coerenza/scalabilità futura.
 
-### 16. Stato disabilitato dei bottoni "Manda messaggio" comunica solo via `title`
+### 16. Stato disabilitato dei bottoni "Manda messaggio" comunica solo via `title` — RISOLTO
 - **Schermata**: `PublicProfileScreen.tsx`.
 - **Problema**: quando `strato < 2`, il bottone "Manda messaggio" è `disabled` con spiegazione solo nel `title` (tooltip, non accessibile su mobile/touch e poco visibile). L'utente su mobile non saprà perché il pulsante è disabilitato.
 - **Miglioramento proposto**: aggiungere sotto il bottone un `<p className="hint">` visibile sempre (non solo al hover) con lo stesso testo del `title` ("Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi"), così il requisito è chiaro anche su touch.
+- **Soluzione applicata**: aggiunto in `PublicProfileScreen.tsx`, subito sotto il bottone disabilitato (caso `strato < 2`), `<p className="hint hint-active">Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi.</p>` — stesso testo del `title`, ora sempre visibile. Usa la nuova classe `.hint-active` introdotta per il punto 19 (vedi sotto) per distinguerlo da un hint puramente informativo.
 - **Motivazione**: prevenzione errori/orientamento (Nielsen #1, #5) — importante perché è un requisito "nascosto" che genera confusione ("perché non posso scrivere a questa persona?").
 
-### 17. Coerenza terminologica "Esci" usato per due azioni diverse
+### 17. Coerenza terminologica "Esci" usato per due azioni diverse — RISOLTO
 - **Schermate**: `RoomsScreen.tsx` (bottone "Esci" = lascia una stanza tematica) vs `BurgerMenu.tsx` (voce "Esci" = logout dall'app).
 - **Problema**: stesso testo per due azioni di significato molto diverso (una reversibile/leggera, l'altra logout). Rischio di click errato percepito come più grave di quanto sia (lasciare una stanza) o sottovalutato (logout).
 - **Miglioramento proposto**: rinominare il bottone di `RoomsScreen` in "Lascia stanza" o "Abbandona", lasciando "Esci" solo per il logout nel burger menu.
+- **Soluzione applicata**: in `RoomsScreen.tsx`, il bottone `.btn-ghost.btn-sm` per uscire da una stanza tematica è ora "Lascia stanza" (stato di caricamento "Lasciando…" invece di "Esco…"). "Esci" resta riservato al logout in `BurgerMenu.tsx`. Aggiornato anche il commento CSS sopra `.btn-ghost, .btn-danger` in `index.css` (riferimento a "Esci da una stanza" → "Lascia stanza").
 - **Motivazione**: coerenza terminologica/prevenzione errori — piccola modifica di label, alto valore di chiarezza.
 
-### 18. `rep-mid` (#e8914e, sistema reputazione staff) molto simile a `--accent` (#E8B14E)
+### 18. `rep-mid` (#e8914e, sistema reputazione staff) molto simile a `--accent` (#E8B14E) — RISOLTO
 - **Schermata**: `screens/admin/UserReputation.tsx`/`ReputationModeration.tsx` (classi `.rep-low`/`.rep-mid`/`.rep-high`).
 - **Problema**: `--accent` (#E8B14E, usato per `.rep-low`) e `#e8914e` (`.rep-mid`) sono percettivamente molto simili (entrambi arancio/oro caldi), mentre `.rep-high` usa `--error` (rosso). Per uno staff member che deve distinguere rapidamente "basso" vs "medio" rischio reputazionale, la differenza cromatica è troppo sottile (specie con daltonismo rosso-verde/protanopia, dove arancio e rosso possono confondersi ulteriormente).
 - **Miglioramento proposto**: per `.rep-mid`, scegliere un colore più distinto da `--accent` (es. derivare dal corallo `#EC6A55` di branding.md non ancora wired, che si posizionerebbe visivamente tra oro e rosso-errore in modo più distinguibile) oppure aggiungere un'icona/etichetta testuale ("Basso"/"Medio"/"Alto") oltre al colore — quest'ultimo già presente come `.rep-label`, verificare che sia sempre visibile e non solo color-coded.
+- **Soluzione applicata**: verificato che `.rep-label` (es. "Storia di problemi" per `.rep-mid`, accanto al colore) è sempre renderizzato come paragrafo dedicato in `UserReputation.tsx` — il colore non è l'unico veicolo dell'informazione, WCAG 1.4.1 già rispettato. In aggiunta, introdotta la variabile `--rep-mid-text` (corallo da branding.md): `#EC6A55` nel tema scuro (contrasto circa 5.8:1 su `--bg`, circa 5.2:1 su `--surface`) e `#994537` (corallo scurito) nel tema chiaro (circa 4.9:1 su `--bg`, circa 4.3:1 su `--surface`), entrambi ≥4.5:1 AA. `.rep-mid` ora usa `var(--rep-mid-text)` al posto del valore hardcoded `#e8914e`, percettivamente più distinto sia da `--accent-text` (oro) sia da `--error-text` (rosso), e posizionato visivamente "tra" i due come da indicazione branding.md.
 - **Motivazione**: accessibilità (non affidarsi solo al colore, WCAG 1.4.1) + coerenza palette, area a basso traffico (solo staff) quindi priorità bassa.
 
-### 19. Messaggi "muted"/`.hint` con opacità 0.55-0.7 su testo informativo importante
+### 19. Messaggi "muted"/`.hint` con opacità 0.55-0.7 su testo informativo importante — RISOLTO
 - **Schermate**: trasversale — `.hint` (`opacity: 0.55`), `.muted` (`opacity: 0.6`), `.search-aff`, `.pf-label` (`opacity: 0.6`), `.dm-section-title` (`opacity: 0.45`).
 - **Problema**: `--text` (#F7EFDD) ha contrasto 15.75:1 su `--bg`, quindi anche al 55% di opacità resta sopra 4.5:1 (≈ 8.7:1, ampiamente sufficiente) — **non è un problema di contrasto numerico**. Tuttavia alcuni di questi testi (es. `.hint` con suggerimenti operativi come "Stanze tematiche: 1/3" o gli hint sotto i bottoni disabilitati di punto 16) trasmettono informazioni funzionali, non solo decorative: vale la pena verificare visivamente che restino leggibili e non vengano percepiti come "disabilitati"/non importanti per via dell'opacità ridotta.
 - **Miglioramento proposto**: nessuna modifica numerica necessaria (contrasto ok); solo verifica visiva in browser che `.hint` non sia confuso con testo disattivato quando comunica un vincolo attivo (es. punto 16). Possibile micro-distinzione: usare opacità leggermente più alta (0.7-0.75) per hint "attivi/azionabili" vs 0.55 per hint puramente informativi.
+- **Soluzione applicata**: aggiunta in `index.css` la classe `.hint-active { opacity: 0.75; }` (da combinare con `.hint`), per hint che comunicano un vincolo o un'azione attivi. Applicata a: l'hint del punto 16 in `PublicProfileScreen.tsx` ("Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni..."), e all'hint "Stanze tematiche: {n}/{MAX}" in `RoomsScreen.tsx` (`.hint.hint-active.rooms-hint`). Altri `.hint`/`.muted` puramente informativi restano a 0.55/0.6 invariati.
 - **Motivazione**: gerarchia visiva/usabilità, verifica da fare con `vesper-tester` o ispezione manuale.
 
 ### 20. Verifica manuale richiesta — non eseguibile da codice
@@ -171,12 +176,14 @@ Convenzioni priorità:
 
 ## Riepilogo
 
-| Priorità | N. voci |
-|---|---|
-| P0 (Alta) | 5 |
-| P1 (Media) | 8 |
-| P2 (Bassa/polish) | 7 |
-| **Totale** | **20** |
+| Priorità | N. voci | Aperte |
+|---|---|---|
+| P0 (Alta) | 5 | 0 |
+| P1 (Media) | 8 | 0 |
+| P2 (Bassa/polish) | 7 | 1 (solo punto 20, verifica manuale) |
+| **Totale** | **20** | **1** |
+
+Tutti i punti P0/P1/P2 risolvibili via codice sono stati implementati (punti 1-19; il punto 15 non richiedeva azione). Il punto 20 resta aperto in quanto richiede verifica visiva/funzionale manuale (browser, screen reader, dispositivo reale).
 
 Aree più toccate: contrasto colori (palette "Inchiostro & oro" su testo di errore, sia tema scuro che chiaro), gestione focus/tastiera nelle modali e nel burger menu, feedback asincroni privi di `aria-live`, touch target nelle azioni dei messaggi chat.
 
