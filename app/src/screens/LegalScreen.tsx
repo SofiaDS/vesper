@@ -1,10 +1,11 @@
 import { AppHeader } from '../components/AppHeader'
 
-export type LegalDoc = 'privacy' | 'terms'
+export type LegalDoc = 'privacy' | 'terms' | 'about'
 
 export const LEGAL_DOC_LABELS: Record<LegalDoc, string> = {
   privacy: 'Privacy Policy',
   terms: 'Termini di servizio',
+  about: 'Chi siamo',
 }
 
 interface LegalSection {
@@ -86,11 +87,57 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
   ],
   terms: [
     {
+      heading: 'Chi può iscriversi',
       paragraphs: [
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.',
-        'Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est.',
-        'Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus.',
-        'Ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat, quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia.',
+        'Vesper è uno spazio dedicato alla community lesbica, bisessuale e queer femminile. Sono benvenute donne cis, donne trans, uomini trans e persone non-binary AFAB. L\'iscrizione non è aperta a uomini cis, per preservare la natura di questo spazio.',
+        'Al momento dell\'iscrizione l\'utente dichiara, sotto la propria responsabilità, di rientrare in una delle categorie ammesse. Una dichiarazione mendace costituisce violazione dei presenti Termini e comporta il ban immediato e definitivo dall\'app.',
+      ],
+    },
+    {
+      heading: 'Età minima',
+      paragraphs: [
+        'L\'iscrizione a Vesper è consentita esclusivamente a persone maggiorenni (18 anni compiuti). In fase di registrazione viene richiesta la data di nascita e una dichiarazione esplicita di maggiore età.',
+        'Dichiarare il falso sull\'età comporta il ban immediato e definitivo dall\'app e può comportare conseguenze legali. L\'utente solleva Vesper da ogni responsabilità derivante da dichiarazioni false rese al momento dell\'iscrizione.',
+      ],
+    },
+    {
+      heading: 'Regole della community',
+      paragraphs: [
+        'Sono vietati: molestie sessuali e contenuti non richiesti, hate speech (transfobia, bifobia, razzismo, abilismo e simili), minacce, doxxing e condivisione di informazioni private altrui, spam commerciale o link sospetti, account falsi o automatizzati, e qualsiasi contenuto illegale.',
+        'Linguaggio aggressivo o offensivo nelle discussioni e altre violazioni minori possono dare luogo ad avvisi o sospensioni temporanee (mute), in base alla gravità.',
+        'Ogni utente può segnalare messaggi, profili o comportamenti scorretti tramite le funzioni di segnalazione presenti nell\'app. Le segnalazioni vengono esaminate dal team di moderazione, che può applicare avvisi, mute temporanei o ban in base alla gravità della violazione.',
+        'In caso di ban, l\'utente ha diritto di presentare appello secondo le modalità indicate nell\'app al momento della sospensione.',
+      ],
+    },
+    {
+      heading: 'Trattamento dei dati e tuoi diritti',
+      paragraphs: [
+        'Il trattamento dei tuoi dati personali è descritto nella Privacy Policy, disponibile in questa stessa sezione dell\'app. La Privacy Policy indica le finalità del trattamento, i tempi di conservazione e i diritti che puoi esercitare (accesso, rettifica, cancellazione, portabilità, opposizione).',
+        'Per qualsiasi richiesta relativa ai tuoi dati personali puoi scrivere a privacy@vesperapp.it.',
+      ],
+    },
+    {
+      heading: 'Comportamento dell\'utente',
+      paragraphs: [
+        'Utilizzando Vesper ti impegni a fornire informazioni veritiere, a rispettare le regole della community e le decisioni del team di moderazione, e a non utilizzare l\'app per finalità illecite o lesive di altri utenti.',
+        'La violazione dei presenti Termini può comportare, a seconda della gravità, avvisi, sospensioni temporanee o la cancellazione definitiva dell\'account, senza diritto a rimborsi ove applicabile.',
+      ],
+    },
+    {
+      heading: 'Modifiche ai Termini',
+      paragraphs: [
+        'Questi Termini di Servizio potranno essere aggiornati nel tempo, ad esempio in caso di nuove funzionalità o cambi normativi. In caso di modifiche sostanziali ti avviseremo tramite l\'app.',
+      ],
+    },
+  ],
+  about: [
+    {
+      heading: 'Chi siamo',
+      paragraphs: [
+        'Abbiamo creato Vesper perché crediamo che le connessioni più belle nascano quando ci si sente davvero liberi di essere se stessi. Sappiamo che certe conversazioni fluiscono con una naturalezza speciale quando si condivide un vissuto o una sensibilità comune.',
+        'Per questo, Vesper è uno spazio pensato per donne, persone trans, non-binary e tutte le soggettività che non si identificano come uomini cisgender. Non è una chiusura verso l\'esterno — crediamo fermamente che il confronto con la diversità sia un arricchimento fondamentale — ma una scelta di design: vogliamo offrire un ambiente dove ogni incontro parta da una base di complicità immediata e serenità.',
+        'Qui la gentilezza è il requisito fondamentale. La nostra moderazione è attiva per mantenere alta la qualità del clima e proteggere la tua tranquillità.',
+        'Siamo qui per chi cerca legami basati sull\'ascolto e sull\'autenticità. Perché in un ambiente in cui ti senti a casa, le connessioni migliori accadono da sole.',
       ],
     },
   ],
@@ -112,9 +159,11 @@ export function LegalScreen({ doc, onBack }: { doc: LegalDoc; onBack: () => void
             ))}
           </div>
         ))}
-        <p className="hint">
-          Bozza informativa — verrà validata con un consulente legale prima del lancio pubblico.
-        </p>
+        {doc !== 'about' && (
+          <p className="hint">
+            Bozza informativa — verrà validata con un consulente legale prima del lancio pubblico.
+          </p>
+        )}
       </section>
     </main>
   )
