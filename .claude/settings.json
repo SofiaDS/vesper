@@ -11,7 +11,11 @@
       "Bash(grep -rln \"[Gg]ruppo D\\\\|[Gg]roup D\" --include=\"*.md\" --include=\"*.txt\" .)",
       "Bash(grep -rln \"[Gg]ruppo D\\\\|[Gg]roup D\" app/src)",
       "Bash(grep -o \"[Gg]ruppo [A-F][^\\\\\"\\\\\\\\\\\\\\\\]*\" 767061f6-56ef-4821-b008-a5afb2cdfd53.jsonl)",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(supabase --version)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\sofia.dellaspora\\.claude\\agents"
     ]
   }
 }

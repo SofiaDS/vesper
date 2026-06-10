@@ -132,6 +132,7 @@ Questa è la categoria più delicata perché un falso positivo (bannare per erro
 - Mantenere tutto in soft mode (se i falsi positivi sono troppi).
 - Passare ad "hard mode selettiva": blocco automatico solo per categorie ad alta confidenza (es. "violence", "sexual/minors", "self-harm"), il resto resta in soft.
 - Calibrare le soglie di confidenza dell'API per ridurre falsi positivi.
+- **Censura visiva dei messaggi flaggati** (placeholder con emoji, es. 🌈/❤️, al posto del testo nei client finché un moderatore non revisiona): idea emersa il 10 giugno 2026, da valutare con cautela per il rischio di censurare in chat reale termini riappropriati dalla community (vedi sopra) — non da introdurre al day-one.
 
 **Nota importante**: questa configurazione è da considerare come **approccio iniziale di partenza**, non come scelta definitiva. Va rivista dopo il primo mese di lancio sulla base dei dati reali raccolti.
 
