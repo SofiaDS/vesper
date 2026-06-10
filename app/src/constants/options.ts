@@ -80,16 +80,8 @@ export const LANGUAGE_OPTIONS: { value: Language; label: string }[] = [
   { value: 'italiano', label: 'Italiano' },
   { value: 'inglese', label: 'Inglese' },
   { value: 'francese', label: 'Francese' },
-  { value: 'spagnolo', label: 'Spagnolo' },
   { value: 'tedesco', label: 'Tedesco' },
-  { value: 'portoghese', label: 'Portoghese' },
-  { value: 'arabo', label: 'Arabo' },
-  { value: 'cinese', label: 'Cinese' },
-  { value: 'russo', label: 'Russo' },
-  { value: 'rumeno', label: 'Rumeno' },
-  { value: 'hindi', label: 'Hindi' },
   { value: 'lis', label: 'Lingua dei segni italiana (LIS)' },
-  { value: 'altro', label: 'Altra lingua' },
 ]
 
 export const CHILDREN_OPTIONS: { value: ChildrenStatus; label: string }[] = [

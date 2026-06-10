@@ -14,11 +14,14 @@ export function AppHeader({
   onBack?: () => void
   backLabel?: string
 }) {
+  // backLabel resta per l'accessibilità (aria-label/title): in UI mostriamo
+  // solo l'icona della freccia, non più il testo "‹ Indietro" / "‹ Stanze" ecc.
+  const backName = backLabel.replace(/^[‹\s]+/, '') || 'Indietro'
   return (
     <header className="app-header">
       {onBack ? (
-        <button type="button" className="link back" onClick={onBack}>
-          {backLabel}
+        <button type="button" className="link back" onClick={onBack} aria-label={backName} title={backName}>
+          ‹
         </button>
       ) : (
         <span className="link-placeholder" />
