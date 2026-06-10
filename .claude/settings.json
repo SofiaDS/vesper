@@ -12,7 +12,16 @@
       "Bash(grep -rln \"[Gg]ruppo D\\\\|[Gg]roup D\" app/src)",
       "Bash(grep -o \"[Gg]ruppo [A-F][^\\\\\"\\\\\\\\\\\\\\\\]*\" 767061f6-56ef-4821-b008-a5afb2cdfd53.jsonl)",
       "Bash(python3 -)",
-      "Bash(supabase --version)"
+      "Bash(supabase --version)",
+      "Bash(npx eslint *)",
+      "Bash(pandoc --version)",
+      "Bash(python3 -c \"import docx; print\\('python-docx ok'\\)\")",
+      "Bash(pip show *)",
+      "Bash(python3 -c \"import docx; print\\('ok'\\)\")",
+      "PowerShell(Get-Command pandoc -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command python -ErrorAction SilentlyContinue)",
+      "PowerShell(node --version)",
+      "PowerShell(python -c \"import docx; print\\('ok'\\)\" 2>&1)"
     ],
     "additionalDirectories": [
       "C:\\Users\\sofia.dellaspora\\.claude\\agents"
