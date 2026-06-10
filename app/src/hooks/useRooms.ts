@@ -9,9 +9,12 @@ export function useRooms(myId: string | undefined) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [busyRoom, setBusyRoom] = useState<string | null>(null)
+  const [reloadKey, setReloadKey] = useState(0)
   const active = useRef(true)
 
   async function load() {
+    setLoading(true)
+    setError(null)
     const [{ data: roomRows, error: roomErr }, { data: memRows }] =
       await Promise.all([
         supabase
@@ -41,7 +44,11 @@ export function useRooms(myId: string | undefined) {
     active.current = true
     load()
     return () => { active.current = false }
-  }, [])
+  }, [reloadKey])
+
+  function retry() {
+    setReloadKey((k) => k + 1)
+  }
 
   const tematicheJoined = rooms.filter(
     (r) => r.kind === 'tematica' && joined.has(r.id),
@@ -109,5 +116,6 @@ export function useRooms(myId: string | undefined) {
     capReached,
     handleJoin,
     handleLeave,
+    retry,
   }
 }

@@ -94,7 +94,7 @@ export function AiFlags() {
 
   return (
     <div className="mod-list">
-      {err && <p className="err">{err}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
       {loading ? (
         <p className="muted">Carico i flag AI…</p>
       ) : flags.length === 0 ? (

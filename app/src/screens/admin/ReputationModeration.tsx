@@ -46,7 +46,7 @@ export function ReputationModeration() {
         </button>
       </form>
 
-      {searchErr && <p className="err">{searchErr}</p>}
+      {searchErr && <p className="err" role="alert">{searchErr}</p>}
 
       {targetId && (
         <UserReputation

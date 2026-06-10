@@ -66,7 +66,7 @@ export function AdminStats() {
   }, [])
 
   if (loading) return <p className="muted">Carico le statistiche…</p>
-  if (err) return <p className="err">{err}</p>
+  if (err) return <p className="err" role="alert">{err}</p>
   if (!stats) return null
 
   return (

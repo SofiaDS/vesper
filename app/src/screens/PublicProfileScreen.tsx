@@ -18,6 +18,7 @@ import type {
   Diet,
   Religion,
   Politics,
+  EducationLevel,
   Smoking,
   Sport,
   Zodiac,
@@ -48,6 +49,8 @@ type PublicProfile = {
   diet: Diet | null
   religion: Religion | null
   politics: Politics | null
+  education_level: EducationLevel | null
+  education_institute: string | null
   smoking: Smoking | null
   sport: Sport | null
   zodiac: Zodiac | null
@@ -57,7 +60,7 @@ type PublicProfile = {
 const COLS = `id, nickname, avatar_preset, accent_color, bio, interests, birth_date, age,
   identity_category, orientations, city, city_province, city_region, pronouns, intents,
   relationship_status, relationship_type, languages, children_status, has_pets, pets_detail,
-  diet, religion, politics, smoking, sport, zodiac, is_self`
+  diet, religion, politics, education_level, education_institute, smoking, sport, zodiac, is_self`
 
 export function PublicProfileScreen({
   userId,
@@ -143,7 +146,7 @@ export function PublicProfileScreen({
       <main className="app profile">
         <AppHeader onBack={onBack} title="Profilo" />
         {loading && <p className="muted">Carico il profilo…</p>}
-        {!loading && <p className="err chat-error">{error ?? 'Profilo non trovato.'}</p>}
+        {!loading && <p className="err chat-error" role="alert">{error ?? 'Profilo non trovato.'}</p>}
       </main>
     )
   }
@@ -207,18 +210,23 @@ export function PublicProfileScreen({
                       >
                         {dmBusy ? 'Invio…' : 'Manda messaggio'}
                       </button>
-                      {dmFeedback && <p className="hint">{dmFeedback}</p>}
+                      {dmFeedback && <p className="hint" role="status">{dmFeedback}</p>}
                     </>
                   )
                   return (
-                    <button
-                      type="button"
-                      className="btn-primary"
-                      disabled
-                      title="Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi"
-                    >
-                      Manda messaggio
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        disabled
+                        title="Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi"
+                      >
+                        Manda messaggio
+                      </button>
+                      <p className="hint hint-active">
+                        Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi.
+                      </p>
+                    </>
                   )
                 })()}
                 {blocked && (

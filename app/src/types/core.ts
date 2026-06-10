@@ -9,6 +9,7 @@ import type {
   Diet,
   Religion,
   Politics,
+  EducationLevel,
   Smoking,
   Sport,
   DmFilter,
@@ -40,6 +41,8 @@ export interface Profile {
   diet: Diet | null
   religion: Religion | null
   politics: Politics | null
+  education_level: EducationLevel | null
+  education_institute: string | null
   smoking: Smoking | null
   sport: Sport | null
   dm_filter: DmFilter
@@ -59,6 +62,7 @@ export interface Profile {
   show_diet: boolean
   show_religion: boolean
   show_politics: boolean
+  show_education: boolean
   show_smoking: boolean
   show_sport: boolean
   show_zodiac: boolean

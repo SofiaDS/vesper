@@ -30,6 +30,7 @@ export interface SearchFilters {
   smoking?: string[]
   sport?: string[]
   zodiac?: string[]
+  educations?: string[]
 }
 
 function orNull<T>(arr: T[] | undefined): T[] | null {
@@ -48,6 +49,7 @@ export function activeFilterCount(f: SearchFilters): number {
   n += orNull(f.smoking) ? 1 : 0
   n += orNull(f.sport) ? 1 : 0
   n += orNull(f.zodiac) ? 1 : 0
+  n += orNull(f.educations) ? 1 : 0
   return n
 }
 
@@ -87,6 +89,7 @@ export async function searchByFilters(f: SearchFilters, offset = 0): Promise<Sea
     p_smoking: orNull(f.smoking),
     p_sport: orNull(f.sport),
     p_zodiac: orNull(f.zodiac),
+    p_educations: orNull(f.educations),
     p_limit: SEARCH_PAGE,
     p_offset: offset,
   })

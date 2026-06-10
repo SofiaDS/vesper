@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { listApprovedPhotos, signedUrls } from '../../lib/photos'
+import { useModalA11y } from '../../hooks/useModalA11y'
 
 type GalleryPhoto = { id: string; url: string }
 
@@ -18,6 +19,7 @@ export function ProfileGallery({
   const [items, setItems] = useState<GalleryPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [openIdx, setOpenIdx] = useState<number | null>(null)
+  const lightboxRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -41,10 +43,12 @@ export function ProfileGallery({
     return () => { alive = false }
   }, [userId])
 
+  const opened = openIdx != null ? items[openIdx] : null
+
+  useModalA11y(lightboxRef, opened != null, () => setOpenIdx(null))
+
   if (loading) return <div className="gallery-strip loading" />
   if (items.length === 0) return <p className="hint">Nessuna foto da mostrare.</p>
-
-  const opened = openIdx != null ? items[openIdx] : null
 
   return (
     <>
@@ -64,7 +68,14 @@ export function ProfileGallery({
 
       {opened && openIdx != null && (
         <div className="modal-overlay" onClick={() => setOpenIdx(null)}>
-          <div className="lightbox" onClick={(e) => e.stopPropagation()}>
+          <div
+            ref={lightboxRef}
+            className="lightbox"
+            role="dialog"
+            aria-modal="true"
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+          >
             <img className="lightbox-img" src={opened.url} alt="Foto profilo ingrandita" />
             {onReportPhoto && (
               <button

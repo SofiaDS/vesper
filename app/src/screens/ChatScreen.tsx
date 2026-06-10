@@ -58,6 +58,7 @@ export function ChatScreen({
     appendMessage,
     loadOlder,
     setError,
+    reload,
   } = useChatMessages({
     roomId: room.id,
     blockedIds,
@@ -78,7 +79,8 @@ export function ChatScreen({
       skipAutoScroll.current = false
       return
     }
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    bottomRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
   }, [messages.length])
 
   async function handleSend(e: React.FormEvent) {
@@ -225,7 +227,14 @@ export function ChatScreen({
         <div ref={bottomRef} />
       </section>
 
-      {error && <p className="err chat-error">{error}</p>}
+      {error && (
+        <p className="err chat-error" role="alert">
+          {error}{' '}
+          <button type="button" className="btn-secondary btn-sm" onClick={reload}>
+            Riprova
+          </button>
+        </p>
+      )}
 
       <MessageComposer
         value={text}
