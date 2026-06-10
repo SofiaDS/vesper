@@ -3,7 +3,7 @@ import { AppHeader } from '../components/AppHeader'
 import { listBlockedUsers, unblockUser, type BlockedUser } from '../lib/blocks'
 
 // Gestione dei propri blocchi: elenco delle persone bloccate con sblocco.
-export function BlockedUsersScreen({ onBack }: { onBack: () => void }) {
+export function BlockedUsersScreen({ onBack, backLabel = '‹ Profilo' }: { onBack: () => void; backLabel?: string }) {
   const [users, setUsers] = useState<BlockedUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -40,7 +40,7 @@ export function BlockedUsersScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <main className="app profile">
-      <AppHeader backLabel="‹ Profilo" onBack={onBack} title="Utenti bloccati" />
+      <AppHeader backLabel={backLabel} onBack={onBack} title="Utenti bloccati" />
 
       {loading && <p className="muted">Carico…</p>}
       {error && <p className="err chat-error" role="alert">{error}</p>}
