@@ -76,6 +76,7 @@ export function SearchScreen({
 }) {
   const [tab, setTab] = useState<Tab>('nickname')
   const [showFilters, setShowFilters] = useState(true)
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({})
   const [resultsView, setResultsView] = useState<'list' | 'grid'>('list')
   const [nick, setNick] = useState('')
   const [filters, setFilters] = useState<SearchFilters>({})
@@ -144,6 +145,10 @@ export function SearchScreen({
   const INTEREST_F = useMemo(() => INTEREST_SUGGESTIONS.map((i) => ({ value: i, label: i })), [])
   const INTENT_F = useMemo(() => INTENT_OPTIONS, [])
 
+  function toggleSection(key: string) {
+    setOpenSections((s) => ({ ...s, [key]: !s[key] }))
+  }
+
   function toggle(key: keyof SearchFilters, v: string) {
     setFilters((f) => {
       const cur = (f[key] as string[] | undefined) ?? []
@@ -155,6 +160,12 @@ export function SearchScreen({
   function builtFilters(): SearchFilters {
     return { ...filters, ageMin: ageOn ? ageMin : null, ageMax: ageOn ? ageMax : null }
   }
+
+  const totalActiveFilters = useMemo(
+    () => activeFilterCount(builtFilters()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filters, ageOn, ageMin, ageMax],
+  )
 
   function pushHistory(entry: Omit<SavedSearch, 'id' | 'savedAt'> & { label: string }) {
     setHistory((prev) => {
@@ -378,49 +389,64 @@ export function SearchScreen({
             />
           </fieldset>
 
-          <fieldset className="field">
-            <legend>Identità</legend>
-            <ChipGroup options={IDENTITY_F} selected={filters.identities ?? []} onToggle={(v) => toggle('identities', v)} />
-          </fieldset>
+          {[
+            { key: 'identities', legend: 'Identità', options: IDENTITY_F, selected: filters.identities },
+            { key: 'orientations', legend: 'Orientamento', options: ORIENTATION_F, selected: filters.orientations },
+            { key: 'interests', legend: 'Interessi', options: INTEREST_F, selected: filters.interests },
+            { key: 'intents', legend: 'Cerco', options: INTENT_F, selected: filters.intents },
+            { key: 'smoking', legend: 'Fumo', options: SMOKING_F, selected: filters.smoking },
+            { key: 'sport', legend: 'Sport', options: SPORT_F, selected: filters.sport },
+            { key: 'zodiac', legend: 'Segno zodiacale', options: ZODIAC_F, selected: filters.zodiac },
+          ].map((section) => {
+            const count = section.selected?.length ?? 0
+            const open = !!openSections[section.key]
+            const panelId = `filter-section-${section.key}`
+            return (
+              <fieldset key={section.key} className="field filter-section">
+                <legend className="visually-hidden">{section.legend}</legend>
+                <button
+                  type="button"
+                  className="filter-section-toggle"
+                  aria-expanded={open}
+                  aria-controls={panelId}
+                  onClick={() => toggleSection(section.key)}
+                >
+                  <span>{section.legend}</span>
+                  {count > 0 && (
+                    <span className="filter-section-badge">
+                      {open ? count : `${count} sel.`}
+                    </span>
+                  )}
+                  <span className="filter-section-arrow" aria-hidden="true">{open ? '▲' : '▼'}</span>
+                </button>
+                {open && (
+                  <div id={panelId} className="filter-section-panel">
+                    <ChipGroup
+                      options={section.options}
+                      selected={section.selected ?? []}
+                      onToggle={(v) => toggle(section.key as keyof SearchFilters, v)}
+                    />
+                  </div>
+                )}
+              </fieldset>
+            )
+          })}
 
-          <fieldset className="field">
-            <legend>Orientamento</legend>
-            <ChipGroup options={ORIENTATION_F} selected={filters.orientations ?? []} onToggle={(v) => toggle('orientations', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Interessi</legend>
-            <ChipGroup options={INTEREST_F} selected={filters.interests ?? []} onToggle={(v) => toggle('interests', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Cerco</legend>
-            <ChipGroup options={INTENT_F} selected={filters.intents ?? []} onToggle={(v) => toggle('intents', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Fumo</legend>
-            <ChipGroup options={SMOKING_F} selected={filters.smoking ?? []} onToggle={(v) => toggle('smoking', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Sport</legend>
-            <ChipGroup options={SPORT_F} selected={filters.sport ?? []} onToggle={(v) => toggle('sport', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Segno zodiacale</legend>
-            <ChipGroup options={ZODIAC_F} selected={filters.zodiac ?? []} onToggle={(v) => toggle('zodiac', v)} />
-          </fieldset>
-
-          <button
-            type="button"
-            className="btn-primary search-go"
-            onClick={runFilters}
-            disabled={loading}
-          >
-            Cerca
-          </button>
+          <div className="search-go-row">
+            <button
+              type="button"
+              className="btn-primary search-go"
+              onClick={runFilters}
+              disabled={loading}
+            >
+              Cerca
+            </button>
+            {totalActiveFilters > 0 && (
+              <span className="filter-active-count" role="status">
+                {totalActiveFilters} {totalActiveFilters === 1 ? 'filtro attivo' : 'filtri attivi'}
+              </span>
+            )}
+          </div>
         </div>
       ) : null}
 
@@ -436,10 +462,17 @@ export function SearchScreen({
               ))}
             </div>
           ) : results.length === 0 ? (
-            <p className="hint">
-              Nessun risultato. Forse non ci sono utenti cercabili che
-              corrispondono — prova a cambiare i filtri.
-            </p>
+            <div className="search-empty">
+              <p className="hint">
+                Nessun risultato. Forse non ci sono utenti cercabili che
+                corrispondono — prova a cambiare i filtri.
+              </p>
+              {tab === 'filtri' && (
+                <button type="button" className="btn-secondary" onClick={() => setShowFilters(true)}>
+                  Modifica filtri
+                </button>
+              )}
+            </div>
           ) : (
             <>
               <div className="search-view-toggle">

@@ -9,7 +9,7 @@ Convenzioni priorità:
 
 ---
 
-## P0 — Alta priorità
+## P0 — Alta priorità TUTTP RISOLTO
 
 ### 1. Contrasto `--error` (#D72638) insufficiente su `--bg`/`--surface` — RISOLTO
 - **Schermate**: trasversale — `AuthScreen`, `OnboardingScreen`, `RoomsScreen`, `ChatScreen` (`.chat-error`), `PinLockScreen`, `ReportDialog`, `SearchScreen`, `VerificationScreen`, badge `.rep-active`, ecc. (classe `.err`/`.warn`).
@@ -55,31 +55,37 @@ Convenzioni priorità:
 
 ## P1 — Media priorità
 
-### 6. `AuthScreen`: errori di validazione non collegati ai campi (`aria-describedby`)
+### 6. `AuthScreen`: errori di validazione non collegati ai campi (`aria-describedby`) — RISOLTO
+
+- **Nota**: aggiunto `id="auth-error"` al paragrafo d'errore e `aria-describedby={error ? 'auth-error' : undefined}` + `aria-invalid={error ? true : undefined}` sui campi email/password/confirmPassword in `AuthScreen.tsx`.
 - **Schermata**: `AuthScreen.tsx`.
 - **Problema**: `error && <p className="err">{error}</p>` è renderizzato sotto il form ma non è associato via `aria-describedby` a `email`/`password`/`confirmPassword`. Per uno screen reader, il messaggio d'errore (es. "Le password non coincidono.") non è collegato al campo che l'ha generato.
 - **Miglioramento proposto**: dare un `id` al paragrafo di errore (es. `id="auth-error"`) e referenziarlo con `aria-describedby` sui campi pertinenti (o almeno sul form), oltre a `aria-invalid="true"` sul campo in errore quando applicabile.
 - **Motivazione**: accessibilità form (WCAG 3.3.1/3.3.3).
 
-### 7. `BurgerMenu`: focus trap e gestione Escape mancanti
+### 7. `BurgerMenu`: focus trap e gestione Escape mancanti — RISOLTO
+
+- **Nota**: applicato `useModalA11y` (già usato per `ReportDialog`/lightbox, punto P0 #3) al `<nav className="burger-panel">` in `BurgerMenu.tsx`, passando `panelRef`, `open` e `() => setOpen(false)` come `onClose`. Il pannello ora riceve `tabIndex={-1}` (richiesto dall'hook per il focus iniziale) e `inert={!open ? '' : undefined}` quando chiuso, così gli item interni non sono raggiungibili da tastiera/screen reader, coerentemente con `aria-hidden={!open}` già presente. Focus trap Tab/Shift+Tab, chiusura su `Escape` e ripristino del focus sul `BurgerMenuButton` sono ora gestiti dall'hook condiviso.
 - **Componente**: `BurgerMenu.tsx`.
 - **Problema**: il pannello `.burger-panel` usa `aria-hidden={!open}` ma quando aperto non intrappola il focus (si può Tab-are dietro l'overlay), non chiude su `Escape`, e alla chiusura il focus non torna al `BurgerMenuButton` che l'ha aperto. Inoltre quando `aria-hidden="true"` il pannello chiuso può ancora contenere elementi focusabili raggiungibili da tastiera (se non `inert`/`tabIndex=-1`), creando un "focus invisibile".
 - **Miglioramento proposto**: aggiungere `inert` (o impostare `tabIndex={-1}` su tutti gli item) quando chiuso; gestire `Escape` per chiudere; al primo render dopo apertura spostare il focus sul primo voce di menu o sul pannello stesso; restituire il focus al bottone burger alla chiusura.
 - **Motivazione**: accessibilità da tastiera — il burger menu è il principale (unico) meccanismo di navigazione dell'app, presente in ogni schermata post-login.
 
-### 8. Stato vuoto generico/poco guidato in `SearchScreen` quando 0 risultati con filtri
+### 8. Stato vuoto generico/poco guidato in `SearchScreen` quando 0 risultati con filtri — RISOLTO
 - **Schermata**: `SearchScreen.tsx`.
 - **Problema**: il messaggio "Nessun risultato. Forse non ci sono utenti cercabili che corrispondono — prova a cambiare i filtri." è corretto ma non offre un'azione diretta (es. bottone "Modifica filtri" che riapra `showFilters`, o "Pulisci filtri"). L'utente deve scrollare manualmente verso l'alto per ritrovare i filtri (probabilmente collassati, dato `setShowFilters(false)` dopo la ricerca).
-- **Miglioramento proposto**: aggiungere un CTA secondario sotto il messaggio di stato vuoto, es. `<button className="btn-secondary" onClick={() => setShowFilters(true)}>Modifica filtri</button>`.
+- **Soluzione applicata**: aggiunto `<button className="btn-secondary" onClick={() => setShowFilters(true)}>Modifica filtri</button>` subito sotto il messaggio di stato vuoto (solo per `tab === 'filtri'`), in un nuovo wrapper `.search-empty`.
 - **Motivazione**: usabilità/recupero errori (Nielsen #5/#9) — evita un vicolo cieco percepito.
 
-### 9. `SearchScreen`: lista filtri molto lunga e priva di gerarchia visiva
+### 9. `SearchScreen`: lista filtri molto lunga e priva di gerarchia visiva — RISOLTO
 - **Schermata**: `SearchScreen.tsx` (tab "Per filtri").
 - **Problema**: 9 `fieldset` consecutivi (Età, Regione, Città, Identità, Orientamento, Interessi, Cerco, Fumo, Sport, Segno zodiacale) tutti con lo stesso peso visivo, ognuno con `ChipGroup` potenzialmente molte chip (es. 20 regioni, suggerimenti interessi). Su schermo 420px, scorrere tutto prima di premere "Cerca" è oneroso; nessun indicatore di "quanti filtri attivi" finché non si invia la ricerca.
-- **Miglioramento proposto**: 1) raggruppare in sezioni collassabili (accordion) con solo 2-3 sezioni aperte di default (es. Età/Regione/Identità) e le altre chiuse mostranti solo il titolo + eventuale conteggio selezioni; 2) mostrare un badge "N filtri attivi" vicino al pulsante "Cerca" sempre visibile (sticky in fondo), così l'utente capisce lo stato senza scrollare. Riusare `.stats-title`/`.badge` esistenti per coerenza visiva.
+- **Soluzione applicata**: Età, Regione e Città restano sempre visibili/aperti; le 7 categorie restanti (Identità, Orientamento, Interessi, Cerco, Fumo, Sport, Segno zodiacale) sono ora rese tramite un accordion (`useState<Record<string, boolean>>` per sezione, tutte chiuse di default), ciascuna con un bottone `.filter-section-toggle` (`aria-expanded`/`aria-controls`) che mostra il titolo, un badge `.filter-section-badge` con il conteggio selezioni quando >0, e una freccia ▲/▼. Vicino al bottone "Cerca" (`.search-go-row`) è stato aggiunto un badge `role="status"` `.filter-active-count` con il totale filtri attivi (`activeFilterCount(builtFilters())` via `useMemo`). Nuove classi minime in `index.css`: `.visually-hidden`, `.filter-section`, `.filter-section-toggle`, `.filter-section-badge`, `.filter-section-arrow`, `.filter-section-panel`, `.search-go-row`, `.filter-active-count`, `.search-empty` — tutte derivate dalla palette esistente (`var(--accent-text)`, `rgba(232, 177, 78, ...)`, `var(--text)`).
 - **Motivazione**: usabilità (riconoscimento > ricordo, riduzione carico cognitivo), coerente con il tono "intimo, non opprimente" del brand.
 
-### 10. Mancanza di `prefers-reduced-motion` per transizioni
+### 10. Mancanza di `prefers-reduced-motion` per transizioni — RISOLTO
+
+- **Nota**: aggiunto blocco globale `@media (prefers-reduced-motion: reduce)` in fondo a `index.css`; in `ChatScreen.tsx` lo `scrollIntoView` ora usa `behavior: 'auto'` quando `window.matchMedia('(prefers-reduced-motion: reduce)').matches` è vero, altrimenti `'smooth'`.
 - **CSS**: `index.css` — `.burger-panel` (`transition: transform 0.25s ease, box-shadow 0.25s ease`), `.toggle-pill`/`.toggle-knob`, `.avatar-opt` (`transform: scale`), `bottomRef.current?.scrollIntoView({ behavior: 'smooth' })` in `ChatScreen`.
 - **Problema**: nessuna media query `@media (prefers-reduced-motion: reduce)` per disattivare/ridurre queste animazioni. Per utenti sensibili al movimento, lo scroll automatico "smooth" della chat ad ogni nuovo messaggio può essere fastidioso.
 - **Miglioramento proposto**: aggiungere in `index.css` un blocco globale:
@@ -91,19 +97,23 @@ Convenzioni priorità:
   e in `ChatScreen` condizionare `behavior: 'smooth'` vs `'auto'` in base a `window.matchMedia('(prefers-reduced-motion: reduce)').matches`.
 - **Motivazione**: accessibilità (WCAG 2.3.3), basso sforzo per beneficio ampio.
 
-### 11. `RoomsScreen`/`ChatScreen`: stato di errore generico senza azione di retry
+### 11. `RoomsScreen`/`ChatScreen`: stato di errore generico senza azione di retry — RISOLTO
 - **Schermate**: `RoomsScreen.tsx` (`{error && <p className="err chat-error">{error}</p>}`), `ChatScreen.tsx` (stesso pattern).
 - **Problema**: se il caricamento stanze/messaggi fallisce, l'utente vede solo un testo d'errore (con contrasto insufficiente, vedi punto 1), senza un pulsante "Riprova". Vicolo cieco se la connessione torna.
-- **Miglioramento proposto**: aggiungere un piccolo `<button className="btn-secondary btn-sm" onClick={retry}>Riprova</button>` accanto al messaggio d'errore, dove `retry` richiama l'hook di fetch (`useRooms`/`useChatMessages` già espongono o possono esporre una funzione di refetch).
+- **Soluzione applicata**: `useRooms` (`app/src/hooks/useRooms.ts`) ora ha uno state `reloadKey` incluso nelle dipendenze dell'effetto di caricamento ed espone `retry()` che lo incrementa (oltre a resettare `loading`/`error` a inizio `load()`). `useChatMessages` (`app/src/hooks/useChatMessages.ts`) espone analogamente `reload()` tramite lo stesso pattern `reloadKey`. In `RoomsScreen.tsx` e `ChatScreen.tsx`, accanto a `{error && <p className="err chat-error">...}` è stato aggiunto `<button className="btn-secondary btn-sm" onClick={retry|reload}>Riprova</button>` che ri-esegue il fetch fallito. In `index.css` è stata aggiunta la regola `.btn-secondary.btn-sm` (display inline-block, width auto) per permettere a `.btn-secondary` (normalmente block/full-width) di affiancarsi al testo d'errore senza spezzare il layout.
 - **Motivazione**: error recovery (Nielsen #9) — evita che l'utente debba uscire e rientrare dalla schermata per ritentare.
 
-### 12. Etichette icon-only con solo `title` (no `aria-label`) da verificare in modo sistematico
+### 12. Etichette icon-only con solo `title` (no `aria-label`) da verificare in modo sistematico — RISOLTO
+
+- **Nota**: verificato `ProfileGallery.tsx` e `PhotoUploadDialog.tsx` — `lightbox-close` ha `aria-label="Chiudi"`, `carousel-report` ha `aria-label="Segnala foto"`, `carousel-nav prev/next` hanno `aria-label="Foto precedente"`/`"Foto successiva"`, e i pulsanti icon-only "Indietro" in `PhotoUploadDialog` hanno già `aria-label`/`title`. Nessuna modifica necessaria, tutti già coperti.
 - **Componenti**: in generale buona copertura (`aria-label` presente su molti pulsanti icona: `pf-icon-btn`, `msg-avatar-btn`, `BurgerMenuButton`, `lightbox-close` manca però `aria-label` — verificare `ProfileGallery.tsx`).
 - **Problema**: `lightbox-close` (`✕` nel lightbox foto) e `carousel-report`/`carousel-nav` (in `PhotoCarousel`/`ProfileGallery`) andrebbero verificati uno per uno per assicurare `aria-label` coerente (es. "Chiudi", "Foto precedente", "Foto successiva", "Segnala foto").
 - **Miglioramento proposto**: passare in rassegna `ProfileGallery.tsx`, `PhotoUploadDialog.tsx` e aggiungere `aria-label` mancanti sui pulsanti icon-only (azione concreta, scoping limitato).
 - **Motivazione**: accessibilità screen reader — pulsanti senza testo visibile né `aria-label` sono annunciati come "button" senza contesto.
 
-### 13. Messaggio "Sostieni Vesper ↗" nel burger apre link esterno senza preavviso
+### 13. Messaggio "Sostieni Vesper ↗" nel burger apre link esterno senza preavviso — RISOLTO
+
+- **Nota**: aggiunto campo opzionale `ariaLabel` a `BurgerMenuItem` (`BurgerMenu.tsx`), passato come `aria-label` sul bottone della voce; in `Home.tsx` la voce "Sostieni Vesper ↗" ora ha `ariaLabel: 'Sostieni Vesper, si apre in una nuova scheda'`.
 - **Componente**: `Home.tsx` (menuItems), apre `window.open(SUPPORT_URL, '_blank', ...)`.
 - **Problema**: `SUPPORT_URL` è ancora un placeholder (`https://www.example.com`, vedi commento `TODO(P30)`) — non bloccante per UX in sé, ma quando sarà sostituito con un link reale, l'apertura in nuova scheda di un dominio esterno (Ko-fi/PayPal) andrebbe segnalata (es. "(si apre in una nuova scheda)" nell'`aria-label`) per orientamento utente.
 - **Miglioramento proposto**: aggiungere `aria-label="Sostieni Vesper, si apre in una nuova scheda"` alla voce di menu quando il link reale sarà attivo.

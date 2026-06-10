@@ -24,6 +24,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
     capReached,
     handleJoin,
     handleLeave,
+    retry,
   } = useRooms(myId)
 
   return (
@@ -31,7 +32,14 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
       <AppHeader title="Vesper" />
 
       {loading && <p className="muted">Carico le stanze…</p>}
-      {error && <p className="err chat-error" role="alert">{error}</p>}
+      {error && (
+        <p className="err chat-error" role="alert">
+          {error}{' '}
+          <button type="button" className="btn-secondary btn-sm" onClick={retry}>
+            Riprova
+          </button>
+        </p>
+      )}
 
       {!loading && (
         <ul className="room-list">

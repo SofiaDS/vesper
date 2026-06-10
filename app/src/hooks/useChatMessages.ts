@@ -32,6 +32,7 @@ export function useChatMessages({
   const [error, setError] = useState<string | null>(null)
   const [hasMore, setHasMore] = useState(false)
   const [loadingOlder, setLoadingOlder] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
   // Evita auto-scroll quando si prependono messaggi vecchi.
   const skipAutoScroll = useRef(false)
 
@@ -88,7 +89,11 @@ export function useChatMessages({
 
     init()
     return () => { active = false }
-  }, [roomId])
+  }, [roomId, reloadKey])
+
+  function reload() {
+    setReloadKey((k) => k + 1)
+  }
 
   async function loadOlder(oldestCreatedAt: string) {
     if (loadingOlder) return
@@ -143,5 +148,6 @@ export function useChatMessages({
     appendMessage,
     loadOlder,
     setError,
+    reload,
   }
 }
