@@ -35,6 +35,8 @@ export function ProfilePreview({
     diet: profile.show_diet ? profile.diet : null,
     religion: profile.show_religion ? profile.religion : null,
     politics: profile.show_politics ? profile.politics : null,
+    education_level: profile.show_education ? profile.education_level : null,
+    education_institute: profile.show_education ? profile.education_institute : null,
     smoking: profile.show_smoking ? profile.smoking : null,
     sport: profile.show_sport ? profile.sport : null,
     zodiac: profile.show_zodiac ? profile.zodiac : null,

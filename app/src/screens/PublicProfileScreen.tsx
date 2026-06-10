@@ -18,6 +18,7 @@ import type {
   Diet,
   Religion,
   Politics,
+  EducationLevel,
   Smoking,
   Sport,
   Zodiac,
@@ -48,6 +49,8 @@ type PublicProfile = {
   diet: Diet | null
   religion: Religion | null
   politics: Politics | null
+  education_level: EducationLevel | null
+  education_institute: string | null
   smoking: Smoking | null
   sport: Sport | null
   zodiac: Zodiac | null
@@ -57,7 +60,7 @@ type PublicProfile = {
 const COLS = `id, nickname, avatar_preset, accent_color, bio, interests, birth_date, age,
   identity_category, orientations, city, city_province, city_region, pronouns, intents,
   relationship_status, relationship_type, languages, children_status, has_pets, pets_detail,
-  diet, religion, politics, smoking, sport, zodiac, is_self`
+  diet, religion, politics, education_level, education_institute, smoking, sport, zodiac, is_self`
 
 export function PublicProfileScreen({
   userId,

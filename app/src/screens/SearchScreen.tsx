@@ -6,6 +6,7 @@ import {
   INTENT_OPTIONS,
   SMOKING_OPTIONS,
   SPORT_OPTIONS,
+  EDUCATION_OPTIONS,
 } from '../constants/options'
 import { ZODIAC_LABELS } from '../constants/labels'
 import { INTEREST_SUGGESTIONS } from '../constants/limits'
@@ -140,6 +141,10 @@ export function SearchScreen({
   )
   const ZODIAC_F = useMemo(
     () => (Object.keys(ZODIAC_LABELS) as Zodiac[]).map((z) => ({ value: z, label: ZODIAC_LABELS[z] })),
+    [],
+  )
+  const EDUCATION_F = useMemo(
+    () => EDUCATION_OPTIONS.filter((o) => o.value !== 'preferisco_non_specificare'),
     [],
   )
   const REGION_F = useMemo(() => REGIONS.map((r) => ({ value: r, label: r })), [])
@@ -412,6 +417,7 @@ export function SearchScreen({
             { key: 'orientations', legend: 'Orientamento', options: ORIENTATION_F, selected: filters.orientations },
             { key: 'interests', legend: 'Interessi', options: INTEREST_F, selected: filters.interests },
             { key: 'intents', legend: 'Cerco', options: INTENT_F, selected: filters.intents },
+            { key: 'educations', legend: 'Formazione', options: EDUCATION_F, selected: filters.educations },
             { key: 'smoking', legend: 'Fumo', options: SMOKING_F, selected: filters.smoking },
             { key: 'sport', legend: 'Sport', options: SPORT_F, selected: filters.sport },
             { key: 'zodiac', legend: 'Segno zodiacale', options: ZODIAC_F, selected: filters.zodiac },

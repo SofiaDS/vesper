@@ -6,6 +6,7 @@ import {
   PRONOUNS_MAX,
   MAX_INTERESTS,
   PETS_DETAIL_MAX,
+  EDUCATION_INSTITUTE_MAX,
   INTEREST_CATEGORIES,
   INTEREST_SUGGESTIONS,
 } from '../../constants/limits'
@@ -20,6 +21,7 @@ import {
   DIET_OPTIONS,
   RELIGION_OPTIONS,
   POLITICS_OPTIONS,
+  EDUCATION_OPTIONS,
   SMOKING_OPTIONS,
   SPORT_OPTIONS,
   DM_FILTER_OPTIONS,
@@ -52,6 +54,7 @@ import type {
   Diet,
   Religion,
   Politics,
+  EducationLevel,
   Smoking,
   Sport,
 } from '../../types'
@@ -227,6 +230,8 @@ export function ProfileEditor({
   const [diet, setDiet] = useState<Diet | null>(profile.diet ?? null)
   const [religion, setReligion] = useState<Religion | null>(profile.religion ?? null)
   const [politics, setPolitics] = useState<Politics | null>(profile.politics ?? null)
+  const [educationLevel, setEducationLevel] = useState<EducationLevel | null>(profile.education_level ?? null)
+  const [educationInstitute, setEducationInstitute] = useState(profile.education_institute ?? '')
   const [interests, setInterests] = useState<string[]>(profile.interests ?? [])
   const [newInterest, setNewInterest] = useState('')
   const [smoking, setSmoking] = useState<Smoking | null>(profile.smoking ?? null)
@@ -263,6 +268,7 @@ export function ProfileEditor({
     show_diet: profile.show_diet,
     show_religion: profile.show_religion,
     show_politics: profile.show_politics,
+    show_education: profile.show_education,
     show_smoking: profile.show_smoking,
     show_sport: profile.show_sport,
     show_zodiac: profile.show_zodiac,
@@ -374,6 +380,10 @@ export function ProfileEditor({
       setError(`La specifica sugli animali domestici non può superare i ${PETS_DETAIL_MAX} caratteri.`)
       return
     }
+    if (educationInstitute.length > EDUCATION_INSTITUTE_MAX) {
+      setError(`Il nome di scuola/università non può superare i ${EDUCATION_INSTITUTE_MAX} caratteri.`)
+      return
+    }
     if (cityQuery.trim() && !citySelected.current) {
       setError("Seleziona la città dall'elenco dei suggerimenti.")
       return
@@ -402,6 +412,8 @@ export function ProfileEditor({
           diet,
           religion,
           politics,
+          education_level: educationLevel,
+          education_institute: educationInstitute.trim() || null,
           interests,
           smoking,
           sport,
@@ -439,6 +451,7 @@ export function ProfileEditor({
   const dietOpts = useMemo(() => DIET_OPTIONS, [])
   const religionOpts = useMemo(() => RELIGION_OPTIONS, [])
   const politicsOpts = useMemo(() => POLITICS_OPTIONS, [])
+  const educationOpts = useMemo(() => EDUCATION_OPTIONS, [])
   const smokingOpts = useMemo(() => SMOKING_OPTIONS, [])
   const sportOpts = useMemo(() => SPORT_OPTIONS, [])
 
@@ -771,6 +784,20 @@ export function ProfileEditor({
             onChange={(v) => setVisFlag('show_languages', v)}
           />
         </MultiChoiceField>
+
+        <SingleChoiceField legend="Titolo di studio" name="education" options={educationOpts} value={educationLevel} onChange={(v) => setEducationLevel(v)}>
+          <div className="composer inline-add">
+            <input
+              type="text"
+              value={educationInstitute}
+              onChange={(e) => setEducationInstitute(e.target.value)}
+              placeholder="Scuola, Università o Ente (opzionale)…"
+              maxLength={EDUCATION_INSTITUTE_MAX}
+            />
+            <span className="muted">{educationInstitute.length}/{EDUCATION_INSTITUTE_MAX}</span>
+          </div>
+          <ShowInProfileToggle checked={vis.show_education} onChange={(v) => setVisFlag('show_education', v)} />
+        </SingleChoiceField>
 
         <SingleChoiceField legend="Alimentazione" name="diet" options={dietOpts} value={diet} onChange={(v) => setDiet(v)}>
           <ShowInProfileToggle checked={vis.show_diet} onChange={(v) => setVisFlag('show_diet', v)} />
