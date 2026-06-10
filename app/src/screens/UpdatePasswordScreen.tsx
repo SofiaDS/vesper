@@ -76,7 +76,7 @@ export function UpdatePasswordScreen() {
             />
           </label>
 
-          {error && <p className="err">{error}</p>}
+          {error && <p className="err" role="alert">{error}</p>}
 
           <button type="submit" className="btn-primary" disabled={busy}>
             {busy ? 'Salvo…' : 'Imposta nuova password'}

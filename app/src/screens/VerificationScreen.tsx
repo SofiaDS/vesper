@@ -179,7 +179,7 @@ export function VerificationScreen() {
               <li>Il video è visibile solo ai moderatori di Vesper</li>
             </ul>
 
-            {error && <p className="err">{error}</p>}
+            {error && <p className="err" role="alert">{error}</p>}
 
             <button type="button" className="btn-primary" onClick={startCamera}>
               Inizia verifica
@@ -227,7 +227,7 @@ export function VerificationScreen() {
                 playsInline
               />
             </div>
-            {error && <p className="err">{error}</p>}
+            {error && <p className="err" role="alert">{error}</p>}
             <div className="verif-actions">
               <button type="button" className="btn-primary" onClick={upload}>
                 Invia per revisione

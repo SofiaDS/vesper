@@ -99,6 +99,20 @@ export type Politics =
   | 'comunista'
   | 'altro'
 
+export type EducationLevel =
+  | 'preferisco_non_specificare'
+  | 'licenza_media'
+  | 'diploma'
+  | 'qualifica_professionale'
+  | 'its'
+  | 'laurea_triennale'
+  | 'laurea_magistrale'
+  | 'master'
+  | 'dottorato'
+  | 'accademia'
+  | 'autodidatta'
+  | 'altro'
+
 export type Smoking = 'fuma' | 'no' | 'occasionalmente' | 'non_dico'
 
 export type Sport = 'regolarmente' | 'saltuariamente' | 'no' | 'non_dico'

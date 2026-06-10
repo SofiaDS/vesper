@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useModalA11y } from '../hooks/useModalA11y'
 
 // Dialog per aggiungere una foto profilo: scelta sorgente (selfie in-app o
 // galleria) + ritaglio quadrato (zoom + trascinamento). Produce un JPEG Blob
@@ -31,6 +32,7 @@ export function PhotoUploadDialog({
   const drag = useRef<{ px: number; py: number; ox: number; oy: number } | null>(
     null,
   )
+  const modalRef = useRef<HTMLDivElement | null>(null)
 
   // Ferma lo stream della fotocamera (pulizia).
   function stopStream() {
@@ -203,9 +205,18 @@ export function PhotoUploadDialog({
     onClose()
   }
 
+  useModalA11y(modalRef, true, close)
+
   return (
     <div className="modal-overlay" onClick={close}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={modalRef}
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         {stage === 'choose' && (
           <>
             <h3 className="modal-title">Aggiungi una foto</h3>
@@ -228,7 +239,7 @@ export function PhotoUploadDialog({
               hidden
               onChange={onPickFile}
             />
-            {err && <p className="err">{err}</p>}
+            {err && <p className="err" role="alert">{err}</p>}
             <div className="modal-actions">
               <button type="button" className="btn-ghost" onClick={close}>
                 Annulla
@@ -248,7 +259,7 @@ export function PhotoUploadDialog({
                 muted
               />
             </div>
-            {err && <p className="err">{err}</p>}
+            {err && <p className="err" role="alert">{err}</p>}
             <div className="modal-actions">
               <button
                 type="button"
@@ -293,7 +304,7 @@ export function PhotoUploadDialog({
               value={zoom}
               onChange={(e) => onZoom(Number(e.target.value))}
             />
-            {err && <p className="err">{err}</p>}
+            {err && <p className="err" role="alert">{err}</p>}
             <div className="modal-actions">
               <button
                 type="button"

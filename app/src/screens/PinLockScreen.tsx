@@ -43,7 +43,7 @@ export function PinLockScreen({ onUnlock }: Props) {
             />
           </label>
 
-          {error && <p className="err">PIN errato. Riprova.</p>}
+          {error && <p className="err" role="alert">PIN errato. Riprova.</p>}
 
           <button type="submit" className="btn-primary" disabled={pin.length < 4}>
             Sblocca

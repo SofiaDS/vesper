@@ -6,6 +6,7 @@ import {
   INTENT_OPTIONS,
   SMOKING_OPTIONS,
   SPORT_OPTIONS,
+  EDUCATION_OPTIONS,
 } from '../constants/options'
 import { ZODIAC_LABELS } from '../constants/labels'
 import { INTEREST_SUGGESTIONS } from '../constants/limits'
@@ -21,6 +22,7 @@ import {
 } from '../lib/search'
 import { useDebounce } from '../hooks/useDebounce'
 import { ChipGroup } from '../components/ChipGroup'
+import { FilterSection } from '../components/FilterSection'
 import { SkeletonCard } from '../components/SkeletonCard'
 import { UserCard } from '../components/UserCard'
 import type { Zodiac } from '../types'
@@ -76,6 +78,7 @@ export function SearchScreen({
 }) {
   const [tab, setTab] = useState<Tab>('nickname')
   const [showFilters, setShowFilters] = useState(true)
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({})
   const [resultsView, setResultsView] = useState<'list' | 'grid'>('list')
   const [nick, setNick] = useState('')
   const [filters, setFilters] = useState<SearchFilters>({})
@@ -140,9 +143,22 @@ export function SearchScreen({
     () => (Object.keys(ZODIAC_LABELS) as Zodiac[]).map((z) => ({ value: z, label: ZODIAC_LABELS[z] })),
     [],
   )
+  const EDUCATION_F = useMemo(
+    () => EDUCATION_OPTIONS.filter((o) => o.value !== 'preferisco_non_specificare'),
+    [],
+  )
   const REGION_F = useMemo(() => REGIONS.map((r) => ({ value: r, label: r })), [])
   const INTEREST_F = useMemo(() => INTEREST_SUGGESTIONS.map((i) => ({ value: i, label: i })), [])
   const INTENT_F = useMemo(() => INTENT_OPTIONS, [])
+
+  function toggleSection(key: string) {
+    setOpenSections((s) => ({ ...s, [key]: !s[key] }))
+  }
+
+  function sectionBadge(count: number, open: boolean) {
+    if (count === 0) return null
+    return <span className="filter-section-badge">{open ? count : `${count} sel.`}</span>
+  }
 
   function toggle(key: keyof SearchFilters, v: string) {
     setFilters((f) => {
@@ -155,6 +171,12 @@ export function SearchScreen({
   function builtFilters(): SearchFilters {
     return { ...filters, ageMin: ageOn ? ageMin : null, ageMax: ageOn ? ageMax : null }
   }
+
+  const totalActiveFilters = useMemo(
+    () => activeFilterCount(builtFilters()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filters, ageOn, ageMin, ageMax],
+  )
 
   function pushHistory(entry: Omit<SavedSearch, 'id' | 'savedAt'> & { label: string }) {
     setHistory((prev) => {
@@ -335,8 +357,12 @@ export function SearchScreen({
         </div>
       ) : showFilters ? (
         <div className="search-filters">
-          <fieldset className="field">
-            <legend>Età</legend>
+          <FilterSection
+            legend="Età"
+            badge={sectionBadge(ageOn ? 1 : 0, !!openSections.age)}
+            open={!!openSections.age}
+            onToggle={() => toggleSection('age')}
+          >
             <label className="check">
               <input type="checkbox" checked={ageOn} onChange={(e) => setAgeOn(e.target.checked)} />
               <span>Filtra per età</span>
@@ -360,15 +386,23 @@ export function SearchScreen({
                 />
               </div>
             )}
-          </fieldset>
+          </FilterSection>
 
-          <fieldset className="field">
-            <legend>Regione</legend>
+          <FilterSection
+            legend="Regione"
+            badge={sectionBadge(filters.regions?.length ?? 0, !!openSections.region)}
+            open={!!openSections.region}
+            onToggle={() => toggleSection('region')}
+          >
             <ChipGroup options={REGION_F} selected={filters.regions ?? []} onToggle={(v) => toggle('regions', v)} />
-          </fieldset>
+          </FilterSection>
 
-          <fieldset className="field">
-            <legend>Città</legend>
+          <FilterSection
+            legend="Città"
+            badge={sectionBadge(filters.city ? 1 : 0, !!openSections.city)}
+            open={!!openSections.city}
+            onToggle={() => toggleSection('city')}
+          >
             <input
               type="text"
               className="search-input"
@@ -376,55 +410,56 @@ export function SearchScreen({
               value={filters.city ?? ''}
               onChange={(e) => setFilters((f) => ({ ...f, city: e.target.value }))}
             />
-          </fieldset>
+          </FilterSection>
 
-          <fieldset className="field">
-            <legend>Identità</legend>
-            <ChipGroup options={IDENTITY_F} selected={filters.identities ?? []} onToggle={(v) => toggle('identities', v)} />
-          </fieldset>
+          {[
+            { key: 'identities', legend: 'Identità', options: IDENTITY_F, selected: filters.identities },
+            { key: 'orientations', legend: 'Orientamento', options: ORIENTATION_F, selected: filters.orientations },
+            { key: 'interests', legend: 'Interessi', options: INTEREST_F, selected: filters.interests },
+            { key: 'intents', legend: 'Cerco', options: INTENT_F, selected: filters.intents },
+            { key: 'educations', legend: 'Formazione', options: EDUCATION_F, selected: filters.educations },
+            { key: 'smoking', legend: 'Fumo', options: SMOKING_F, selected: filters.smoking },
+            { key: 'sport', legend: 'Sport', options: SPORT_F, selected: filters.sport },
+            { key: 'zodiac', legend: 'Segno zodiacale', options: ZODIAC_F, selected: filters.zodiac },
+          ].map((section) => {
+            const count = section.selected?.length ?? 0
+            const open = !!openSections[section.key]
+            return (
+              <FilterSection
+                key={section.key}
+                legend={section.legend}
+                badge={sectionBadge(count, open)}
+                open={open}
+                onToggle={() => toggleSection(section.key)}
+              >
+                <ChipGroup
+                  options={section.options}
+                  selected={section.selected ?? []}
+                  onToggle={(v) => toggle(section.key as keyof SearchFilters, v)}
+                />
+              </FilterSection>
+            )
+          })}
 
-          <fieldset className="field">
-            <legend>Orientamento</legend>
-            <ChipGroup options={ORIENTATION_F} selected={filters.orientations ?? []} onToggle={(v) => toggle('orientations', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Interessi</legend>
-            <ChipGroup options={INTEREST_F} selected={filters.interests ?? []} onToggle={(v) => toggle('interests', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Cerco</legend>
-            <ChipGroup options={INTENT_F} selected={filters.intents ?? []} onToggle={(v) => toggle('intents', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Fumo</legend>
-            <ChipGroup options={SMOKING_F} selected={filters.smoking ?? []} onToggle={(v) => toggle('smoking', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Sport</legend>
-            <ChipGroup options={SPORT_F} selected={filters.sport ?? []} onToggle={(v) => toggle('sport', v)} />
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>Segno zodiacale</legend>
-            <ChipGroup options={ZODIAC_F} selected={filters.zodiac ?? []} onToggle={(v) => toggle('zodiac', v)} />
-          </fieldset>
-
-          <button
-            type="button"
-            className="btn-primary search-go"
-            onClick={runFilters}
-            disabled={loading}
-          >
-            Cerca
-          </button>
+          <div className="search-go-row">
+            <button
+              type="button"
+              className="btn-primary search-go"
+              onClick={runFilters}
+              disabled={loading}
+            >
+              Cerca
+            </button>
+            {totalActiveFilters > 0 && (
+              <span className="filter-active-count" role="status">
+                {totalActiveFilters} {totalActiveFilters === 1 ? 'filtro attivo' : 'filtri attivi'}
+              </span>
+            )}
+          </div>
         </div>
       ) : null}
 
-      {err && <p className="err">{err}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
       {softWarning && <p className="hint search-soft-warn">{softWarning}</p>}
 
       {searched && (
@@ -436,10 +471,17 @@ export function SearchScreen({
               ))}
             </div>
           ) : results.length === 0 ? (
-            <p className="hint">
-              Nessun risultato. Forse non ci sono utenti cercabili che
-              corrispondono — prova a cambiare i filtri.
-            </p>
+            <div className="search-empty">
+              <p className="hint">
+                Nessun risultato. Forse non ci sono utenti cercabili che
+                corrispondono — prova a cambiare i filtri.
+              </p>
+              {tab === 'filtri' && (
+                <button type="button" className="btn-secondary" onClick={() => setShowFilters(true)}>
+                  Modifica filtri
+                </button>
+              )}
+            </div>
           ) : (
             <>
               <div className="search-view-toggle">

@@ -24,6 +24,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
     capReached,
     handleJoin,
     handleLeave,
+    retry,
   } = useRooms(myId)
 
   return (
@@ -31,7 +32,14 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
       <AppHeader title="Vesper" />
 
       {loading && <p className="muted">Carico le stanze…</p>}
-      {error && <p className="err chat-error">{error}</p>}
+      {error && (
+        <p className="err chat-error" role="alert">
+          {error}{' '}
+          <button type="button" className="btn-secondary btn-sm" onClick={retry}>
+            Riprova
+          </button>
+        </p>
+      )}
 
       {!loading && (
         <ul className="room-list">
@@ -72,7 +80,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
                           onClick={() => handleLeave(room)}
                           disabled={working}
                         >
-                          {working ? 'Esco…' : 'Esci'}
+                          {working ? 'Lasciando…' : 'Lascia stanza'}
                         </button>
                       )}
                     </>
@@ -99,7 +107,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
       )}
 
       {!loading && (
-        <p className="hint rooms-hint">
+        <p className="hint hint-active rooms-hint">
           Stanze tematiche: {tematicheJoined}/{MAX_TEMATICHE}.
         </p>
       )}

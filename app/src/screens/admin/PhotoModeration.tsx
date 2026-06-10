@@ -45,7 +45,7 @@ export function PhotoModeration() {
 
   return (
     <div className="mod-list">
-      {err && <p className="err">{err}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
       {photos.map((p) => (
         <div key={p.id} className="mod-photo">
           {p.url ? (

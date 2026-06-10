@@ -153,7 +153,7 @@ export function ReportsModeration() {
               Salta
             </button>
           </div>
-          {repErr && <p className="err">{repErr}</p>}
+          {repErr && <p className="err" role="alert">{repErr}</p>}
         </div>
       )}
 
@@ -173,7 +173,7 @@ export function ReportsModeration() {
         </label>
       </div>
 
-      {err && <p className="err">{err}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
 
       {loading ? (
         <p className="muted">Carico le segnalazioni…</p>
