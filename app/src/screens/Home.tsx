@@ -150,7 +150,7 @@ export function Home() {
     screen = <AdminScreen tab={adminTab} onBack={goBack} />
   } else if (showSettings) {
     goBack = () => setShowSettings(false)
-    screen = <SettingsScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} />
+    screen = <SettingsScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} onOpenLegal={openLegal} />
   } else if (legalDoc) {
     goBack = () => setLegalDoc(null)
     screen = <LegalScreen doc={legalDoc} onBack={goBack} />
