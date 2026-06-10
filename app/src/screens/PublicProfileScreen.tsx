@@ -211,14 +211,19 @@ export function PublicProfileScreen({
                     </>
                   )
                   return (
-                    <button
-                      type="button"
-                      className="btn-primary"
-                      disabled
-                      title="Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi"
-                    >
-                      Manda messaggio
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        disabled
+                        title="Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi"
+                      >
+                        Manda messaggio
+                      </button>
+                      <p className="hint hint-active">
+                        Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi.
+                      </p>
+                    </>
                   )
                 })()}
                 {blocked && (

@@ -80,7 +80,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
                           onClick={() => handleLeave(room)}
                           disabled={working}
                         >
-                          {working ? 'Esco…' : 'Esci'}
+                          {working ? 'Lasciando…' : 'Lascia stanza'}
                         </button>
                       )}
                     </>
@@ -107,7 +107,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
       )}
 
       {!loading && (
-        <p className="hint rooms-hint">
+        <p className="hint hint-active rooms-hint">
           Stanze tematiche: {tematicheJoined}/{MAX_TEMATICHE}.
         </p>
       )}
