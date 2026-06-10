@@ -43,12 +43,12 @@ export function ProfileGallery({
     return () => { alive = false }
   }, [userId])
 
-  if (loading) return <div className="gallery-strip loading" />
-  if (items.length === 0) return <p className="hint">Nessuna foto da mostrare.</p>
-
   const opened = openIdx != null ? items[openIdx] : null
 
   useModalA11y(lightboxRef, opened != null, () => setOpenIdx(null))
+
+  if (loading) return <div className="gallery-strip loading" />
+  if (items.length === 0) return <p className="hint">Nessuna foto da mostrare.</p>
 
   return (
     <>

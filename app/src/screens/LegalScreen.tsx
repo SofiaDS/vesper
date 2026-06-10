@@ -145,10 +145,10 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
 
 // Schermata unica parametrizzata sul documento (stesso pattern di AdminScreen
 // con `tab`): evita di avere due file quasi identici per Privacy Policy e ToS.
-export function LegalScreen({ doc, onBack }: { doc: LegalDoc; onBack: () => void }) {
+export function LegalScreen({ doc, onBack, backLabel = '‹ Stanze' }: { doc: LegalDoc; onBack: () => void; backLabel?: string }) {
   return (
     <main className="app profile">
-      <AppHeader backLabel="‹ Stanze" onBack={onBack} title={LEGAL_DOC_LABELS[doc]} />
+      <AppHeader backLabel={backLabel} onBack={onBack} title={LEGAL_DOC_LABELS[doc]} />
 
       <section className="card box-shadow">
         {LEGAL_DOC_SECTIONS[doc].map((section, i) => (

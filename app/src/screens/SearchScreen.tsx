@@ -21,6 +21,7 @@ import {
 } from '../lib/search'
 import { useDebounce } from '../hooks/useDebounce'
 import { ChipGroup } from '../components/ChipGroup'
+import { FilterSection } from '../components/FilterSection'
 import { SkeletonCard } from '../components/SkeletonCard'
 import { UserCard } from '../components/UserCard'
 import type { Zodiac } from '../types'
@@ -147,6 +148,11 @@ export function SearchScreen({
 
   function toggleSection(key: string) {
     setOpenSections((s) => ({ ...s, [key]: !s[key] }))
+  }
+
+  function sectionBadge(count: number, open: boolean) {
+    if (count === 0) return null
+    return <span className="filter-section-badge">{open ? count : `${count} sel.`}</span>
   }
 
   function toggle(key: keyof SearchFilters, v: string) {
@@ -346,8 +352,12 @@ export function SearchScreen({
         </div>
       ) : showFilters ? (
         <div className="search-filters">
-          <fieldset className="field">
-            <legend>Età</legend>
+          <FilterSection
+            legend="Età"
+            badge={sectionBadge(ageOn ? 1 : 0, !!openSections.age)}
+            open={!!openSections.age}
+            onToggle={() => toggleSection('age')}
+          >
             <label className="check">
               <input type="checkbox" checked={ageOn} onChange={(e) => setAgeOn(e.target.checked)} />
               <span>Filtra per età</span>
@@ -371,15 +381,23 @@ export function SearchScreen({
                 />
               </div>
             )}
-          </fieldset>
+          </FilterSection>
 
-          <fieldset className="field">
-            <legend>Regione</legend>
+          <FilterSection
+            legend="Regione"
+            badge={sectionBadge(filters.regions?.length ?? 0, !!openSections.region)}
+            open={!!openSections.region}
+            onToggle={() => toggleSection('region')}
+          >
             <ChipGroup options={REGION_F} selected={filters.regions ?? []} onToggle={(v) => toggle('regions', v)} />
-          </fieldset>
+          </FilterSection>
 
-          <fieldset className="field">
-            <legend>Città</legend>
+          <FilterSection
+            legend="Città"
+            badge={sectionBadge(filters.city ? 1 : 0, !!openSections.city)}
+            open={!!openSections.city}
+            onToggle={() => toggleSection('city')}
+          >
             <input
               type="text"
               className="search-input"
@@ -387,7 +405,7 @@ export function SearchScreen({
               value={filters.city ?? ''}
               onChange={(e) => setFilters((f) => ({ ...f, city: e.target.value }))}
             />
-          </fieldset>
+          </FilterSection>
 
           {[
             { key: 'identities', legend: 'Identità', options: IDENTITY_F, selected: filters.identities },
@@ -400,35 +418,20 @@ export function SearchScreen({
           ].map((section) => {
             const count = section.selected?.length ?? 0
             const open = !!openSections[section.key]
-            const panelId = `filter-section-${section.key}`
             return (
-              <fieldset key={section.key} className="field filter-section">
-                <legend className="visually-hidden">{section.legend}</legend>
-                <button
-                  type="button"
-                  className="filter-section-toggle"
-                  aria-expanded={open}
-                  aria-controls={panelId}
-                  onClick={() => toggleSection(section.key)}
-                >
-                  <span>{section.legend}</span>
-                  {count > 0 && (
-                    <span className="filter-section-badge">
-                      {open ? count : `${count} sel.`}
-                    </span>
-                  )}
-                  <span className="filter-section-arrow" aria-hidden="true">{open ? '▲' : '▼'}</span>
-                </button>
-                {open && (
-                  <div id={panelId} className="filter-section-panel">
-                    <ChipGroup
-                      options={section.options}
-                      selected={section.selected ?? []}
-                      onToggle={(v) => toggle(section.key as keyof SearchFilters, v)}
-                    />
-                  </div>
-                )}
-              </fieldset>
+              <FilterSection
+                key={section.key}
+                legend={section.legend}
+                badge={sectionBadge(count, open)}
+                open={open}
+                onToggle={() => toggleSection(section.key)}
+              >
+                <ChipGroup
+                  options={section.options}
+                  selected={section.selected ?? []}
+                  onToggle={(v) => toggle(section.key as keyof SearchFilters, v)}
+                />
+              </FilterSection>
             )
           })}
 

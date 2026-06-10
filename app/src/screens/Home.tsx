@@ -71,6 +71,12 @@ export function Home() {
     openScreen(() => setLegalDoc(doc))
   }
 
+  // Apertura da dentro Impostazioni: non resetta showSettings, così il tasto
+  // "indietro" dalla schermata legale torna ad Impostazioni e non alla lobby.
+  function openLegalFromSettings(doc: LegalDoc) {
+    setLegalDoc(doc)
+  }
+
   const onLobby =
     !room &&
     !showProfile &&
@@ -87,20 +93,20 @@ export function Home() {
   // catena di precedenza dello switch dello schermo qui sotto.
   const currentScreenLabel = showAdmin
     ? `Moderazione · ${ADMIN_TAB_LABELS[adminTab]}`
+    : legalDoc
+    ? LEGAL_DOC_LABELS[legalDoc]
+    : showBlocked
+    ? 'Utenti bloccati'
     : showSettings
     ? 'Impostazioni'
     : viewUserId
     ? 'Profilo pubblico'
-    : showBlocked
-    ? 'Utenti bloccati'
     : showSearch
     ? 'Ricerca'
     : showDm
     ? 'Messaggi'
     : showProfile
     ? 'Il mio profilo'
-    : legalDoc
-    ? LEGAL_DOC_LABELS[legalDoc]
     : room
     ? room.name
     : 'Stanze'
@@ -154,18 +160,18 @@ export function Home() {
   if (showAdmin) {
     goBack = () => setShowAdmin(false)
     screen = <AdminScreen tab={adminTab} onBack={goBack} />
-  } else if (showSettings) {
-    goBack = () => setShowSettings(false)
-    screen = <SettingsScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} onOpenLegal={openLegal} />
   } else if (legalDoc) {
     goBack = () => setLegalDoc(null)
-    screen = <LegalScreen doc={legalDoc} onBack={goBack} />
+    screen = <LegalScreen doc={legalDoc} onBack={goBack} backLabel={showSettings ? '‹ Impostazioni' : '‹ Stanze'} />
+  } else if (showBlocked) {
+    goBack = () => setShowBlocked(false)
+    screen = <BlockedUsersScreen onBack={goBack} backLabel={showSettings ? '‹ Impostazioni' : '‹ Profilo'} />
+  } else if (showSettings) {
+    goBack = () => setShowSettings(false)
+    screen = <SettingsScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} onOpenLegal={openLegalFromSettings} />
   } else if (viewUserId) {
     goBack = () => setViewUserId(null)
     screen = <PublicProfileScreen userId={viewUserId} onBack={goBack} />
-  } else if (showBlocked) {
-    goBack = () => setShowBlocked(false)
-    screen = <BlockedUsersScreen onBack={goBack} />
   } else if (showSearch) {
     goBack = () => setShowSearch(false)
     screen = <SearchScreen onBack={goBack} onOpenProfile={setViewUserId} />
