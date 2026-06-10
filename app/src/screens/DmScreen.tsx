@@ -219,7 +219,7 @@ function ConversationView({
         <div ref={bottomRef} />
       </section>
 
-      {error && <p className="err chat-error">{error}</p>}
+      {error && <p className="err chat-error" role="alert">{error}</p>}
 
       <MessageComposer
         value={text}

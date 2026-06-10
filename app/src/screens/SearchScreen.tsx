@@ -424,7 +424,7 @@ export function SearchScreen({
         </div>
       ) : null}
 
-      {err && <p className="err">{err}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
       {softWarning && <p className="hint search-soft-warn">{softWarning}</p>}
 
       {searched && (

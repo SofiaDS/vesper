@@ -104,7 +104,7 @@ export function UserReputation({
   }
 
   if (loading) return <p className="muted">Carico reputazione…</p>
-  if (err)     return <p className="err">{err}</p>
+  if (err)     return <p className="err" role="alert">{err}</p>
   if (score === null) return null
 
   const { text: label, cls } = scoreLabel(score)
@@ -149,7 +149,7 @@ export function UserReputation({
             onChange={(e) => setAddNotes(e.target.value)}
             rows={2}
           />
-          {addErr && <p className="err">{addErr}</p>}
+          {addErr && <p className="err" role="alert">{addErr}</p>}
           <button
             type="button"
             className="btn-primary btn-sm"
@@ -165,7 +165,7 @@ export function UserReputation({
         <p className="rep-history-title">
           Storico ultimi 12 mesi ({history.length} eventi)
         </p>
-        {annulErr && <p className="err">{annulErr}</p>}
+        {annulErr && <p className="err" role="alert">{annulErr}</p>}
         {history.length === 0 ? (
           <p className="hint">Nessun evento registrato.</p>
         ) : (

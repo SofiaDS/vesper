@@ -198,7 +198,7 @@ function PhotoManager({ userId }: { userId: string }) {
         La prima è la principale (★). Le foto restano <em>in revisione</em>{' '}
         finché non vengono approvate: le altre persone le vedono solo dopo l'ok.
       </span>
-      {err && <p className="err">{err}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
     </fieldset>
   )
 }
@@ -867,7 +867,7 @@ export function ProfileEditor({
             {layerEligibility.nextLayer && (
               <>
                 {layerEligibility.eligible ? (
-                  <p className="ok">Hai soddisfatto tutti i requisiti. L'avanzamento avviene automaticamente al tuo prossimo accesso.</p>
+                  <p className="ok" role="status">Hai soddisfatto tutti i requisiti. L'avanzamento avviene automaticamente al tuo prossimo accesso.</p>
                 ) : (
                   <ul className="layer-requirements">
                     {layerEligibility.missingDays > 0 && (
@@ -926,7 +926,7 @@ export function ProfileEditor({
           </fieldset>
         )}
 
-        {error && <p className="err">{error}</p>}
+        {error && <p className="err" role="alert">{error}</p>}
 
         <div className="composer inline-add profile-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>

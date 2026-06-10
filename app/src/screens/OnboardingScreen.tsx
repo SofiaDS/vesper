@@ -138,7 +138,7 @@ export function OnboardingScreen() {
               />
             </label>
 
-            {vouchErr && <p className="err">{vouchErr}</p>}
+            {vouchErr && <p className="err" role="alert">{vouchErr}</p>}
 
             <button
               type="submit"
@@ -230,7 +230,7 @@ export function OnboardingScreen() {
             </span>
           </label>
 
-          {error && <p className="err">{error}</p>}
+          {error && <p className="err" role="alert">{error}</p>}
 
           <button type="submit" className="btn-primary" disabled={busy || !declared}>
             {busy ? 'Creazione…' : 'Entra nel Foyer'}

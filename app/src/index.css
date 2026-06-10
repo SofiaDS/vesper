@@ -7,6 +7,14 @@
   --error:   #D72638;
   --success: #4caf7d;
 
+  /* Varianti per testo leggibile (contrasto AA su --bg/--surface).
+     --accent resta invariato per sfondi/bordi/badge (3:1 ok);
+     --accent-text è usato quando --accent funge da colore del *testo*. */
+  --accent-text: var(--accent);
+  /* --error resta invariato per sfondi/bordi/badge (3:1 ok);
+     --error-text è una variante più chiara per il *testo* (4.5:1+). */
+  --error-text: #FF6B7A;
+
   color-scheme: dark;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   background-color: var(--bg);
@@ -51,12 +59,12 @@ body {
   margin: 0;
   font-size: 2.5rem;
   letter-spacing: 0.06em;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .tagline {
   margin: 0.25rem 0 1.75rem;
-  color: var(--accent);
+  color: var(--accent-text);
   opacity: 0.7;
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -79,13 +87,13 @@ body {
 }
 
 .ok {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .warn {
-  color: var(--error);
+  color: var(--error-text);
 }
 .err {
-  color: var(--error);
+  color: var(--error-text);
 }
 .muted {
   color: var(--text);
@@ -98,7 +106,7 @@ body {
 
 code {
   background: rgba(232, 177, 78, 0.12);
-  color: var(--accent);
+  color: var(--accent-text);
   padding: 0.1em 0.35em;
   border-radius: 5px;
   font-size: 0.9em;
@@ -173,7 +181,7 @@ code {
 .chip:has(input:checked) {
   border-color: var(--accent);
   background: rgba(232, 177, 78, 0.14);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .chip input {
@@ -204,7 +212,7 @@ code {
 }
 
 .declare strong {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .btn-primary {
@@ -243,7 +251,7 @@ code {
   border: 1.5px solid rgba(232, 177, 78, 0.4);
   border-radius: 35px;
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -266,7 +274,7 @@ code {
   border: 0;
   padding: 0;
   margin-top: 1.25rem;
-  color: var(--accent);
+  color: var(--accent-text);
   cursor: pointer;
   font: inherit;
   text-decoration: underline;
@@ -597,7 +605,7 @@ body:has(.install-banner) .rooms-hint {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent);
+  color: var(--accent-text);
   opacity: 0.8;
 }
 
@@ -629,7 +637,7 @@ body:has(.install-banner) .rooms-hint {
   border: 1px solid rgba(236, 106, 85, 0.5);
   border-radius: 35px;
   background: none;
-  color: var(--error);
+  color: var(--error-text);
   font-weight: 600;
   cursor: pointer;
 }
@@ -785,7 +793,7 @@ body:has(.install-banner) .rooms-hint {
 .chip.sel {
   border-color: var(--accent);
   background: rgba(232, 177, 78, 0.14);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* Riga "aggiungi interesse libero" */
@@ -854,7 +862,7 @@ body:has(.install-banner) .rooms-hint {
 .ac-item:focus {
   outline: none;
   background: rgba(232, 177, 78, 0.14);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .ac-item .ac-sub {
@@ -1023,7 +1031,7 @@ body:has(.install-banner) .rooms-hint {
 }
 
 .photo-cell.primary .photo-star {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .photo-del:hover {
@@ -1163,11 +1171,11 @@ body:has(.install-banner) .rooms-hint {
 
 .stat-value {
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .stat-value.warn {
-  color: var(--error);
+  color: var(--error-text);
 }
 
 .mod-list {
@@ -1267,7 +1275,7 @@ body:has(.install-banner) .rooms-hint {
   font-size: 0.85rem;
   border: 1px solid rgba(232, 177, 78, 0.4);
   background: rgba(232, 177, 78, 0.1);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .report-card {
@@ -1278,6 +1286,9 @@ body:has(.install-banner) .rooms-hint {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  margin-top: 0.4rem;
+  background-color: rgba(23, 21, 32, 0.07);
+  
 }
 
 .report-head {
@@ -1289,7 +1300,7 @@ body:has(.install-banner) .rooms-hint {
 
 .report-type {
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .report-reason {
@@ -1362,13 +1373,20 @@ body:has(.install-banner) .rooms-hint {
 .msg-footer {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.25rem;
   margin-top: 2px;
 }
-.msg-report {
+.msg-report,
+.msg-reply {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -0.55rem 0;
   border: none;
   background: none;
-  padding: 0;
+  padding: 0.4rem 0.6rem;
   font-size: 0.72rem;
   line-height: 1;
   color: var(--text);
@@ -1377,21 +1395,11 @@ body:has(.install-banner) .rooms-hint {
 }
 .msg-report:hover {
   opacity: 0.9;
-  color: var(--error);
-}
-.msg-reply {
-  border: none;
-  background: none;
-  padding: 0;
-  font-size: 0.72rem;
-  line-height: 1;
-  color: var(--text);
-  opacity: 0.35;
-  cursor: pointer;
+  color: var(--error-text);
 }
 .msg-reply:hover {
   opacity: 0.9;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* --- Citazione di un messaggio (anteprima nella bolla e nel composer) --- */
@@ -1445,7 +1453,7 @@ body:has(.install-banner) .rooms-hint {
   flex-shrink: 0;
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
   opacity: 0.85;
 }
 .reply-bar .msg-quote {
@@ -1458,7 +1466,13 @@ body:has(.install-banner) .rooms-hint {
   opacity: 1;
 }
 .reply-bar-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -0.4rem -0.4rem -0.4rem 0;
   border: none;
   background: none;
   padding: 0.2rem;
@@ -1470,7 +1484,7 @@ body:has(.install-banner) .rooms-hint {
 }
 .reply-bar-cancel:hover {
   opacity: 0.9;
-  color: var(--error);
+  color: var(--error-text);
 }
 
 /* --- Menzione "@nickname" cliccabile nel testo del messaggio --- */
@@ -1481,7 +1495,7 @@ body:has(.install-banner) .rooms-hint {
   padding: 0;
   font: inherit;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
   cursor: pointer;
 }
 .mention:hover {
@@ -1515,7 +1529,7 @@ body:has(.install-banner) .rooms-hint {
 .msg-reaction-mine {
   border-color: var(--accent);
   background: rgba(232, 177, 78, 0.16);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .msg-reaction-count {
   font-size: 0.72rem;
@@ -1525,6 +1539,7 @@ body:has(.install-banner) .rooms-hint {
   position: relative;
 }
 .msg-reaction-add {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1539,9 +1554,21 @@ body:has(.install-banner) .rooms-hint {
   line-height: 1;
   cursor: pointer;
 }
+/* Area di tocco invisibile estesa a 44x44px senza alterare l'aspetto del cerchio.
+   Ancorata al bordo inferiore ed estesa solo verso l'alto/lati per non
+   sovrapporsi all'area di tocco di .msg-reply/.msg-report nella riga sottostante. */
+.msg-reaction-add::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translateX(-50%);
+}
 .msg-reaction-add:hover {
   opacity: 0.9;
-  color: var(--accent);
+  color: var(--accent-text);
   border-color: var(--accent);
 }
 .reaction-picker {
@@ -1699,7 +1726,7 @@ body:has(.install-banner) .rooms-hint {
 }
 .pf-icon-btn.danger:hover {
   border-color: var(--error);
-  color: var(--error);
+  color: var(--error-text);
 }
 
 .pf-hero {
@@ -1880,7 +1907,7 @@ body:has(.install-banner) .rooms-hint {
 .seg.on {
   border-color: var(--accent);
   background: rgba(232, 177, 78, 0.14);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .search-nick-form {
   display: flex;
@@ -1914,7 +1941,7 @@ body:has(.install-banner) .rooms-hint {
 .chip.on {
   border-color: var(--accent);
   background: rgba(232, 177, 78, 0.14);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .age-range {
   display: flex;
@@ -2028,7 +2055,7 @@ body:has(.install-banner) .rooms-hint {
   padding: 0.1rem 0.45rem;
   border-radius: 999px;
   background: rgba(232, 177, 78, 0.14);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .search-aff {
   font-size: 0.72rem;
@@ -2086,7 +2113,7 @@ button.dm-conv:hover {
   min-width: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .dm-conv-meta {
@@ -2150,9 +2177,9 @@ button.dm-conv:hover {
 .rep-label { margin: 0.15rem 0 0; font-size: 0.82rem; opacity: 0.8; }
 
 .rep-neutral { color: var(--text); }
-.rep-low     { color: var(--accent); }
+.rep-low     { color: var(--accent-text); }
 .rep-mid     { color: #e8914e; }
-.rep-high    { color: var(--error); }
+.rep-high    { color: var(--error-text); }
 
 .rep-add-form {
   display: flex;
@@ -2202,7 +2229,7 @@ button.dm-conv:hover {
 }
 
 .rep-event-type { font-size: 0.9rem; font-weight: 600; }
-.rep-active     { color: var(--error); }
+.rep-active     { color: var(--error-text); }
 .rep-expired    { color: var(--text); opacity: 0.5; }
 
 .rep-event-meta {
@@ -2219,7 +2246,7 @@ button.dm-conv:hover {
   font-weight: 600;
 }
 
-.rep-badge-active  { background: rgba(215, 38, 56, 0.18); color: var(--error); }
+.rep-badge-active  { background: rgba(215, 38, 56, 0.18); color: var(--error-text); }
 .rep-badge-expired { background: rgba(247, 239, 221, 0.08); color: var(--text); opacity: 0.6; }
 
 .rep-notes {
@@ -2232,7 +2259,7 @@ button.dm-conv:hover {
 
 .rep-annul {
   font-size: 0.75rem;
-  color: var(--accent);
+  color: var(--accent-text);
   opacity: 0.7;
   margin-top: 0.25rem;
   padding: 0;
@@ -2283,7 +2310,7 @@ button.dm-conv:hover {
   border-radius: 8px;
   padding: 0.6rem 0.8rem;
   font-size: 0.88rem;
-  color: var(--error);
+  color: var(--error-text);
   margin-bottom: 0.75rem;
 }
 
@@ -2320,7 +2347,7 @@ button.dm-conv:hover {
   transform: translate(-50%, -50%);
   font-size: 3.5rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   pointer-events: none;
 }
@@ -2410,6 +2437,12 @@ button.dm-conv:hover {
   --text:    #1a1626;
   --error:   #D72638;
   --success: #1f7a48;
+
+  /* Varianti per testo leggibile (vedi nota in :root). Nel tema chiaro
+     --accent e --error non bastano come colore del testo (contrasto < 4.5:1). */
+  --accent-text: #7A5510;
+  --error-text:  #B91C3C;
+
   color-scheme: light;
   background-color: var(--bg);
   color: var(--text);
@@ -2460,7 +2493,7 @@ button.dm-conv:hover {
 [data-theme="light"] .chip.sel {
   background: rgba(154, 106, 0, 0.18);
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* ── Theme toggle pill ────────────────────────────────── */
@@ -2660,7 +2693,7 @@ button.dm-conv:hover {
   outline-color: var(--error);
 }
 .limit-warning {
-  color: var(--error);
+  color: var(--error-text);
   font-size: 0.8rem;
   font-weight: 600;
 }

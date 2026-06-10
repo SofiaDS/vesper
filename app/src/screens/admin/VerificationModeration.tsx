@@ -70,7 +70,7 @@ export function VerificationModeration() {
 
   return (
     <div className="mod-list">
-      {err && <p className="err">{err}</p>}
+      {err && <p className="err" role="alert">{err}</p>}
 
       {items.length === 0 ? (
         <p className="hint">Nessuna verifica in attesa.</p>
