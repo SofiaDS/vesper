@@ -221,7 +221,9 @@ Le scelte tecniche seguono questi principi, in ordine di priorità:
   - **Cloudflare Email Routing**: gratis e illimitato, ma solo forwarding (non si può inviare da bug@dominio direttamente). Inadatto a casella legale/GDPR.
   - **ProtonMail Free**: una sola casella, no custom domain nel free tier.
   - **Google Workspace / Microsoft 365**: ~€6/mese per casella, overkill in v1.
-- **Da decidere ancora**: per email "applicative" inviate dal backend (es. notifica esito appello automatica, comunicazioni community) — si usa Supabase, o un servizio dedicato tipo Resend/SendGrid/Mailgun? Le caselle Zoho sono per email "umane" (lette e scritte dai founder), non per invio massivo programmatico dal codice.
+- **Email applicative (invii programmatici dal backend)**: ✅ Decisione presa il 10 giugno 2026: **Brevo** (provider EU/Francia, free tier 300 email/giorno ≈ 9.000/mese, GDPR-friendly, API REST + SMTP). Le caselle Zoho restano per email "umane" (lette e scritte dai founder); Brevo è per invii automatici (es. notifica esito appello, comunicazioni community).
+  - **Setup**: account Brevo creato (mittente di default: `giftgenius.ad@gmail.com`, già verificato automaticamente da Brevo). API key transazionale generata con **scadenza a 1 anno** (anziché i 90 giorni di inattività di default) — da rinnovare entro giugno 2027. Secret `BREVO_API_KEY` e `BREVO_SENDER_EMAIL` impostati nel progetto Supabase e invio di test riuscito il 10 giugno 2026. La verifica del dominio mittente (record DNS SPF/DKIM) è **rimandata** alla scelta del nome/dominio definitivo (vedi `branding.md` sez. 4 — "Vesper" scartato il 10 giugno 2026, serve nuovo nome). Nel frattempo si usa il sender di default Brevo per sviluppo e integrazione.
+  - Collegata a T9 (allowlist redirect Supabase): entrambe da completare quando si fissa il dominio definitivo.
 
 **T2. Liveness detection per il selfie video**
 
