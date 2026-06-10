@@ -103,7 +103,7 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
     {
       heading: 'Regole della community',
       paragraphs: [
-        'Sono vietati: molestie sessuali e contenuti non richiesti, hate speech (transfobia, bifobia, razzismo, abilismo e simili), minacce, doxxing e condivisione di informazioni private altrui, spam commerciale o link sospetti, account falsi o automatizzati, e qualsiasi contenuto illegale.',
+        'Sono vietati: molestie sessuali e contenuti non richiesti, hate speech (omofobia, transfobia, bifobia, razzismo, abilismo e simili), minacce, doxxing e condivisione di informazioni private altrui, spam commerciale o link sospetti, account falsi o automatizzati, e qualsiasi contenuto illegale.',
         'Linguaggio aggressivo o offensivo nelle discussioni e altre violazioni minori possono dare luogo ad avvisi o sospensioni temporanee (mute), in base alla gravità.',
         'Ogni utente può segnalare messaggi, profili o comportamenti scorretti tramite le funzioni di segnalazione presenti nell\'app. Le segnalazioni vengono esaminate dal team di moderazione, che può applicare avvisi, mute temporanei o ban in base alla gravità della violazione.',
         'In caso di ban, l\'utente ha diritto di presentare appello secondo le modalità indicate nell\'app al momento della sospensione.',

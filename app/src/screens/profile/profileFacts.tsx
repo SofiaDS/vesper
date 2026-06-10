@@ -12,6 +12,7 @@ import {
   DIET_OPTIONS,
   RELIGION_OPTIONS,
   POLITICS_OPTIONS,
+  EDUCATION_OPTIONS,
   INTENT_OPTIONS,
 } from '../../constants/options'
 import {
@@ -35,6 +36,7 @@ import type {
   Diet,
   Religion,
   Politics,
+  EducationLevel,
   Smoking,
   Sport,
   Zodiac,
@@ -56,6 +58,8 @@ export interface ProfileFacts {
   diet: Diet | null
   religion: Religion | null
   politics: Politics | null
+  education_level: EducationLevel | null
+  education_institute: string | null
   smoking: Smoking | null
   sport: Sport | null
   zodiac: Zodiac | null
@@ -115,6 +119,13 @@ export function buildProfileRows(f: ProfileFacts): React.ReactNode[] {
     rows.push(<ProfileRow key="rel2" label="Religione & credo">{labelOf(RELIGION_OPTIONS, f.religion)}</ProfileRow>)
   if (f.politics)
     rows.push(<ProfileRow key="pol" label="Orientamento politico">{labelOf(POLITICS_OPTIONS, f.politics)}</ProfileRow>)
+  if (f.education_level && f.education_level !== 'preferisco_non_specificare')
+    rows.push(
+      <ProfileRow key="edu" label="Formazione">
+        {labelOf(EDUCATION_OPTIONS, f.education_level)}
+        {f.education_institute ? ` — ${f.education_institute}` : ''}
+      </ProfileRow>,
+    )
   if (f.smoking)
     rows.push(<ProfileRow key="sm" label="Fumo">{SMOKING_LABELS[f.smoking]}</ProfileRow>)
   if (f.sport)

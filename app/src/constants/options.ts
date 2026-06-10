@@ -9,6 +9,7 @@ import type {
   Diet,
   Religion,
   Politics,
+  EducationLevel,
   Smoking,
   Sport,
   DmFilter,
@@ -120,6 +121,21 @@ export const POLITICS_OPTIONS: { value: Politics; label: string }[] = [
   { value: 'anarchica', label: 'Anarchicə' },
   { value: 'socialista', label: 'Socialista' },
   { value: 'comunista', label: 'Comunista' },
+  { value: 'altro', label: 'Altro' },
+]
+
+export const EDUCATION_OPTIONS: { value: EducationLevel; label: string }[] = [
+  { value: 'preferisco_non_specificare', label: 'Preferisco non specificare' },
+  { value: 'licenza_media', label: 'Licenza di scuola secondaria di primo grado (Licenza media)' },
+  { value: 'diploma', label: 'Diploma di istruzione secondaria di secondo grado' },
+  { value: 'qualifica_professionale', label: 'Qualifica di formazione professionale' },
+  { value: 'its', label: 'Diploma tecnico superiore (ITS)' },
+  { value: 'laurea_triennale', label: 'Laurea triennale' },
+  { value: 'laurea_magistrale', label: 'Laurea magistrale / Vecchio ordinamento' },
+  { value: 'master', label: 'Master post-laurea' },
+  { value: 'dottorato', label: 'Dottorato di ricerca (PhD)' },
+  { value: 'accademia', label: 'Percorso di studi artistici / Accademia' },
+  { value: 'autodidatta', label: 'Autodidatta / Formazione sul campo' },
   { value: 'altro', label: 'Altro' },
 ]
 
