@@ -9,6 +9,7 @@ export type {
   Diet,
   Religion,
   Politics,
+  EducationLevel,
   Smoking,
   Sport,
   DmFilter,
