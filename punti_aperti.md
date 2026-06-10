@@ -16,11 +16,11 @@ Ultimo aggiornamento: 4 giugno 2026 (aggiunto T9 — allowlist redirect Supabase
 
 ## Priorità ALTA (bloccanti per architettura o lancio)
 
-### A. Moderazione chatroom — punti residui
+### A. Moderazione chatroom — ✅ COMPLETA
 
-✅ Pilastri decisi (vedi [`moderazione.md`](./moderazione.md)). Resta da definire:
+Tutti i punti decisi (vedi [`moderazione.md`](./moderazione.md)):
 
-- **SLA esatti di risposta per segnalazioni gravi** (target <2h?)
+- ~~**SLA esatti di risposta per segnalazioni gravi**~~ ✅ Deciso il 10 giugno 2026: <8h in ore attive (8:00-24:00), <24h overnight; "sospetto minorenne" sempre priorità massima (vedi `moderazione.md` sezione 3).
 - ~~**Revisione del filtro AI** dopo 1-2 mesi di dati reali (passaggio a hard mode selettiva o no)~~ ✅ Processo definito il 20 maggio 2026 (vedi `moderazione.md` sezione 6.1). Resta l'esecuzione al raggiungimento del trigger.
 
 ### B. Struttura della chatroom — scelta finale
@@ -65,17 +65,17 @@ Da definire quando l'app sarà cresciuta e queste feature avranno senso:
 
 ### Branding — logo e nome
 
-Pilastri decisi (vedi [`branding.md`](./branding.md)): palette **"Inchiostro & oro"** scelta, nome **Vesper** candidato forte. Resta da definire:
+Pilastri decisi (vedi [`branding.md`](./branding.md)): palette **"Inchiostro & oro"** scelta. Resta da definire:
 
-- **Logo**: non ancora deciso. Le proposte AI sono state scartate. Prossimo passo: sviluppare il **brief strutturato** (aggettivi guida + lista "no" + vincoli tecnici) prima di nuove proposte.
-- **Conferma nome "Vesper"**: subordinata alle verifiche di disponibilità — marchio UIBM/EUIPO (classe app/social), App Store, Play Store, dominio `.it`/`.com`, social handle.
+- ❌ **Nome "Vesper" SCARTATO** (10 giugno 2026): `vesper.it` già registrato, `vesper.com` disponibile solo a prezzo molto elevato. Serve **trovare un nuovo nome candidato** e ripetere le verifiche (dominio per primo, poi marchio UIBM/EUIPO, App Store, Play Store, social handle) — vedi `branding.md` sezione 4. Fino alla scelta del sostituto, "Vesper" resta nome di lavoro nel codice/documentazione.
+- **Logo**: non ancora deciso. Le proposte AI sono state scartate. Prossimo passo: sviluppare il **brief strutturato** (aggettivi guida + lista "no" + vincoli tecnici) prima di nuove proposte — da allineare comunque al nuovo nome una volta scelto.
 - **Tonalità di stato e accessibilità**: definire scale di stato (success/warning/error) e verificare i contrasti AA/AAA della palette in fase di wireframe.
 
 ### Punti tecnici da decidere
 
 Vedi [`stack_tecnico.md`](./stack_tecnico.md) per i dettagli completi:
 
-- **T1**: Email applicative per invii programmatici dal backend (Resend/SendGrid/Mailgun/AWS SES) — le caselle umane sono già decise (Zoho Mail Free, vedi punto 10 di `stack_tecnico.md`)
+- ~~**T1**: Email applicative per invii programmatici dal backend~~ ✅ Decisione presa il 10 giugno 2026: **Brevo** (provider EU/Francia, free tier 300 email/giorno, GDPR-friendly) — le caselle umane restano su Zoho Mail Free (vedi punto 10 di `stack_tecnico.md`). Verifica del dominio mittente rimandata a quando sarà scelto il nome/dominio definitivo (collegata al punto sopra e a T9); nel frattempo si usa il sender di test/sandbox di Brevo.
 - ~~**T2**: Liveness detection per il selfie video — libreria specifica~~ ✅ Decisione presa il 20 maggio 2026: `expo-camera` + revisione manuale (vedi punto 11 di `stack_tecnico.md`)
 - **T3**: Monitoraggio errori e crash reporting — direzione provvisoria **Sentry**, da confermare in Tappa 4 (preparazione lancio store)
 - ~~**T4**: CI/CD (Expo Application Services o GitHub Actions)~~ ✅ Decisione presa il 20 maggio 2026: EAS per build nativi + GitHub Actions per CI codice (vedi punto 12 di `stack_tecnico.md`)

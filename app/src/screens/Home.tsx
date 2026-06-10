@@ -17,7 +17,8 @@ import { DmScreen } from './DmScreen'
 import { LegalScreen, LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
 import { openSupportEmail } from '../lib/support'
 
-const PAYPAL_URL = 'https://paypal.me/vesperapp'
+// TODO(P30): sostituire con il link definitivo (Ko-fi / Liberapay / PayPal) quando disponibile.
+const SUPPORT_URL = 'https://www.example.com'
 
 // Shell post-login: gestisce la navigazione fra lobby, chat, profilo e moderazione.
 // Nessun router esterno: basta uno stato locale, raccolto nel burger menu fisso.
@@ -129,11 +130,12 @@ export function Home() {
         }]
       : []),
     { label: 'Impostazioni', onClick: () => openScreen(() => setShowSettings(true)), active: showSettings },
+    { label: LEGAL_DOC_LABELS.about, onClick: () => openLegal('about'), active: legalDoc === 'about' },
     { label: LEGAL_DOC_LABELS.privacy, onClick: () => openLegal('privacy'), active: legalDoc === 'privacy' },
     { label: LEGAL_DOC_LABELS.terms, onClick: () => openLegal('terms'), active: legalDoc === 'terms' },
     { label: 'Segnala un bug', onClick: () => openSupportEmail({ type: 'bug', screen: currentScreenLabel, userId: myId }) },
     { label: 'Dacci un suggerimento', onClick: () => openSupportEmail({ type: 'feedback', screen: currentScreenLabel, userId: myId }) },
-    { label: 'Sostieni Vesper ↗', onClick: () => window.open(PAYPAL_URL, '_blank', 'noopener,noreferrer') },
+    { label: 'Sostieni Vesper ↗', onClick: () => window.open(SUPPORT_URL, '_blank', 'noopener,noreferrer') },
   ]
 
   // Quante "schermate" sono aperte una sull'altra in questo momento (es.
@@ -150,7 +152,7 @@ export function Home() {
     screen = <AdminScreen tab={adminTab} onBack={goBack} />
   } else if (showSettings) {
     goBack = () => setShowSettings(false)
-    screen = <SettingsScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} />
+    screen = <SettingsScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} onOpenLegal={openLegal} />
   } else if (legalDoc) {
     goBack = () => setLegalDoc(null)
     screen = <LegalScreen doc={legalDoc} onBack={goBack} />

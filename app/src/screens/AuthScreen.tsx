@@ -9,6 +9,7 @@ export function AuthScreen() {
   const [declared, setDeclared] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
@@ -30,6 +31,11 @@ export function AuthScreen() {
       const pwError = validatePassword(password)
       if (pwError) {
         setError(pwError)
+        setBusy(false)
+        return
+      }
+      if (password !== confirmPassword) {
+        setError('Le password non coincidono.')
         setBusy(false)
         return
       }
@@ -72,8 +78,11 @@ export function AuthScreen() {
   if (mode === 'declare') {
     return (
       <main className="app">
-        <header className="brand"><h1>Vesper</h1><p className="tagline">{tagline}</p></header>
-        <section className="card">
+        <header className="brand">
+          <h1>Vesper</h1>
+          <p className="tagline">{tagline}</p>
+        </header>
+        <section className="card box-shadow">
           <p>
             Vesper è uno spazio dedicato alla community lesbica, bisessuale e queer femminile.
           </p>
@@ -97,17 +106,15 @@ export function AuthScreen() {
           </label>
           <button
             type="button"
-            className="btn-primary"
+            className="btn-primary btn-wide"
             disabled={!declared}
             onClick={() => switchMode('signup')}
           >
             Continua
           </button>
-          <p className="switch">
-            <button type="button" className="link" onClick={() => switchMode('login')}>
-              Torna ad accedere
-            </button>
-          </p>
+          <button type="button" className="btn-secondary" onClick={() => switchMode('login')}>
+            Torna ad accedere
+          </button>
         </section>
       </main>
     )
@@ -120,7 +127,7 @@ export function AuthScreen() {
         <p className="tagline">{tagline}</p>
       </header>
 
-      <section className="card">
+      <section className="card box-shadow">
         <form onSubmit={handleSubmit} className="form">
           <label className="field">
             <span>Email</span>
@@ -156,6 +163,20 @@ export function AuthScreen() {
             </label>
           )}
 
+          {mode === 'signup' && (
+            <label className="field">
+              <span>Conferma password</span>
+              <input
+                type="password"
+                autoComplete="new-password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="ripeti la password"
+              />
+            </label>
+          )}
+
           {mode === 'login' && (
             <button type="button" className="link forgot" onClick={() => switchMode('reset')}>
               Password dimenticata?
@@ -183,15 +204,15 @@ export function AuthScreen() {
               Torna ad accedere
             </button>
           </p>
+        ) : mode === 'login' ? (
+          <button type="button" className="btn-secondary" onClick={() => switchMode('declare')}>
+            Registrati
+          </button>
         ) : (
           <p className="switch">
-            {mode === 'login' ? 'Non hai un account?' : 'Hai già un account?'}{' '}
-            <button
-              type="button"
-              className="link"
-              onClick={() => switchMode(mode === 'login' ? 'declare' : 'login')}
-            >
-              {mode === 'login' ? 'Registrati' : 'Accedi'}
+            Hai già un account?{' '}
+            <button type="button" className="link" onClick={() => switchMode('login')}>
+              Accedi
             </button>
           </p>
         )}

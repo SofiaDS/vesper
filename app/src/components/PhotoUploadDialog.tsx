@@ -253,12 +253,14 @@ export function PhotoUploadDialog({
               <button
                 type="button"
                 className="btn-ghost"
+                aria-label="Indietro"
+                title="Indietro"
                 onClick={() => {
                   stopStream()
                   setStage('choose')
                 }}
               >
-                Indietro
+                ‹
               </button>
               <button type="button" className="btn-primary" onClick={capture}>
                 Scatta
@@ -296,13 +298,15 @@ export function PhotoUploadDialog({
               <button
                 type="button"
                 className="btn-ghost"
+                aria-label="Indietro"
+                title="Indietro"
                 onClick={() => {
                   setImg(null)
                   setStage('choose')
                 }}
                 disabled={busy}
               >
-                Indietro
+                ‹
               </button>
               <button
                 type="button"

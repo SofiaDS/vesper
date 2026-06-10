@@ -71,6 +71,14 @@ Vedi anche:
 
 - Critiche all'app o ai fondatori (sono opinioni legittime, vanno gestite con risposta pubblica, mai con censura).
 
+### SLA di revisione per le categorie "Gravi" — ✅ deciso 10 giugno 2026
+
+- **Segnalazione arrivata in "ore attive" (8:00-24:00)**: revisione entro **8 ore**.
+- **Segnalazione arrivata di notte (00:00-8:00)**: revisione entro la giornata successiva, **massimo 24 ore**.
+- **"Sospetto minorenne"**: priorità massima sempre, da trattare per primo indipendentemente dall'orario di arrivo (procedura specifica in [`minori_e_eta.md`](./minori_e_eta.md)).
+- Questo SLA è più stretto del trigger generale di 8h sul tempo medio di risposta complessivo (sezione 2), che resta il segnale per passare ai moderatori volontari.
+- Realistico per i 2 fondatori in fase iniziale, senza reperibilità notturna strutturata. Da rivedere con i dati reali insieme alle altre calibrazioni post-lancio (3 mesi).
+
 ---
 
 ## 4. Flusso di segnalazione (UX utente)
@@ -132,6 +140,7 @@ Questa è la categoria più delicata perché un falso positivo (bannare per erro
 - Mantenere tutto in soft mode (se i falsi positivi sono troppi).
 - Passare ad "hard mode selettiva": blocco automatico solo per categorie ad alta confidenza (es. "violence", "sexual/minors", "self-harm"), il resto resta in soft.
 - Calibrare le soglie di confidenza dell'API per ridurre falsi positivi.
+- **Censura visiva dei messaggi flaggati** (placeholder con emoji, es. 🌈/❤️, al posto del testo nei client finché un moderatore non revisiona): idea emersa il 10 giugno 2026, da valutare con cautela per il rischio di censurare in chat reale termini riappropriati dalla community (vedi sopra) — non da introdurre al day-one.
 
 **Nota importante**: questa configurazione è da considerare come **approccio iniziale di partenza**, non come scelta definitiva. Va rivista dopo il primo mese di lancio sulla base dei dati reali raccolti.
 
@@ -205,5 +214,5 @@ La revisione del filtro AI non è un evento "una tantum" dopo il lancio, ma un p
 
 ## Punti aperti sulla moderazione
 
-- **SLA esatti di risposta per segnalazioni gravi** (target <2h?). Vedi [`punti_aperti.md`](./punti_aperti.md).
+- ~~**SLA esatti di risposta per segnalazioni gravi**~~ ✅ Deciso il 10 giugno 2026 (vedi sezione 3, "SLA di revisione per le categorie Gravi").
 - ~~**Revisione del filtro AI** dopo 1-2 mesi di dati reali (passaggio a hard mode selettiva o no).~~ ✅ Processo definito il 20 maggio 2026 (vedi sezione 6.1). Resta l'esecuzione al raggiungimento del trigger.

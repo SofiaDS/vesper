@@ -1,5 +1,6 @@
 import type {
   IdentityCategory,
+  Language,
   Orientation,
   Smoking,
   Sport,
@@ -31,6 +32,22 @@ export const ORIENTATION_LABELS: Record<Orientation, string> = {
   non_etichettata: 'Non etichettatə',
   altro: 'Altro',
   preferisco_non_dire: 'Preferisco non dire',
+}
+
+export const LANGUAGE_LABELS: Record<Language, string> = {
+  italiano: 'Italiano',
+  inglese: 'Inglese',
+  francese: 'Francese',
+  spagnolo: 'Spagnolo',
+  tedesco: 'Tedesco',
+  portoghese: 'Portoghese',
+  arabo: 'Arabo',
+  cinese: 'Cinese',
+  russo: 'Russo',
+  rumeno: 'Rumeno',
+  hindi: 'Hindi',
+  lis: 'Lingua dei segni italiana (LIS)',
+  altro: 'Altra lingua',
 }
 
 export const SMOKING_LABELS: Record<Smoking, string> = {

@@ -15,8 +15,8 @@ P34. Pagina Informativa Privacy in-app
     - Può essere una screen statica con WebView o testo formattato
 
 P35. Pagina Termini di Servizio in-app
-    - gdpr_e_legale.md §3: TOS con clausola "chi può iscriversi", età 18+, regole community, GDPR
-    - Stessa struttura: screen statica accessibile da Impostazioni e al primo login
+    → già implementato: LegalScreen 'terms' con clausole chi può iscriversi, età 18+,
+      regole community, trattamento dati e comportamento utente (gdpr_e_legale.md §3).
 
 DONE
 P36. Dichiarazione appartenenza community al primo accesso

@@ -20,7 +20,7 @@ Ultimo aggiornamento: 4 giugno 2026
 - Connotazione liturgica del termine "vespro".
 - Riferimento a **Vesper Lynd** (James Bond) — potenziale associazione cocktail/spy non in linea con il target.
 
-**Stato**: candidato forte, **non ancora confermato**. Confermabile solo dopo le verifiche di disponibilità (vedi sezione 4).
+**Stato**: ❌ **scartato il 10 giugno 2026** — verifica dominio fallita: `vesper.it` già registrato, `vesper.com` disponibile solo a prezzo molto elevato (aftermarket). Da riaprire la ricerca del nome pubblico (vedi sezione 4).
 
 ---
 
@@ -62,14 +62,18 @@ I logo proposti via AI sono stati **rifiutati**.
 
 ---
 
-## 4. Verifiche di disponibilità — DA FARE (legate al nome)
+## 4. Verifiche di disponibilità — "Vesper" SCARTATO, serve nuovo nome
 
-Prima di confermare "Vesper" come nome pubblico, verificare:
+**10 giugno 2026**: verificato che `vesper.it` è già registrato (dal 1996, gestione attiva) e `vesper.com` è disponibile solo in aftermarket a prezzo molto elevato. "Vesper" è quindi **scartato come nome pubblico**.
 
+**Prossimo passo**: trovare un nuovo candidato e ripetere le verifiche di disponibilità prima di confermarlo:
+
+- **Dominio** (`.it` primario + `.com` difensivo) — verificare per primo, è il check più rapido ed economico ed è quello che ha bocciato "Vesper".
 - **Marchio**: UIBM (Italia) ed EUIPO (UE) nelle classi rilevanti (app / social / servizi di community online).
 - **App Store** (Apple) e **Play Store** (Google): disponibilità del nome.
-- **Dominio**: `.it` (primario) e `.com` (difensivo) — vedi `stack_tecnico.md` per la strategia domini.
 - **Social handle**: disponibilità del nome sui principali social.
+
+Nota: il nome "Vesper" continua ad essere usato in questo documento e nel codice/documentazione come nome di lavoro fino a quando non verrà scelto un sostituto.
 
 ---
 
