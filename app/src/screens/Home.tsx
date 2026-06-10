@@ -129,6 +129,7 @@ export function Home() {
         }]
       : []),
     { label: 'Impostazioni', onClick: () => openScreen(() => setShowSettings(true)), active: showSettings },
+    { label: LEGAL_DOC_LABELS.about, onClick: () => openLegal('about'), active: legalDoc === 'about' },
     { label: LEGAL_DOC_LABELS.privacy, onClick: () => openLegal('privacy'), active: legalDoc === 'privacy' },
     { label: LEGAL_DOC_LABELS.terms, onClick: () => openLegal('terms'), active: legalDoc === 'terms' },
     { label: 'Segnala un bug', onClick: () => openSupportEmail({ type: 'bug', screen: currentScreenLabel, userId: myId }) },
