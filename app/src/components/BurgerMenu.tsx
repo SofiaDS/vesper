@@ -87,7 +87,7 @@ export function BurgerMenu({
         className={`burger-panel${open ? ' open' : ''}`}
         aria-hidden={!open}
         tabIndex={-1}
-        inert={!open ? '' : undefined}
+        inert={!open ? true : undefined}
       >
         <div className="burger-items">
           {items.map((item) => (
