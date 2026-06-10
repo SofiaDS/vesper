@@ -16,11 +16,11 @@ Ultimo aggiornamento: 4 giugno 2026 (aggiunto T9 — allowlist redirect Supabase
 
 ## Priorità ALTA (bloccanti per architettura o lancio)
 
-### A. Moderazione chatroom — punti residui
+### A. Moderazione chatroom — ✅ COMPLETA
 
-✅ Pilastri decisi (vedi [`moderazione.md`](./moderazione.md)). Resta da definire:
+Tutti i punti decisi (vedi [`moderazione.md`](./moderazione.md)):
 
-- **SLA esatti di risposta per segnalazioni gravi** (target <2h?)
+- ~~**SLA esatti di risposta per segnalazioni gravi**~~ ✅ Deciso il 10 giugno 2026: <8h in ore attive (8:00-24:00), <24h overnight; "sospetto minorenne" sempre priorità massima (vedi `moderazione.md` sezione 3).
 - ~~**Revisione del filtro AI** dopo 1-2 mesi di dati reali (passaggio a hard mode selettiva o no)~~ ✅ Processo definito il 20 maggio 2026 (vedi `moderazione.md` sezione 6.1). Resta l'esecuzione al raggiungimento del trigger.
 
 ### B. Struttura della chatroom — scelta finale
