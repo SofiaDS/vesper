@@ -12,6 +12,7 @@ const BLOCKLIST: string[] = [
   'lesbica di merda',
   'trans di merda',
   'culattone',
+  'figl di puttan',
 ]
 
 export function containsBlockedTerm(text: string): boolean {
