@@ -14,7 +14,10 @@ export const MAX_TEMATICHE = 3
 
 // Set fisso di emoji selezionabili come reazione a un messaggio
 // (chat di gruppo e DM — vedi message_reactions/dm_message_reactions).
-export const REACTION_EMOJIS = ['❤️', '😂', '👍', '😮', '😢', '🙏'] as const
+export const REACTION_EMOJIS = [
+  '❤️', '😂', '👍', '😮', '😢', '🙏',
+  '🔥', '🎉', '😍', '💜', '🏳️‍🌈', '🏳️‍⚧️',
+] as const
 
 export const INTEREST_CATEGORIES = [
   {

@@ -116,6 +116,32 @@ export async function getDmMessages(
   return ((data ?? []) as DmMessage[]).reverse()
 }
 
+// Trova la conversazione DM (in qualunque stato) tra l'utente corrente e
+// un'altra persona, se esiste.
+export async function findDmConversation(
+  userId: string,
+  otherUserId: string,
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('dm_conversations')
+    .select('id')
+    .or(
+      `and(from_user_id.eq.${userId},to_user_id.eq.${otherUserId}),and(from_user_id.eq.${otherUserId},to_user_id.eq.${userId})`,
+    )
+    .maybeSingle()
+  if (error) throw error
+  return (data as { id: string } | null)?.id ?? null
+}
+
+// Cancella una conversazione DM (e i suoi messaggi, in cascata) per entrambe.
+export async function deleteDmConversation(conversationId: string): Promise<void> {
+  const { error } = await supabase
+    .from('dm_conversations')
+    .delete()
+    .eq('id', conversationId)
+  if (error) throw error
+}
+
 export async function countPendingDmRequests(userId: string): Promise<number> {
   const { count, error } = await supabase
     .from('dm_conversations')

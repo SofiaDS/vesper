@@ -195,23 +195,25 @@ function ConversationView({
                   )}
                   <span className="msg-body">{m.body}</span>
                 </div>
-                <MessageReactions
-                  reactions={reactions.forMessage(m.id)}
-                  myId={myId}
-                  onToggle={(emoji) => reactions.toggle(m.id, emoji)}
-                />
-                <span className="msg-footer">
-                  <span className="msg-time">{formatTime(m.created_at)}</span>
-                  <button
-                    type="button"
-                    className="msg-reply"
-                    title="Rispondi citando"
-                    aria-label="Rispondi citando"
-                    onClick={() => setReplyTo(m)}
-                  >
-                    ↩
-                  </button>
-                </span>
+                <div className="msg-meta">
+                  <MessageReactions
+                    reactions={reactions.forMessage(m.id)}
+                    myId={myId}
+                    onToggle={(emoji) => reactions.toggle(m.id, emoji)}
+                  />
+                  <span className="msg-footer">
+                    <span className="msg-time">{formatTime(m.created_at)}</span>
+                    <button
+                      type="button"
+                      className="msg-reply"
+                      title="Rispondi citando"
+                      aria-label="Rispondi citando"
+                      onClick={() => setReplyTo(m)}
+                    >
+                      ↩
+                    </button>
+                  </span>
+                </div>
               </div>
             </div>
           )
