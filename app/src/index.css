@@ -69,6 +69,7 @@ body {
   width: 100%;
   max-width: 420px;
   min-width: 0;
+  margin: 0 auto;
   padding-top: 0.5rem;
   text-align: center;
 }
@@ -307,13 +308,15 @@ code {
 
 /* --- Chat (Foyer) --- */
 .chat {
-width: calc(100dvw - 1.5rem);
-/* max-width: 100vw; */
-height: calc(100dvh - 3rem);
-padding-top: 0.5rem;
-display: flex;
-flex-direction: column;
-text-align: left;
+  width: 100%;
+  max-width: 420px;
+  min-width: 0;
+  margin: 0 auto;
+  height: calc(100dvh - 3rem - 2.5rem);
+  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
 }
 
 .small-inline {
@@ -325,10 +328,26 @@ text-align: left;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 1rem 0;
+  padding: 1rem 0.6rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232, 177, 78, 0.3) transparent;
+}
+.messages::-webkit-scrollbar {
+  width: 6px;
+}
+.messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+.messages::-webkit-scrollbar-thumb {
+  background-color: rgba(232, 177, 78, 0.3);
+  border-radius: 999px;
+}
+.messages::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(232, 177, 78, 0.5);
 }
 
 .msg-row {
@@ -1409,11 +1428,25 @@ body:has(.install-banner) .rooms-hint {
   text-decoration: underline;
   opacity: 0.9;
 }
+/* Riga unica con reazioni (a sx) e azioni rispondi/reagisci/segnala (a dx) */
+.msg-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 3px;
+}
+.msg-row-mine .msg-meta {
+  justify-content: flex-end;
+}
 .msg-footer {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  margin-top: 2px;
+  margin-left: auto;
+}
+.msg-row-mine .msg-footer {
+  margin-left: 0;
 }
 .msg-report,
 .msg-reply {
@@ -1426,10 +1459,10 @@ body:has(.install-banner) .rooms-hint {
   border: none;
   background: none;
   padding: 0.4rem 0.6rem;
-  font-size: 0.72rem;
+  font-size: 1rem;
   line-height: 1;
   color: var(--text);
-  opacity: 0.35;
+  opacity: 0.6;
   cursor: pointer;
 }
 .msg-report:hover {
@@ -1547,7 +1580,6 @@ body:has(.install-banner) .rooms-hint {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.3rem;
-  margin-top: 3px;
 }
 .msg-reaction {
   display: inline-flex;
@@ -1582,14 +1614,14 @@ body:has(.install-banner) .rooms-hint {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.7rem;
+  height: 1.7rem;
   border-radius: 999px;
-  border: 1px dashed rgba(232, 177, 78, 0.3);
+  border: 1px dashed rgba(232, 177, 78, 0.5);
   background: none;
   color: var(--text);
-  opacity: 0.45;
-  font-size: 0.85rem;
+  opacity: 0.7;
+  font-size: 1.05rem;
   line-height: 1;
   cursor: pointer;
 }
@@ -1601,7 +1633,7 @@ body:has(.install-banner) .rooms-hint {
   position: absolute;
   bottom: 0;
   left: 50%;
-  width: 44px;
+  width: 32px;
   height: 44px;
   transform: translateX(-50%);
 }
@@ -1615,16 +1647,24 @@ body:has(.install-banner) .rooms-hint {
   z-index: 20;
   bottom: calc(100% + 4px);
   left: 0;
+  width: min(240px, calc(100vw - 4rem));
   display: flex;
+  flex-wrap: wrap;
   gap: 0.2rem;
   margin: 0;
   padding: 0.3rem;
   list-style: none;
-  border-radius: 999px;
+  border-radius: 14px;
   border: 1px solid rgba(232, 177, 78, 0.3);
-  background: #1e1b29;
+  background: var(--surface);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
-  white-space: nowrap;
+}
+/* Nelle righe dei messaggi propri (allineate a destra), il wrapper è
+   posizionato verso il bordo destro: ancora il picker a destra invece
+   che a sinistra per evitare che esca dal viewport. */
+.msg-row-mine .reaction-picker {
+  left: auto;
+  right: 0;
 }
 .reaction-picker-item {
   border: 0;
@@ -1670,6 +1710,18 @@ body:has(.install-banner) .rooms-hint {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 16px;
+}
+
+/* Variante a colonna per dialoghi con più azioni testuali (es. conferma blocco) */
+.modal-actions-col {
+  flex-direction: column;
+  align-items: stretch;
+}
+.modal-actions-col .btn-secondary,
+.modal-actions-col .btn-danger,
+.modal-actions-col .btn-ghost {
+  width: 100%;
+  text-align: center;
 }
 
 /* --- Form di segnalazione --- */

@@ -7,6 +7,7 @@ type Mode = 'login' | 'signup' | 'reset' | 'declare'
 export function AuthScreen() {
   const [mode, setMode] = useState<Mode>('login')
   const [declared, setDeclared] = useState(false)
+  const [acceptedConduct, setAcceptedConduct] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -18,7 +19,10 @@ export function AuthScreen() {
     setMode(next)
     setError(null)
     setInfo(null)
-    if (next !== 'declare') setDeclared(false)
+    if (next !== 'declare') {
+      setDeclared(false)
+      setAcceptedConduct(false)
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -104,10 +108,22 @@ export function AuthScreen() {
               dall'app.
             </span>
           </label>
+          <label className="declare">
+            <input
+              type="checkbox"
+              checked={acceptedConduct}
+              onChange={(e) => setAcceptedConduct(e.target.checked)}
+            />
+            <span>
+              La nostra community è uno spazio sicuro. Linguaggi d'odio, misoginia e omofobia non
+              sono tollerati. Il sistema di moderazione è attivo e l'uso ripetuto di toni ostili
+              porterà alla sospensione dell'account.
+            </span>
+          </label>
           <button
             type="button"
             className="btn-primary btn-wide"
-            disabled={!declared}
+            disabled={!declared || !acceptedConduct}
             onClick={() => switchMode('signup')}
           >
             Continua

@@ -42,7 +42,7 @@ export function ChatScreen({
   const bottomRef = useRef<HTMLDivElement>(null)
   const myId = session?.user.id
 
-  const members = useChatMembers(room.id, room.kind)
+  const members = useChatMembers(room.id)
   const reactions = useMessageReactions({ scope: 'room', scopeId: room.id, myId })
 
   const { blockedIds, nicknameCache, avatarCache, loadBlockedIds, cacheNicknames, resolveNickname } =
@@ -193,34 +193,36 @@ export function ChatScreen({
                   <MentionText body={m.body} members={members} onOpenProfile={onOpenProfile} />
                 </span>
               </div>
-              <MessageReactions
-                reactions={reactions.forMessage(m.id)}
-                myId={myId}
-                onToggle={(emoji) => reactions.toggle(m.id, emoji)}
-              />
-              <span className="msg-footer">
-                <span className="msg-time">{formatTime(m.created_at)}</span>
-                <button
-                  type="button"
-                  className="msg-reply"
-                  title="Rispondi citando"
-                  aria-label="Rispondi citando"
-                  onClick={() => setReplyTo(m)}
-                >
-                  ↩
-                </button>
-                {m.sender_id !== myId && (
+              <div className="msg-meta">
+                <MessageReactions
+                  reactions={reactions.forMessage(m.id)}
+                  myId={myId}
+                  onToggle={(emoji) => reactions.toggle(m.id, emoji)}
+                />
+                <span className="msg-footer">
+                  <span className="msg-time">{formatTime(m.created_at)}</span>
                   <button
                     type="button"
-                    className="msg-report"
-                    title="Segnala messaggio"
-                    aria-label="Segnala messaggio"
-                    onClick={() => setReportMsg(m)}
+                    className="msg-reply"
+                    title="Rispondi citando"
+                    aria-label="Rispondi citando"
+                    onClick={() => setReplyTo(m)}
                   >
-                    ⚑
+                    ↩
                   </button>
-                )}
-              </span>
+                  {m.sender_id !== myId && (
+                    <button
+                      type="button"
+                      className="msg-report"
+                      title="Segnala messaggio"
+                      aria-label="Segnala messaggio"
+                      onClick={() => setReportMsg(m)}
+                    >
+                      ⚑
+                    </button>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
         ))}

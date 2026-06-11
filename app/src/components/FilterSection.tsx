@@ -1,7 +1,7 @@
 import { useId, type ReactNode } from 'react'
 
-// Sezione filtro comprimibile: stesso pattern usato in SearchScreen per
-// identità, orientamento, interessi ecc. — un bottone con titolo + badge
+// Sezione comprimibile riusata da SearchScreen (filtri di ricerca) e
+// ProfileEditor (categorie del profilo) — un bottone con titolo + badge
 // opzionale che mostra/nasconde il contenuto.
 export function FilterSection({
   legend,
