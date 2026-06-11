@@ -16,7 +16,7 @@ export function RoomRoster({
 }) {
   const [open, setOpen] = useState(false)
   const online = useChatPresence(room.id, myId, myNickname, showOnline)
-  const members = useChatMembers(room.id, room.kind)
+  const members = useChatMembers(room.id)
 
   return (
     <div className="roster-wrap">
