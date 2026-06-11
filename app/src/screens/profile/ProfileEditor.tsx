@@ -28,6 +28,7 @@ import {
 } from '../../constants/options'
 import { ZODIAC_LABELS } from '../../constants/labels'
 import { SingleChoiceField, MultiChoiceField, ShowInProfileToggle } from './ChoiceField'
+import { FilterSection } from '../../components/FilterSection'
 import { glyphFor, normalize, AVATAR_PRESETS } from '../../lib/profile/formatters'
 import { checkLayerEligibility, type LayerEligibility } from '../../lib/layers'
 import {
@@ -279,6 +280,24 @@ export function ProfileEditor({
   const [error, setError] = useState<string | null>(null)
   const [layerEligibility, setLayerEligibility] = useState<LayerEligibility | null>(null)
 
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => ({
+    identity:
+      profile.orientations.length > 0 ||
+      profile.identity_category !== 'preferisco_non_specificare',
+    relations: !!profile.relationship_status || profile.intents.length > 0,
+    interests: profile.interests.length > 0 || profile.languages.length > 0,
+    lifestyle:
+      [
+        profile.education_level,
+        profile.diet,
+        profile.religion,
+        profile.politics,
+        profile.children_status,
+        profile.smoking,
+        profile.sport,
+      ].some((v) => v !== null) || profile.has_pets !== null,
+  }))
+
   useEffect(() => {
     checkLayerEligibility(profile.id)
       .then((e) => setLayerEligibility(e))
@@ -291,6 +310,15 @@ export function ProfileEditor({
 
   function setVisFlag(key: keyof typeof vis, value: boolean) {
     setVis((prev) => ({ ...prev, [key]: value }))
+  }
+
+  function toggleSection(key: string) {
+    setOpenSections((s) => ({ ...s, [key]: !s[key] }))
+  }
+
+  function sectionBadge(count: number, open: boolean) {
+    if (count === 0) return null
+    return <span className="filter-section-badge">{open ? count : `${count} sel.`}</span>
   }
 
   function addInterest(raw: string) {
@@ -454,6 +482,13 @@ export function ProfileEditor({
   const educationOpts = useMemo(() => EDUCATION_OPTIONS, [])
   const smokingOpts = useMemo(() => SMOKING_OPTIONS, [])
   const sportOpts = useMemo(() => SPORT_OPTIONS, [])
+
+  const identityCount = orientations.length + (identity !== 'preferisco_non_specificare' ? 1 : 0)
+  const relationsCount = (relStatus ? 1 : 0) + intents.length
+  const interestsCount = interests.length + languages.length
+  const lifestyleCount =
+    [educationLevel, diet, religion, politics, childrenStatus, smoking, sport].filter((v) => v !== null).length +
+    (hasPets !== null ? 1 : 0)
 
   return (
     <main className="app profile">
@@ -627,260 +662,311 @@ export function ProfileEditor({
           </fieldset>
         )}
 
-        <fieldset className="field">
-          <legend>Come ti identifichi</legend>
-          <div className="options">
-            {identityOpts.map((opt) => (
-              <label key={opt.value} className="chip">
-                <input
-                  type="radio"
-                  name="identity"
-                  checked={identity === opt.value}
-                  onChange={() => setIdentity(opt.value)}
-                />
-                <span>{opt.label}</span>
-              </label>
-            ))}
-          </div>
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={vis.show_identity}
-              onChange={(e) => setVisFlag('show_identity', e.target.checked)}
-            />
-            <span>Mostra nel profilo</span>
-          </label>
-        </fieldset>
-
-        <MultiChoiceField
-          legend="Orientamento"
-          options={orientationOpts}
-          selected={orientations}
-          onToggle={(v) => setOrientations(toggle(orientations, v))}
+        <FilterSection
+          legend="Identità & orientamento"
+          badge={sectionBadge(identityCount, !!openSections.identity)}
+          open={!!openSections.identity}
+          onToggle={() => toggleSection('identity')}
         >
-          <ShowInProfileToggle
-            checked={vis.show_orientation}
-            onChange={(v) => setVisFlag('show_orientation', v)}
-          />
-        </MultiChoiceField>
-
-        <fieldset className="field">
-          <legend>Stato relazionale</legend>
-          <div className="options">
-            {relStatusOpts.map((opt) => (
-              <label key={opt.value} className="chip">
-                <input
-                  type="radio"
-                  name="relstatus"
-                  checked={relStatus === opt.value}
-                  onChange={() => setRelStatus(opt.value)}
-                />
-                <span>{opt.label}</span>
-              </label>
-            ))}
-            {relStatus && (
-              <button type="button" className="link clear-sel" onClick={() => { setRelStatus(null); setRelType(null) }}>
-                pulisci
-              </button>
-            )}
-          </div>
-          {relStatus === 'in_relazione' && (
-            <div className="options sub-options">
-              {relTypeOpts.map((opt) => (
+          <fieldset className="field">
+            <legend>Come ti identifichi</legend>
+            <div className="options">
+              {identityOpts.map((opt) => (
                 <label key={opt.value} className="chip">
                   <input
                     type="radio"
-                    name="reltype"
-                    checked={relType === opt.value}
-                    onChange={() => setRelType(opt.value)}
+                    name="identity"
+                    checked={identity === opt.value}
+                    onChange={() => setIdentity(opt.value)}
                   />
                   <span>{opt.label}</span>
                 </label>
               ))}
             </div>
-          )}
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={vis.show_relationship}
-              onChange={(e) => setVisFlag('show_relationship', e.target.checked)}
-            />
-            <span>Mostra nel profilo</span>
-          </label>
-        </fieldset>
-
-        <MultiChoiceField
-          legend="Cosa cerchi"
-          options={intentOpts}
-          selected={intents}
-          onToggle={(v) => setIntents(toggle(intents, v))}
-        >
-          <ShowInProfileToggle
-            checked={vis.show_intents}
-            onChange={(v) => setVisFlag('show_intents', v)}
-          />
-        </MultiChoiceField>
-
-        <fieldset className="field">
-          <legend>
-            Interessi <span className="muted">({interests.length}/{MAX_INTERESTS})</span>
-          </legend>
-          {INTEREST_CATEGORIES.map((cat) => (
-            <div key={cat.label} className="interest-cat">
-              <span className="interest-cat-label">{cat.label}</span>
-              <div className="options">
-                {cat.options.map((tag) => (
-                  <label key={tag} className="chip">
-                    <input
-                      type="checkbox"
-                      checked={interests.includes(tag)}
-                      onChange={() => toggleInterest(tag)}
-                      disabled={!interests.includes(tag) && interests.length >= MAX_INTERESTS}
-                    />
-                    <span>{tag}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          ))}
-          {customInterests.length > 0 && (
-            <div className="options">
-              {customInterests.map((tag) => (
-                <button type="button" key={tag} className="chip sel" onClick={() => toggleInterest(tag)}>
-                  {tag} ✕
-                </button>
-              ))}
-            </div>
-          )}
-          <div className="composer inline-add">
-            <input
-              type="text"
-              value={newInterest}
-              onChange={(e) => setNewInterest(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addInterest(newInterest) } }}
-              placeholder="Altro (specifica)…"
-              maxLength={24}
-              disabled={interests.length >= MAX_INTERESTS}
-            />
-            <button
-              type="button"
-              className="btn-primary btn-sm"
-              onClick={() => addInterest(newInterest)}
-              disabled={!newInterest.trim() || interests.length >= MAX_INTERESTS}
-            >
-              Aggiungi
-            </button>
-          </div>
-        </fieldset>
-
-        <MultiChoiceField
-          legend="Lingue parlate"
-          options={languageOpts}
-          selected={languages}
-          onToggle={(v) => setLanguages(toggle(languages, v))}
-        >
-          <ShowInProfileToggle
-            checked={vis.show_languages}
-            onChange={(v) => setVisFlag('show_languages', v)}
-          />
-        </MultiChoiceField>
-
-        <SingleChoiceField legend="Titolo di studio" name="education" options={educationOpts} value={educationLevel} onChange={(v) => setEducationLevel(v)}>
-          <div className="composer inline-add">
-            <input
-              type="text"
-              value={educationInstitute}
-              onChange={(e) => setEducationInstitute(e.target.value)}
-              placeholder="Scuola, Università o Ente (opzionale)…"
-              maxLength={EDUCATION_INSTITUTE_MAX}
-            />
-            <span className="muted">{educationInstitute.length}/{EDUCATION_INSTITUTE_MAX}</span>
-          </div>
-          <ShowInProfileToggle checked={vis.show_education} onChange={(v) => setVisFlag('show_education', v)} />
-        </SingleChoiceField>
-
-        <SingleChoiceField legend="Alimentazione" name="diet" options={dietOpts} value={diet} onChange={(v) => setDiet(v)}>
-          <ShowInProfileToggle checked={vis.show_diet} onChange={(v) => setVisFlag('show_diet', v)} />
-        </SingleChoiceField>
-
-        <SingleChoiceField legend="Religione & credo" name="religion" options={religionOpts} value={religion} onChange={(v) => setReligion(v)}>
-          <ShowInProfileToggle checked={vis.show_religion} onChange={(v) => setVisFlag('show_religion', v)} />
-        </SingleChoiceField>
-
-        <SingleChoiceField legend="Orientamento politico" name="politics" options={politicsOpts} value={politics} onChange={(v) => setPolitics(v)}>
-          <ShowInProfileToggle checked={vis.show_politics} onChange={(v) => setVisFlag('show_politics', v)} />
-        </SingleChoiceField>
-
-        <SingleChoiceField legend="Figli" name="children" options={childrenOpts} value={childrenStatus} onChange={(v) => setChildrenStatus(v)}>
-          <ShowInProfileToggle checked={vis.show_children} onChange={(v) => setVisFlag('show_children', v)} />
-        </SingleChoiceField>
-
-        <SingleChoiceField legend="Fumo" name="smoking" options={smokingOpts} value={smoking} onChange={(v) => setSmoking(v)}>
-          <ShowInProfileToggle checked={vis.show_smoking} onChange={(v) => setVisFlag('show_smoking', v)} />
-        </SingleChoiceField>
-
-        <SingleChoiceField legend="Attività fisica" name="sport" options={sportOpts} value={sport} onChange={(v) => setSport(v)}>
-          <ShowInProfileToggle checked={vis.show_sport} onChange={(v) => setVisFlag('show_sport', v)} />
-        </SingleChoiceField>
-
-        <fieldset className="field">
-          <legend>Animali domestici</legend>
-          <div className="options">
-            <label className="chip">
-              <input
-                type="radio"
-                name="pets"
-                checked={hasPets === true}
-                onChange={() => setHasPets(true)}
-              />
-              <span>Sì</span>
-            </label>
-            <label className="chip">
-              <input
-                type="radio"
-                name="pets"
-                checked={hasPets === false}
-                onChange={() => { setHasPets(false); setPetsDetail('') }}
-              />
-              <span>No</span>
-            </label>
-            {hasPets !== null && (
-              <button type="button" className="link clear-sel" onClick={() => { setHasPets(null); setPetsDetail('') }}>
-                pulisci
-              </button>
-            )}
-          </div>
-          {hasPets === true && (
-            <div className="composer inline-add">
-              <input
-                type="text"
-                value={petsDetail}
-                onChange={(e) => setPetsDetail(e.target.value)}
-                placeholder="Specifica (es. un gatto e un cane)…"
-                maxLength={PETS_DETAIL_MAX}
-              />
-              <span className="muted">{petsDetail.length}/{PETS_DETAIL_MAX}</span>
-            </div>
-          )}
-          <ShowInProfileToggle checked={vis.show_pets} onChange={(v) => setVisFlag('show_pets', v)} />
-        </fieldset>
-
-        {profile.zodiac && (
-          <fieldset className="field">
-            <legend>Segno zodiacale</legend>
-            <p className="hint">
-              {ZODIAC_LABELS[profile.zodiac]} · calcolato dalla data di nascita.
-            </p>
             <label className="declare mini">
               <input
                 type="checkbox"
-                checked={vis.show_zodiac}
-                onChange={(e) => setVisFlag('show_zodiac', e.target.checked)}
+                checked={vis.show_identity}
+                onChange={(e) => setVisFlag('show_identity', e.target.checked)}
               />
               <span>Mostra nel profilo</span>
             </label>
           </fieldset>
-        )}
+
+          <MultiChoiceField
+            legend="Orientamento"
+            options={orientationOpts}
+            selected={orientations}
+            onToggle={(v) => setOrientations(toggle(orientations, v))}
+          >
+            <ShowInProfileToggle
+              checked={vis.show_orientation}
+              onChange={(v) => setVisFlag('show_orientation', v)}
+            />
+          </MultiChoiceField>
+
+          {profile.zodiac && (
+            <fieldset className="field">
+              <legend>Segno zodiacale</legend>
+              <p className="hint">
+                {ZODIAC_LABELS[profile.zodiac]} · calcolato dalla data di nascita.
+              </p>
+              <label className="declare mini">
+                <input
+                  type="checkbox"
+                  checked={vis.show_zodiac}
+                  onChange={(e) => setVisFlag('show_zodiac', e.target.checked)}
+                />
+                <span>Mostra nel profilo</span>
+              </label>
+            </fieldset>
+          )}
+        </FilterSection>
+
+        <FilterSection
+          legend="Relazioni & obiettivi"
+          badge={sectionBadge(relationsCount, !!openSections.relations)}
+          open={!!openSections.relations}
+          onToggle={() => toggleSection('relations')}
+        >
+          <fieldset className="field">
+            <legend>Stato relazionale</legend>
+            <div className="options">
+              {relStatusOpts.map((opt) => (
+                <label key={opt.value} className="chip">
+                  <input
+                    type="radio"
+                    name="relstatus"
+                    checked={relStatus === opt.value}
+                    onChange={() => setRelStatus(opt.value)}
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+              {relStatus && (
+                <button type="button" className="link clear-sel" onClick={() => { setRelStatus(null); setRelType(null) }}>
+                  pulisci
+                </button>
+              )}
+            </div>
+            {relStatus === 'in_relazione' && (
+              <div className="options sub-options">
+                {relTypeOpts.map((opt) => (
+                  <label key={opt.value} className="chip">
+                    <input
+                      type="radio"
+                      name="reltype"
+                      checked={relType === opt.value}
+                      onChange={() => setRelType(opt.value)}
+                    />
+                    <span>{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+            <label className="declare mini">
+              <input
+                type="checkbox"
+                checked={vis.show_relationship}
+                onChange={(e) => setVisFlag('show_relationship', e.target.checked)}
+              />
+              <span>Mostra nel profilo</span>
+            </label>
+          </fieldset>
+
+          <MultiChoiceField
+            legend="Cosa cerchi"
+            options={intentOpts}
+            selected={intents}
+            onToggle={(v) => setIntents(toggle(intents, v))}
+          >
+            <ShowInProfileToggle
+              checked={vis.show_intents}
+              onChange={(v) => setVisFlag('show_intents', v)}
+            />
+          </MultiChoiceField>
+
+          {profile.strato >= 2 && (
+            <fieldset className="field">
+              <legend>Chi può scrivermi in privato</legend>
+              <div className="options">
+                {DM_FILTER_OPTIONS.map((opt) => (
+                  <label key={opt.value} className="chip">
+                    <input
+                      type="radio"
+                      name="dm_filter"
+                      value={opt.value}
+                      checked={dmFilter === opt.value}
+                      onChange={() => setDmFilter(opt.value)}
+                    />
+                    <span>{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="hint">
+                Filtra le richieste di messaggio privato che ricevi.
+              </p>
+            </fieldset>
+          )}
+        </FilterSection>
+
+        <FilterSection
+          legend="Interessi & lingue"
+          badge={sectionBadge(interestsCount, !!openSections.interests)}
+          open={!!openSections.interests}
+          onToggle={() => toggleSection('interests')}
+        >
+          <fieldset className="field">
+            <legend>
+              Interessi <span className="muted">({interests.length}/{MAX_INTERESTS})</span>
+            </legend>
+            {INTEREST_CATEGORIES.map((cat) => (
+              <div key={cat.label} className="interest-cat">
+                <span className="interest-cat-label">{cat.label}</span>
+                <div className="options">
+                  {cat.options.map((tag) => (
+                    <label key={tag} className="chip">
+                      <input
+                        type="checkbox"
+                        checked={interests.includes(tag)}
+                        onChange={() => toggleInterest(tag)}
+                        disabled={!interests.includes(tag) && interests.length >= MAX_INTERESTS}
+                      />
+                      <span>{tag}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {customInterests.length > 0 && (
+              <div className="options">
+                {customInterests.map((tag) => (
+                  <button type="button" key={tag} className="chip sel" onClick={() => toggleInterest(tag)}>
+                    {tag} ✕
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className="composer inline-add">
+              <input
+                type="text"
+                value={newInterest}
+                onChange={(e) => setNewInterest(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addInterest(newInterest) } }}
+                placeholder="Altro (specifica)…"
+                maxLength={24}
+                disabled={interests.length >= MAX_INTERESTS}
+              />
+              <button
+                type="button"
+                className="btn-primary btn-sm"
+                onClick={() => addInterest(newInterest)}
+                disabled={!newInterest.trim() || interests.length >= MAX_INTERESTS}
+              >
+                Aggiungi
+              </button>
+            </div>
+          </fieldset>
+
+          <MultiChoiceField
+            legend="Lingue parlate"
+            options={languageOpts}
+            selected={languages}
+            onToggle={(v) => setLanguages(toggle(languages, v))}
+          >
+            <ShowInProfileToggle
+              checked={vis.show_languages}
+              onChange={(v) => setVisFlag('show_languages', v)}
+            />
+          </MultiChoiceField>
+        </FilterSection>
+
+        <FilterSection
+          legend="Stile di vita"
+          badge={sectionBadge(lifestyleCount, !!openSections.lifestyle)}
+          open={!!openSections.lifestyle}
+          onToggle={() => toggleSection('lifestyle')}
+        >
+          <SingleChoiceField legend="Titolo di studio" name="education" options={educationOpts} value={educationLevel} onChange={(v) => setEducationLevel(v)}>
+            <div className="composer inline-add">
+              <input
+                type="text"
+                value={educationInstitute}
+                onChange={(e) => setEducationInstitute(e.target.value)}
+                placeholder="Scuola, Università o Ente (opzionale)…"
+                maxLength={EDUCATION_INSTITUTE_MAX}
+              />
+              <span className="muted">{educationInstitute.length}/{EDUCATION_INSTITUTE_MAX}</span>
+            </div>
+            <ShowInProfileToggle checked={vis.show_education} onChange={(v) => setVisFlag('show_education', v)} />
+          </SingleChoiceField>
+
+          <SingleChoiceField legend="Alimentazione" name="diet" options={dietOpts} value={diet} onChange={(v) => setDiet(v)}>
+            <ShowInProfileToggle checked={vis.show_diet} onChange={(v) => setVisFlag('show_diet', v)} />
+          </SingleChoiceField>
+
+          <SingleChoiceField legend="Religione & credo" name="religion" options={religionOpts} value={religion} onChange={(v) => setReligion(v)}>
+            <ShowInProfileToggle checked={vis.show_religion} onChange={(v) => setVisFlag('show_religion', v)} />
+          </SingleChoiceField>
+
+          <SingleChoiceField legend="Orientamento politico" name="politics" options={politicsOpts} value={politics} onChange={(v) => setPolitics(v)}>
+            <ShowInProfileToggle checked={vis.show_politics} onChange={(v) => setVisFlag('show_politics', v)} />
+          </SingleChoiceField>
+
+          <SingleChoiceField legend="Figli" name="children" options={childrenOpts} value={childrenStatus} onChange={(v) => setChildrenStatus(v)}>
+            <ShowInProfileToggle checked={vis.show_children} onChange={(v) => setVisFlag('show_children', v)} />
+          </SingleChoiceField>
+
+          <SingleChoiceField legend="Fumo" name="smoking" options={smokingOpts} value={smoking} onChange={(v) => setSmoking(v)}>
+            <ShowInProfileToggle checked={vis.show_smoking} onChange={(v) => setVisFlag('show_smoking', v)} />
+          </SingleChoiceField>
+
+          <SingleChoiceField legend="Attività fisica" name="sport" options={sportOpts} value={sport} onChange={(v) => setSport(v)}>
+            <ShowInProfileToggle checked={vis.show_sport} onChange={(v) => setVisFlag('show_sport', v)} />
+          </SingleChoiceField>
+
+          <fieldset className="field">
+            <legend>Animali domestici</legend>
+            <div className="options">
+              <label className="chip">
+                <input
+                  type="radio"
+                  name="pets"
+                  checked={hasPets === true}
+                  onChange={() => setHasPets(true)}
+                />
+                <span>Sì</span>
+              </label>
+              <label className="chip">
+                <input
+                  type="radio"
+                  name="pets"
+                  checked={hasPets === false}
+                  onChange={() => { setHasPets(false); setPetsDetail('') }}
+                />
+                <span>No</span>
+              </label>
+              {hasPets !== null && (
+                <button type="button" className="link clear-sel" onClick={() => { setHasPets(null); setPetsDetail('') }}>
+                  pulisci
+                </button>
+              )}
+            </div>
+            {hasPets === true && (
+              <div className="composer inline-add">
+                <input
+                  type="text"
+                  value={petsDetail}
+                  onChange={(e) => setPetsDetail(e.target.value)}
+                  placeholder="Specifica (es. un gatto e un cane)…"
+                  maxLength={PETS_DETAIL_MAX}
+                />
+                <span className="muted">{petsDetail.length}/{PETS_DETAIL_MAX}</span>
+              </div>
+            )}
+            <ShowInProfileToggle checked={vis.show_pets} onChange={(v) => setVisFlag('show_pets', v)} />
+          </fieldset>
+        </FilterSection>
 
         {layerEligibility && (
           <fieldset className="field">
@@ -929,29 +1015,6 @@ export function ProfileEditor({
             <span>Mostra quando sono online</span>
           </label>
         </fieldset>
-
-        {profile.strato >= 2 && (
-          <fieldset className="field">
-            <legend>Chi può scrivermi in privato</legend>
-            <div className="options">
-              {DM_FILTER_OPTIONS.map((opt) => (
-                <label key={opt.value} className="chip">
-                  <input
-                    type="radio"
-                    name="dm_filter"
-                    value={opt.value}
-                    checked={dmFilter === opt.value}
-                    onChange={() => setDmFilter(opt.value)}
-                  />
-                  <span>{opt.label}</span>
-                </label>
-              ))}
-            </div>
-            <p className="hint">
-              Filtra le richieste di messaggio privato che ricevi.
-            </p>
-          </fieldset>
-        )}
 
         {error && <p className="err" role="alert">{error}</p>}
 
