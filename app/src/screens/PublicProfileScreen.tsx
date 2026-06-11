@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { AppHeader } from '../components/AppHeader'
-import { sendDmRequest } from '../lib/dm'
+import { sendDmRequest, findDmConversation, deleteDmConversation } from '../lib/dm'
 import { ProfileLayout } from './profile/ProfileLayout'
 import { buildProfileRows, buildKeyFacts } from './profile/profileFacts'
 import { ReportDialog } from '../components/ReportDialog'
+import { BlockConfirmDialog } from '../components/BlockConfirmDialog'
 import { blockUser, unblockUser, isBlocked } from '../lib/blocks'
 import type {
   IdentityCategory,
@@ -79,6 +80,7 @@ export function PublicProfileScreen({
   const [reportPhotoId, setReportPhotoId] = useState<string | null>(null)
   const [blocked, setBlocked] = useState(false)
   const [blockBusy, setBlockBusy] = useState(false)
+  const [blockConfirmOpen, setBlockConfirmOpen] = useState(false)
   const [dmBusy, setDmBusy] = useState(false)
   const [dmFeedback, setDmFeedback] = useState<string | null>(null)
 
@@ -124,16 +126,32 @@ export function PublicProfileScreen({
     }
   }
 
-  async function toggleBlock() {
-    setBlockBusy(true)
-    try {
-      if (blocked) {
+  async function handleBlockClick() {
+    if (blocked) {
+      setBlockBusy(true)
+      try {
         await unblockUser(userId)
         setBlocked(false)
-      } else {
-        await blockUser(userId)
-        setBlocked(true)
+      } catch {
+        // silenzioso: l'utente può riprovare
+      } finally {
+        setBlockBusy(false)
       }
+      return
+    }
+    setBlockConfirmOpen(true)
+  }
+
+  async function confirmBlock(deleteConversation: boolean) {
+    setBlockBusy(true)
+    try {
+      await blockUser(userId)
+      setBlocked(true)
+      if (deleteConversation && myId) {
+        const convId = await findDmConversation(myId, userId)
+        if (convId) await deleteDmConversation(convId)
+      }
+      setBlockConfirmOpen(false)
     } catch {
       // silenzioso: l'utente può riprovare
     } finally {
@@ -176,7 +194,7 @@ export function PublicProfileScreen({
                 className={blocked ? 'pf-icon-btn danger' : 'pf-icon-btn'}
                 title={blocked ? 'Sblocca' : 'Blocca'}
                 aria-label={blocked ? 'Sblocca' : 'Blocca'}
-                onClick={toggleBlock}
+                onClick={handleBlockClick}
                 disabled={blockBusy}
               >
                 ⛔
@@ -239,6 +257,15 @@ export function PublicProfileScreen({
           )
         }
       />
+
+      {blockConfirmOpen && (
+        <BlockConfirmDialog
+          nickname={p.nickname}
+          busy={blockBusy}
+          onCancel={() => setBlockConfirmOpen(false)}
+          onConfirm={confirmBlock}
+        />
+      )}
 
       {reporting && (
         <ReportDialog
