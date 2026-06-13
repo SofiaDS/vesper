@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mockup completo (tema chiaro) — Vesper</title>
+<style>
+  :root {
+    --bg:      #f0ece0;
+    --surface: #e4dfd0;
+    --surface-2: #d9d3c0;
+    --accent:  #B8841F;
+    --accent-text: #7A5510;
+    --text:    #1a1626;
+    --error:   #D72638;
+    --error-text: #B91C3C;
+    --success: #1f7a48;
+    --muted: #8a8073;
+    --border: rgba(26, 22, 38, 0.16);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+  }
+  .phone {
+    width: 100%;
+    max-width: 420px;
+    min-height: 760px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ── Header ───────────────────────────────────────────────── */
+  .app-header {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr 2.5rem;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .app-header h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.15rem;
+    color: var(--accent-text);
+    letter-spacing: 0.04em;
+  }
+  .burger {
+    justify-self: end;
+    width: 1.6rem; height: 1.6rem;
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+    background: none; border: none; cursor: pointer; padding: 0;
+  }
+  .burger span { display: block; height: 2px; background: var(--accent); border-radius: 2px; }
+
+  /* ── Burger menu drawer ───────────────────────────────────── */
+  .drawer-overlay {
+    position: absolute; inset: 0;
+    background: rgba(26,22,38,0.35);
+    display: none;
+    z-index: 20;
+  }
+  .drawer-overlay.show { display: block; }
+  .drawer {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: 78%;
+    max-width: 300px;
+    background: var(--bg);
+    border-left: 1px solid var(--border);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    overflow-y: auto;
+    padding: 0.75rem;
+    z-index: 21;
+  }
+  .drawer.show { transform: translateX(0); }
+  .drawer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.6rem 0.7rem;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.88rem;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .drawer-item.active { background: var(--surface); color: var(--accent-text); font-weight: 700; }
+  .drawer-item .badge-sm {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 1.1rem; height: 1.1rem; padding: 0 0.3rem;
+    border-radius: 999px; background: var(--error); color: #fff;
+    font-size: 0.65rem; font-weight: 700;
+  }
+  .drawer-group-label {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); margin: 0.8rem 0.7rem 0.2rem;
+  }
+  .drawer-children { padding-left: 0.75rem; }
+  .drawer-signout {
+    margin-top: 1rem; width: 100%; padding: 0.6rem;
+    border-radius: 8px; border: 1px solid var(--border);
+    background: none; color: var(--error-text); font-weight: 700;
+    cursor: pointer; font-family: inherit; font-size: 0.85rem;
+  }
+
+  /* ── Tab bar (sezioni principali) ────────────────────────── */
+  .tabbar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab {
+    position: relative;
+    padding: 0.7rem 0.2rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.74rem;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .tab.active { color: var(--accent-text); }
+  .tab.active::after {
+    content: "";
+    position: absolute;
+    left: 18%; right: 18%; bottom: 0;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--accent);
+  }
+  .tab-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 1.1rem; height: 1.1rem; padding: 0 0.3rem;
+    margin-left: 0.25rem;
+    border-radius: 999px;
+    background: var(--error);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+  .tab-badge.mention { background: var(--accent); color: var(--bg); }
+
+  /* ── Content ──────────────────────────────────────────────── */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem 0.9rem 1.25rem;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .subpanel { display: none; }
+  .subpanel.active { display: block; }
+
+  .hint-bar {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+    margin: 0.4rem 0 0.9rem;
+  }
+  .hint { font-size: 0.8rem; color: var(--muted); }
+  .hint-active { color: var(--accent-text); }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.75rem; }
+  .err { color: var(--error-text); font-size: 0.82rem; }
+  .ok { color: var(--success); font-size: 0.82rem; }
+  .warn { color: var(--error-text); font-weight: 700; }
+
+  /* ── Generic card ─────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .box-shadow { box-shadow: 0 2px 8px rgba(26,22,38,0.06); }
+  .card h2, .card h3 { margin-top: 0; }
+  .section-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 0 0 0.5rem;
+  }
+
+  /* ── Buttons ──────────────────────────────────────────────── */
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .btn-primary.btn-sm, .btn-secondary.btn-sm, .btn-ghost.btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
+  .btn-secondary {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-wide { width: 100%; }
+  .btn-approve, .btn-reject {
+    border: none; border-radius: 8px; padding: 0.35rem 0.7rem;
+    font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .btn-approve { background: var(--success); color: #fff; }
+  .btn-reject { background: var(--error); color: #fff; }
+  .link {
+    background: none; border: none; color: var(--accent-text);
+    text-decoration: underline; cursor: pointer; font-family: inherit;
+    font-size: 0.85rem; padding: 0;
+  }
+
+  /* ── Sub-screen header (AppHeader pattern) ───────────────── */
+  .sub-header {
+    display: flex; align-items: center; gap: 0.5rem;
+    margin: -0.1rem -0.1rem 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .sub-header .back-btn {
+    background: none; border: none; color: var(--accent-text);
+    font-size: 0.85rem; font-weight: 700; cursor: pointer;
+    padding: 0.3rem 0.4rem 0.3rem 0; font-family: inherit;
+    display: flex; align-items: center; gap: 0.2rem;
+  }
+  .sub-header .sub-title { font-weight: 700; font-size: 0.95rem; flex: 1; }
+
+  /* ── Brand / auth ─────────────────────────────────────────── */
+  .brand { text-align: center; padding: 1.5rem 1rem 0.5rem; }
+  .brand h1 { margin: 0; color: var(--accent-text); letter-spacing: 0.06em; }
+  .tagline { color: var(--muted); margin: 0.25rem 0 0; font-size: 0.9rem; }
+  .form { display: flex; flex-direction: column; gap: 0.75rem; }
+  .field { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; }
+  .field span:first-child { font-weight: 600; }
+  .field input, .field textarea, .search-input, input[type=text], input[type=email], input[type=password], input[type=number] {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.55rem 0.7rem;
+    font-size: 0.88rem;
+    background: var(--bg);
+    color: var(--text);
+    font-family: inherit;
+  }
+  .declare {
+    display: flex; gap: 0.5rem; align-items: flex-start;
+    font-size: 0.78rem; color: var(--muted); margin: 0.5rem 0;
+  }
+  .declare input { margin-top: 0.2rem; }
+  .switch { font-size: 0.85rem; text-align: center; margin-top: 0.75rem; }
+  .forgot { text-align: right; font-size: 0.78rem; }
+
+  /* ── Options / chips ──────────────────────────────────────── */
+  .options { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 0.3rem 0.7rem; font-size: 0.78rem; cursor: pointer;
+    background: var(--bg);
+  }
+  .chip input { margin: 0; }
+  .chip.on, .chip-on {
+    border-color: var(--accent); background: rgba(184,132,31,0.1); color: var(--accent-text); font-weight: 700;
+  }
+  fieldset.field { border: none; padding: 0; margin: 0; }
+  fieldset.field legend { font-weight: 600; font-size: 0.85rem; padding: 0; margin-bottom: 0.35rem; }
+
+  /* ── Segmented tabs ───────────────────────────────────────── */
+  .seg-row { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; }
+  .seg {
+    flex: 1; text-align: center; padding: 0.45rem; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted); font-size: 0.82rem; font-weight: 600; cursor: pointer;
+    font-family: inherit;
+  }
+  .seg.on { border-color: var(--accent); color: var(--accent-text); background: rgba(184,132,31,0.1); }
+
+  /* ── Room cards (Stanze) ──────────────────────────────────── */
+  .room-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+  .room-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+  }
+  .room-card.has-unread {
+    border-color: rgba(184,132,31,0.45);
+    background: rgba(184,132,31,0.05);
+  }
+  .room-card.has-mention {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .room-main { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; min-width: 0; }
+  .room-name-row { display: flex; align-items: center; gap: 0.4rem; }
+  .room-name { font-weight: 700; font-size: 1rem; color: var(--text); }
+  .room-name.unread { color: var(--accent-text); }
+  .room-desc { font-size: 0.8rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .room-online { font-size: 0.72rem; color: var(--success); margin-top: 0.15rem; }
+  .room-online::before { content: "●"; margin-right: 0.3rem; font-size: 0.6rem; vertical-align: middle; }
+  .room-side { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; }
+  .unread-pill {
+    flex-shrink: 0; min-width: 1.3rem; height: 1.3rem; padding: 0 0.4rem;
+    border-radius: 999px; background: var(--accent); color: var(--bg);
+    font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  }
+  .mention-pill {
+    flex-shrink: 0; height: 1.3rem; padding: 0 0.5rem;
+    border-radius: 999px; background: transparent; border: 1.5px solid var(--accent);
+    color: var(--accent-text); font-size: 0.68rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; gap: 0.2rem; white-space: nowrap;
+  }
+
+  /* ── DM list — Variante B ────────────────────────────────── */
+  .dm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .dm-row {
+    display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.5rem;
+    border-bottom: 1px solid var(--border); cursor: pointer; background: none;
+    border-left: none; border-right: none; border-top: none; width: 100%;
+    text-align: left; color: inherit; font-family: inherit; border-radius: 10px;
+  }
+  .dm-row:last-child { border-bottom: none; }
+  .dm-row.unread-row { background: rgba(184,132,31,0.07); }
+  .dm-avatar {
+    position: relative; width: 46px; height: 46px; border-radius: 50%;
+    background: var(--surface-2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.05rem; color: var(--accent-text); flex-shrink: 0;
+  }
+  .dm-avatar.unread-avatar { border: 2px solid var(--accent); }
+  .presence-dot {
+    position: absolute; bottom: 1px; right: 1px; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--success); border: 2px solid var(--bg);
+  }
+  .dm-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.15rem; }
+  .dm-info-top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+  .dm-name { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+  .dm-name.unread { color: var(--accent-text); }
+  .dm-time { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  .dm-time.unread { color: var(--accent-text); font-weight: 700; }
+  .dm-info-bottom { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+  .dm-preview { font-size: 0.82rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dm-preview.unread { color: var(--text); font-weight: 600; }
+  .dm-section-title {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); margin: 1rem 0 0.4rem; padding: 0 0.25rem;
+  }
+  .dm-section-title:first-child { margin-top: 0.2rem; }
+  .dm-request-actions { display: flex; gap: 0.4rem; }
+  .btn-ghost-sm {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    border-radius: 8px; padding: 0.35rem 0.6rem; font-size: 0.75rem; cursor: pointer; font-family: inherit;
+  }
+  .btn-primary-sm {
+    background: var(--accent); color: var(--bg); border: none; border-radius: 8px;
+    padding: 0.35rem 0.6rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+
+  /* ── Chat (rooms & DM conversation) ──────────────────────── */
+  .chat-window { display: flex; flex-direction: column; gap: 0.5rem; }
+  .chat-msg { max-width: 82%; }
+  .chat-msg.mine { align-self: flex-end; text-align: right; }
+  .chat-bubble {
+    display: inline-block; padding: 0.5rem 0.75rem; border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--border); font-size: 0.85rem;
+  }
+  .chat-msg.mine .chat-bubble { background: rgba(184,132,31,0.14); border-color: rgba(184,132,31,0.3); }
+  .chat-meta { font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; }
+  .chat-sender { font-weight: 700; font-size: 0.78rem; color: var(--accent-text); margin-bottom: 0.15rem; }
+  .composer-row {
+    display: flex; gap: 0.5rem; margin-top: 0.75rem; align-items: flex-end;
+    position: sticky; bottom: 0; background: var(--bg); padding-top: 0.5rem;
+  }
+  .composer-row textarea {
+    flex: 1; resize: none; min-height: 2.4rem; border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.5rem 0.7rem; font-family: inherit; font-size: 0.85rem;
+    background: var(--bg); color: var(--text);
+  }
+  .roster-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+  .roster-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.3rem 0; }
+
+  /* ── Profile layout ───────────────────────────────────────── */
+  .avatar-bubble {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; color: #fff; font-weight: 800; flex-shrink: 0;
+  }
+  .avatar-bubble-sm { width: 1.6rem; height: 1.6rem; font-size: 0.8rem; }
+  .avatar-bubble-lg { width: 4.5rem; height: 4.5rem; font-size: 1.8rem; margin: 0 auto 0.5rem; }
+  .pf-header-title { display: flex; align-items: center; gap: 0.4rem; justify-content: center; }
+  .pf-icon-actions { display: flex; justify-content: flex-end; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .pf-icon-btn {
+    width: 2.1rem; height: 2.1rem; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--surface); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1rem;
+  }
+  .pf-icon-btn.danger { color: var(--error-text); border-color: var(--error); }
+  .pf-hero { text-align: center; margin-bottom: 0.75rem; }
+  .pf-nick { margin: 0.2rem 0; font-size: 1.1rem; }
+  .pf-key-facts { color: var(--muted); font-size: 0.85rem; margin: 0; }
+  .pf-section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 0.6rem; }
+  .pf-bio { font-size: 0.9rem; line-height: 1.4; margin: 0; }
+  .pf-rows { display: flex; flex-direction: column; gap: 0.45rem; }
+  .pf-row { display: flex; justify-content: space-between; font-size: 0.85rem; gap: 0.5rem; }
+  .pf-row .pf-row-label { color: var(--muted); }
+  .pf-row .pf-row-value { text-align: right; font-weight: 600; }
+  .pf-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+  .pf-gallery .ph {
+    aspect-ratio: 1; border-radius: 8px; background: var(--surface-2);
+    border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 0.7rem;
+  }
+  .pf-actions { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+
+  /* ── Search ───────────────────────────────────────────────── */
+  .search-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.6rem; }
+  .search-nick-form { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .search-nick-form .search-input { flex: 1; }
+  .search-history { margin-bottom: 0.75rem; }
+  .search-history-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.3rem; }
+  .search-history-row { display: flex; justify-content: space-between; align-items: center; padding: 0.2rem 0; }
+  .filter-section { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 0.5rem; overflow: hidden; }
+  .filter-section-head {
+    display: flex; justify-content: space-between; align-items: center; width: 100%;
+    padding: 0.6rem 0.8rem; background: var(--surface); border: none; cursor: pointer;
+    font-family: inherit; font-size: 0.85rem; font-weight: 600; color: var(--text);
+  }
+  .filter-section-body { padding: 0.7rem 0.8rem; display: none; }
+  .filter-section.open .filter-section-body { display: block; }
+  .filter-section-badge {
+    background: var(--accent); color: var(--bg); border-radius: 999px;
+    font-size: 0.68rem; padding: 0.1rem 0.45rem; font-weight: 700; margin-left: 0.4rem;
+  }
+  .age-range { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+  .age-range input { width: 4.5rem; }
+  .search-go-row { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem; }
+  .filter-active-count { font-size: 0.78rem; color: var(--accent-text); }
+  .search-cards { display: flex; flex-direction: column; gap: 0.6rem; }
+  .search-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  .user-card {
+    display: flex; gap: 0.7rem; align-items: center; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; cursor: pointer;
+  }
+  .search-cards-grid .user-card { flex-direction: column; text-align: center; }
+  .user-card-name { font-weight: 700; font-size: 0.9rem; }
+  .user-card-meta { font-size: 0.75rem; color: var(--muted); }
+  .affinity-pill {
+    display: inline-block; margin-top: 0.2rem; font-size: 0.68rem; font-weight: 700;
+    color: var(--accent-text); background: rgba(184,132,31,0.12); border-radius: 999px; padding: 0.1rem 0.5rem;
+  }
+  .skeleton-card { height: 70px; border-radius: 12px; background: linear-gradient(90deg, var(--surface), var(--surface-2), var(--surface)); margin-bottom: 0.6rem; }
+
+  /* ── Moderation lists ─────────────────────────────────────── */
+  .mod-list { display: flex; flex-direction: column; gap: 0.6rem; }
+  .mod-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .mod-row:last-child { border-bottom: none; }
+  .mod-people { list-style: none; margin: 0; padding: 0; }
+  .mod-photo { display: flex; gap: 0.6rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem; }
+  .mod-photo-img { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--surface-2); }
+  .mod-photo-img.ph { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.65rem; }
+  .mod-photo-body { flex: 1; display: flex; flex-direction: column; gap: 0.3rem; }
+  .mod-photo-who { margin: 0; font-size: 0.85rem; font-weight: 600; }
+  .mod-photo-actions { display: flex; gap: 0.4rem; margin-top: 0.2rem; }
+  .stats-section { background: var(--surface); border-radius: 10px; padding: 0.7rem 0.9rem; border: 1px solid var(--border); margin-bottom: 0.6rem; }
+  .stats-title { margin: 0 0 0.4rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .stat-row { display: flex; justify-content: space-between; padding: 0.25rem 0; font-size: 0.88rem; }
+  .stat-value { font-weight: 700; }
+  .stat-value.warn { color: var(--error-text); }
+  .rep-neutral { color: var(--success); }
+  .rep-low { color: var(--accent-text); }
+  .rep-mid { color: var(--error-text); }
+  .rep-high { color: var(--error-text); font-weight: 800; }
+
+  /* ── Toast ────────────────────────────────────────────────── */
+  .global-toast {
+    position: absolute; left: 0.6rem; right: 0.6rem; bottom: 0.8rem;
+    background: var(--surface-2); border: 1px solid var(--accent); border-radius: 12px;
+    padding: 0.65rem 0.8rem; display: flex; align-items: center; gap: 0.6rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    transform: translateY(120%); transition: transform 0.25s ease; cursor: pointer; z-index: 15;
+  }
+  .global-toast.show { transform: translateY(0); }
+  .global-toast-icon {
+    width: 2rem; height: 2rem; border-radius: 50%; background: rgba(184,132,31,0.15);
+    border: 1.5px solid var(--accent); color: var(--accent-text);
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; flex-shrink: 0;
+  }
+  .global-toast-text { flex: 1; min-width: 0; }
+  .global-toast-title { font-size: 0.82rem; font-weight: 700; color: var(--text); }
+  .global-toast-sub { font-size: 0.74rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .global-toast-close { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 0.2rem; line-height: 1; }
+
+  .demo-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 0.75rem; max-width: 420px; }
+  .demo-controls button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+    border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 0.72rem; cursor: pointer; font-family: inherit;
+  }
+
+  /* ── Nested screen list (admin sub-nav inside Admin tab) ───── */
+  .admin-subnav { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+  .admin-subnav button {
+    border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+    border-radius: 999px; padding: 0.35rem 0.7rem; font-size: 0.75rem; cursor: pointer; font-family: inherit;
+  }
+  .admin-subnav button.active { border-color: var(--accent); color: var(--accent-text); font-weight: 700; background: rgba(184,132,31,0.1); }
+  .admin-subnav button .badge-sm {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 1.1rem; height: 1.1rem; padding: 0 0.3rem; margin-left: 0.25rem;
+    border-radius: 999px; background: var(--error); color: #fff; font-size: 0.6rem; font-weight: 700;
+  }
+
+  .verif-video-wrap {
+    aspect-ratio: 4/3; background: var(--surface-2); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; color: var(--muted);
+    font-size: 0.8rem; margin: 0.6rem 0;
+  }
+  .verif-tips { font-size: 0.82rem; padding-left: 1.1rem; }
+  .verif-rejection { color: var(--error-text); font-size: 0.85rem; }
+
+  .label-tag {
+    text-align: center; font-size: 0.7rem; color: var(--muted); margin: 0.6rem 0;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <header class="app-header">
+    <span></span>
+    <h1>Vesper</h1>
+    <button class="burger" id="burger-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+  </header>
+
+  <nav class="tabbar">
+    <button class="tab active" data-tab="stanze">Stanze <span class="tab-badge mention">@1</span></button>
+    <button class="tab" data-tab="dm">DM <span class="tab-badge">5</span></button>
+    <button class="tab" data-tab="ricerca">Ricerca</button>
+    <button class="tab" data-tab="profilo">Profilo</button>
+    <button class="tab" data-tab="altro">Altro</button>
+  </nav>
+
+  <div class="content" id="content-root">
+
+    <!-- ════════════════════ STANZE ════════════════════ -->
+    <section class="panel active" id="panel-stanze">
+
+      <!-- Lista stanze -->
+      <div class="subpanel active" id="sub-stanze-lista">
+        <p class="hint-bar">Stanze tematiche: 2/3</p>
+        <ul class="room-list">
+          <li class="room-card has-mention">
+            <div class="room-main">
+              <div class="room-name-row">
+                <span class="room-name unread">Letteratura &amp; Poesia</span>
+              </div>
+              <span class="room-desc">@anna.r ti ha risposto: "Concordo, è bellissimo..."</span>
+              <span class="room-online">12 online</span>
+            </div>
+            <div class="room-side">
+              <span class="mention-pill">@ menzione</span>
+              <button class="btn-primary" onclick="openSub('stanze','sub-stanze-chat')">Apri</button>
+            </div>
+          </li>
+
+          <li class="room-card has-unread">
+            <div class="room-main">
+              <div class="room-name-row">
+                <span class="room-name unread">Foyer</span>
+              </div>
+              <span class="room-desc">La hall principale, aperta a tutti</span>
+              <span class="room-online">42 online</span>
+            </div>
+            <div class="room-side">
+              <span class="unread-pill">24</span>
+              <button class="btn-primary" onclick="openSub('stanze','sub-stanze-chat')">Apri</button>
+            </div>
+          </li>
+
+          <li class="room-card">
+            <div class="room-main">
+              <div class="room-name-row">
+                <span class="room-name">Musica dal vivo</span>
+              </div>
+              <span class="room-desc">Concerti, vinili e nuove uscite</span>
+              <span class="room-online">7 online</span>
+            </div>
+            <button class="btn-primary" onclick="openSub('stanze','sub-stanze-chat')">Apri</button>
+          </li>
+
+          <li class="room-card">
+            <div class="room-main">
+              <div class="room-name-row">
+                <span class="room-name">Cinema &amp; Serie TV</span>
+              </div>
+              <span class="room-desc">Spoiler avvisati</span>
+              <span class="room-online">3 online</span>
+            </div>
+            <button class="btn-primary btn-sm">Unisciti</button>
+          </li>
+        </ul>
+
+        <p class="hint hint-active" style="text-align:center; margin-top:0.9rem;">Stanze tematiche: 2/3.</p>
+      </div>
+
+      <!-- Chat di una stanza -->
+      <div class="subpanel" id="sub-stanze-chat">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('stanze','sub-stanze-lista')">‹ Stanze</button>
+          <span class="sub-title">Letteratura &amp; Poesia</span>
+          <button class="pf-icon-btn" title="Persone in stanza" onclick="openSub('stanze','sub-stanze-roster')">👥</button>
+        </div>
+
+        <div class="chat-window">
+          <div class="chat-msg">
+            <div class="chat-sender">@anna.r</div>
+            <div class="chat-bubble">Concordo, è bellissimo questo passaggio sulla nostalgia 🌙</div>
+            <div class="chat-meta">14:02</div>
+          </div>
+          <div class="chat-msg mine">
+            <div class="chat-bubble">Grazie! L'ho riletto tre volte questa settimana</div>
+            <div class="chat-meta">14:05</div>
+          </div>
+          <div class="chat-msg">
+            <div class="chat-sender">@giuliab</div>
+            <div class="chat-bubble">Qualcuna ha letto anche la raccolta successiva? Vorrei iniziarla</div>
+            <div class="chat-meta">14:07</div>
+          </div>
+          <div class="chat-msg">
+            <div class="chat-sender">@lorenzo_t</div>
+            <div class="chat-bubble">Io sì! Ti consiglio di partire con calma, i primi capitoli sono densi</div>
+            <div class="chat-meta">14:09</div>
+          </div>
+        </div>
+
+        <div class="composer-row">
+          <textarea placeholder="Scrivi un messaggio…" rows="1"></textarea>
+          <button class="btn-primary">Invia</button>
+        </div>
+      </div>
+
+      <!-- Roster stanza -->
+      <div class="subpanel" id="sub-stanze-roster">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('stanze','sub-stanze-chat')">‹ Chat</button>
+          <span class="sub-title">Persone in "Letteratura &amp; Poesia"</span>
+        </div>
+        <ul class="roster-list">
+          <li class="roster-row"><span class="avatar-bubble avatar-bubble-sm" style="background:var(--accent);">A</span> @anna.r <span class="presence-dot" style="position:static; border:none; display:inline-block; width:8px; height:8px;"></span></li>
+          <li class="roster-row"><span class="avatar-bubble avatar-bubble-sm" style="background:#9B8CE0;">G</span> @giuliab</li>
+          <li class="roster-row"><span class="avatar-bubble avatar-bubble-sm" style="background:#7FB7A3;">L</span> @lorenzo_t</li>
+          <li class="roster-row"><span class="avatar-bubble avatar-bubble-sm" style="background:#EC6A55;">S</span> @sara_m</li>
+          <li class="roster-row"><span class="avatar-bubble avatar-bubble-sm" style="background:var(--accent);">F</span> @francesca90</li>
+        </ul>
+        <p class="hint" style="margin-top:0.75rem;">12 persone online in questa stanza.</p>
+      </div>
+    </section>
+
+    <!-- ════════════════════ DM ════════════════════ -->
+    <section class="panel" id="panel-dm">
+
+      <!-- Lista conversazioni -->
+      <div class="subpanel active" id="sub-dm-lista">
+        <p class="dm-section-title">Richieste (1)</p>
+        <div class="dm-row" style="cursor:default;">
+          <div class="dm-avatar">M</div>
+          <div class="dm-info">
+            <div class="dm-info-top">
+              <span class="dm-name">@marcorossi</span>
+              <span class="dm-time">2g</span>
+            </div>
+            <div class="dm-info-bottom">
+              <span class="dm-preview">Vuole iniziare una conversazione</span>
+              <div class="dm-request-actions">
+                <button class="btn-primary-sm">Accetta</button>
+                <button class="btn-ghost-sm">Rifiuta</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="dm-section-title">Conversazioni</p>
+        <ul class="dm-list">
+          <li>
+            <button class="dm-row unread-row" onclick="openSub('dm','sub-dm-conv')">
+              <div class="dm-avatar unread-avatar">G
+                <span class="presence-dot"></span>
+              </div>
+              <div class="dm-info">
+                <div class="dm-info-top">
+                  <span class="dm-name unread">● @giuliab</span>
+                  <span class="dm-time unread">12:41</span>
+                </div>
+                <div class="dm-info-bottom">
+                  <span class="dm-preview unread">Ci vediamo stasera al Foyer? (3 nuovi)</span>
+                </div>
+              </div>
+            </button>
+          </li>
+          <li>
+            <button class="dm-row unread-row" onclick="openSub('dm','sub-dm-conv')">
+              <div class="dm-avatar unread-avatar">L</div>
+              <div class="dm-info">
+                <div class="dm-info-top">
+                  <span class="dm-name unread">● @lorenzo_t</span>
+                  <span class="dm-time unread">10:05</span>
+                </div>
+                <div class="dm-info-bottom">
+                  <span class="dm-preview unread">Hai letto l'ultimo capitolo? (1 nuovo)</span>
+                </div>
+              </div>
+            </button>
+          </li>
+          <li>
+            <button class="dm-row unread-row" onclick="openSub('dm','sub-dm-conv')">
+              <div class="dm-avatar unread-avatar">A
+                <span class="presence-dot"></span>
+              </div>
+              <div class="dm-info">
+                <div class="dm-info-top">
+                  <span class="dm-name unread">● @anna.r</span>
+                  <span class="dm-time unread">ieri</span>
+                </div>
+                <div class="dm-info-bottom">
+                  <span class="dm-preview unread">😂😂😂 troppo divertente (12 nuovi)</span>
+                </div>
+              </div>
+            </button>
+          </li>
+          <li>
+            <button class="dm-row" onclick="openSub('dm','sub-dm-conv')">
+              <div class="dm-avatar">S</div>
+              <div class="dm-info">
+                <div class="dm-info-top">
+                  <span class="dm-name">@sara_m</span>
+                  <span class="dm-time">lun</span>
+                </div>
+                <div class="dm-info-bottom">
+                  <span class="dm-preview">tu: Perfetto, a presto!</span>
+                </div>
+              </div>
+            </button>
+          </li>
+        </ul>
+
+        <p class="dm-section-title">In attesa di risposta</p>
+        <div class="dm-row" style="cursor:default;">
+          <div class="dm-avatar">F</div>
+          <div class="dm-info">
+            <div class="dm-info-top">
+              <span class="dm-name">@francesca90</span>
+            </div>
+            <div class="dm-info-bottom">
+              <span class="dm-preview">In attesa · 3 giorni fa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversazione singola -->
+      <div class="subpanel" id="sub-dm-conv">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('dm','sub-dm-lista')">‹ Messaggi</button>
+          <span class="sub-title pf-header-title">
+            <span class="avatar-bubble avatar-bubble-sm" style="background:var(--accent);">G</span>
+            <span>@giuliab</span>
+          </span>
+        </div>
+
+        <div class="chat-window">
+          <div class="chat-msg">
+            <div class="chat-bubble">Ehi! Come va? 😊</div>
+            <div class="chat-meta">12:30</div>
+          </div>
+          <div class="chat-msg mine">
+            <div class="chat-bubble">Tutto bene, grazie! Tu?</div>
+            <div class="chat-meta">12:33</div>
+          </div>
+          <div class="chat-msg">
+            <div class="chat-bubble">Bene! Senti, ci vediamo stasera al Foyer?</div>
+            <div class="chat-meta">12:41</div>
+          </div>
+          <div class="chat-msg">
+            <div class="chat-bubble">Verso le 21 di solito è più tranquillo</div>
+            <div class="chat-meta">12:41</div>
+          </div>
+          <div class="chat-msg">
+            <div class="chat-bubble">Fammi sapere così ci organizziamo 🌙</div>
+            <div class="chat-meta">12:42</div>
+          </div>
+        </div>
+
+        <div class="composer-row">
+          <textarea placeholder="Scrivi un messaggio…" rows="1"></textarea>
+          <button class="btn-primary">Invia</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════ RICERCA ════════════════════ -->
+    <section class="panel" id="panel-ricerca">
+
+      <div class="subpanel active" id="sub-ricerca-home">
+        <div class="card box-shadow">
+          <p><strong>Benvenuta in Ricerca.</strong> Qui trovi utenti che hanno scelto di
+          essere cercabili. Non è un'app di dating: niente swipe, niente match.
+          Vedi solo ciò che ognuna ha reso pubblico nel suo profilo.</p>
+          <p class="muted">Per essere trovata, attiva <em>Sono cercabile</em> nelle impostazioni del tuo profilo.</p>
+        </div>
+
+        <div class="search-tabs">
+          <button class="seg on" id="ricerca-tab-nick" onclick="searchTab('nick')">Per nickname</button>
+          <button class="seg" id="ricerca-tab-filtri" onclick="searchTab('filtri')">Per filtri</button>
+        </div>
+
+        <!-- Per nickname -->
+        <div id="ricerca-nick-form">
+          <div class="search-nick-form">
+            <input type="text" class="search-input" placeholder="Cerca un nickname…" value="anna" />
+            <button class="btn-primary" onclick="openSub('ricerca','sub-ricerca-risultati')">Cerca</button>
+          </div>
+        </div>
+
+        <!-- Per filtri -->
+        <div id="ricerca-filtri-form" style="display:none;">
+          <div class="filter-section open">
+            <button class="filter-section-head" onclick="toggleFilter(this)">
+              <span>Età <span class="filter-section-badge">1</span></span>
+              <span>▾</span>
+            </button>
+            <div class="filter-section-body">
+              <label class="chip chip-on"><input type="checkbox" checked /> <span>Filtra per età</span></label>
+              <div class="age-range">
+                <input type="number" value="25" /> <span>–</span> <input type="number" value="38" />
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <button class="filter-section-head" onclick="toggleFilter(this)">
+              <span>Regione</span>
+              <span>▾</span>
+            </button>
+            <div class="filter-section-body">
+              <div class="options">
+                <span class="chip chip-on">Lazio</span>
+                <span class="chip">Lombardia</span>
+                <span class="chip">Toscana</span>
+                <span class="chip">Veneto</span>
+                <span class="chip">Emilia-Romagna</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <button class="filter-section-head" onclick="toggleFilter(this)">
+              <span>Città</span>
+              <span>▾</span>
+            </button>
+            <div class="filter-section-body">
+              <input type="text" class="search-input" placeholder="Es. Roma" />
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <button class="filter-section-head" onclick="toggleFilter(this)">
+              <span>Interessi <span class="filter-section-badge">2</span></span>
+              <span>▾</span>
+            </button>
+            <div class="filter-section-body">
+              <div class="options">
+                <span class="chip chip-on">Letteratura</span>
+                <span class="chip chip-on">Musica dal vivo</span>
+                <span class="chip">Cinema</span>
+                <span class="chip">Escursionismo</span>
+                <span class="chip">Cucina</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <button class="filter-section-head" onclick="toggleFilter(this)">
+              <span>Cerco</span>
+              <span>▾</span>
+            </button>
+            <div class="filter-section-body">
+              <div class="options">
+                <span class="chip">Amicizia</span>
+                <span class="chip chip-on">Relazione</span>
+                <span class="chip">Community</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="search-go-row">
+            <button class="btn-primary search-go" onclick="openSub('ricerca','sub-ricerca-risultati')">Cerca</button>
+            <span class="filter-active-count">3 filtri attivi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Risultati -->
+      <div class="subpanel" id="sub-ricerca-risultati">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('ricerca','sub-ricerca-home')">‹ Ricerca</button>
+          <span class="sub-title">Risultati</span>
+        </div>
+
+        <div class="search-tabs">
+          <button class="seg on">Lista</button>
+          <button class="seg">Griglia</button>
+        </div>
+
+        <div class="search-cards">
+          <div class="user-card" onclick="openProfile('public')">
+            <span class="avatar-bubble avatar-bubble-sm" style="width:3rem; height:3rem; font-size:1.2rem; background:var(--accent);">A</span>
+            <div>
+              <div class="user-card-name">@anna.r</div>
+              <div class="user-card-meta">29 · Roma (RM) · Lesbica</div>
+              <span class="affinity-pill">Affinità alta · Letteratura, Musica</span>
+            </div>
+          </div>
+          <div class="user-card" onclick="openProfile('public')">
+            <span class="avatar-bubble avatar-bubble-sm" style="width:3rem; height:3rem; font-size:1.2rem; background:#9B8CE0;">G</span>
+            <div>
+              <div class="user-card-name">@giuliab</div>
+              <div class="user-card-meta">31 · Milano (MI) · Bisessuale</div>
+              <span class="affinity-pill">Affinità media · Musica dal vivo</span>
+            </div>
+          </div>
+          <div class="user-card" onclick="openProfile('public')">
+            <span class="avatar-bubble avatar-bubble-sm" style="width:3rem; height:3rem; font-size:1.2rem; background:#7FB7A3;">F</span>
+            <div>
+              <div class="user-card-name">@francesca90</div>
+              <div class="user-card-meta">34 · Bologna (BO) · Queer</div>
+              <span class="affinity-pill">Affinità alta · Letteratura, Relazione</span>
+            </div>
+          </div>
+        </div>
+        <button class="link search-more" style="display:block; margin:0.75rem auto 0;">Carica altri</button>
+      </div>
+    </section>
+
+    <!-- ════════════════════ PROFILO ════════════════════ -->
+    <section class="panel" id="panel-profilo">
+
+      <!-- Vista profilo proprio -->
+      <div class="subpanel active" id="sub-profilo-vista">
+        <div class="pf-icon-actions">
+          <button class="pf-icon-btn" title="Modifica profilo" onclick="openSub('profilo','sub-profilo-edit')">✎</button>
+        </div>
+        <header class="pf-hero">
+          <span class="avatar-bubble avatar-bubble-lg" style="background:var(--accent);">T</span>
+          <h2 class="pf-nick">@tu_nickname</h2>
+          <p class="pf-key-facts">29 anni · Lesbica · Roma (RM) · Relazione</p>
+        </header>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Descrizione</h2>
+          <p class="pf-bio">Amo le serate tranquille con un buon libro, i concerti improvvisati e le chiacchiere fino a tardi. Sempre pronta per una nuova playlist condivisa.</p>
+        </section>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Foto</h2>
+          <div class="pf-gallery">
+            <div class="ph">Foto 1</div>
+            <div class="ph">Foto 2</div>
+            <div class="ph">+ Aggiungi</div>
+          </div>
+        </section>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Altre informazioni</h2>
+          <div class="pf-rows">
+            <div class="pf-row"><span class="pf-row-label">Pronomi</span><span class="pf-row-value">lei/lei</span></div>
+            <div class="pf-row"><span class="pf-row-label">Città</span><span class="pf-row-value">Roma (RM), Lazio</span></div>
+            <div class="pf-row"><span class="pf-row-label">Orientamento</span><span class="pf-row-value">Lesbica</span></div>
+            <div class="pf-row"><span class="pf-row-label">Cerco</span><span class="pf-row-value">Relazione, Amicizia</span></div>
+            <div class="pf-row"><span class="pf-row-label">Stato relazionale</span><span class="pf-row-value">Single</span></div>
+            <div class="pf-row"><span class="pf-row-label">Lingue</span><span class="pf-row-value">Italiano, Inglese</span></div>
+            <div class="pf-row"><span class="pf-row-label">Interessi</span><span class="pf-row-value">Letteratura, Musica dal vivo, Cinema</span></div>
+            <div class="pf-row"><span class="pf-row-label">Figli</span><span class="pf-row-value">Nessuno</span></div>
+            <div class="pf-row"><span class="pf-row-label">Animali</span><span class="pf-row-value">Sì · una gatta</span></div>
+            <div class="pf-row"><span class="pf-row-label">Formazione</span><span class="pf-row-value">Laurea · Lettere Moderne</span></div>
+            <div class="pf-row"><span class="pf-row-label">Fumo</span><span class="pf-row-value">No</span></div>
+            <div class="pf-row"><span class="pf-row-label">Segno zodiacale</span><span class="pf-row-value">Pesci</span></div>
+          </div>
+        </section>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Zona pericolosa</h2>
+          <p class="hint">Eliminando l'account perderai definitivamente il profilo, i messaggi e le foto.</p>
+          <button class="btn-ghost" style="color:var(--error-text); border-color:var(--error);">Elimina account</button>
+        </section>
+      </div>
+
+      <!-- Modifica profilo -->
+      <div class="subpanel" id="sub-profilo-edit">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('profilo','sub-profilo-vista')">‹ Annulla</button>
+          <span class="sub-title">Modifica profilo</span>
+        </div>
+
+        <div class="card box-shadow">
+          <h2 class="pf-section-title">Aspetto</h2>
+          <div class="field">
+            <span>Nickname</span>
+            <input type="text" value="tu_nickname" />
+          </div>
+          <div class="field" style="margin-top:0.6rem;">
+            <span>Colore avatar</span>
+            <div class="options">
+              <span class="avatar-bubble avatar-bubble-sm chip-on" style="background:#E8B14E; border-radius:50%; width:1.8rem; height:1.8rem;"></span>
+              <span class="avatar-bubble avatar-bubble-sm" style="background:#EC6A55; border-radius:50%; width:1.8rem; height:1.8rem;"></span>
+              <span class="avatar-bubble avatar-bubble-sm" style="background:#7FB7A3; border-radius:50%; width:1.8rem; height:1.8rem;"></span>
+              <span class="avatar-bubble avatar-bubble-sm" style="background:#9B8CE0; border-radius:50%; width:1.8rem; height:1.8rem;"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card box-shadow">
+          <h2 class="pf-section-title">Descrizione</h2>
+          <div class="field">
+            <textarea rows="3" maxlength="500">Amo le serate tranquille con un buon libro, i concerti improvvisati e le chiacchiere fino a tardi.</textarea>
+            <span class="hint small">98 / 500 caratteri</span>
+          </div>
+        </div>
+
+        <div class="card box-shadow">
+          <h2 class="pf-section-title">Identità &amp; orientamento</h2>
+          <fieldset class="field">
+            <legend>Come ti identifichi</legend>
+            <div class="options">
+              <label class="chip chip-on"><input type="radio" name="mock-identity" checked /><span>Donna cisgender</span></label>
+              <label class="chip"><input type="radio" name="mock-identity" /><span>Donna transgender</span></label>
+              <label class="chip"><input type="radio" name="mock-identity" /><span>Non-binary</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="field" style="margin-top:0.6rem;">
+            <legend>Orientamento</legend>
+            <div class="options">
+              <label class="chip chip-on"><input type="checkbox" checked /><span>Lesbica</span></label>
+              <label class="chip"><input type="checkbox" /><span>Bisessuale</span></label>
+              <label class="chip"><input type="checkbox" /><span>Queer</span></label>
+              <label class="chip"><input type="checkbox" /><span>Pansessuale</span></label>
+            </div>
+          </fieldset>
+          <label class="check" style="display:flex; gap:0.4rem; align-items:center; margin-top:0.6rem; font-size:0.82rem;">
+            <input type="checkbox" checked /> <span>Mostra orientamento nel profilo pubblico</span>
+          </label>
+        </div>
+
+        <div class="card box-shadow">
+          <h2 class="pf-section-title">Posizione</h2>
+          <div class="field">
+            <span>Città</span>
+            <input type="text" value="Roma" />
+          </div>
+          <label class="check" style="display:flex; gap:0.4rem; align-items:center; margin-top:0.6rem; font-size:0.82rem;">
+            <input type="checkbox" checked /> <span>Mostra città nel profilo pubblico</span>
+          </label>
+        </div>
+
+        <div class="card box-shadow">
+          <h2 class="pf-section-title">Interessi</h2>
+          <div class="options">
+            <span class="chip chip-on">Letteratura ✕</span>
+            <span class="chip chip-on">Musica dal vivo ✕</span>
+            <span class="chip chip-on">Cinema ✕</span>
+            <span class="chip">+ Aggiungi</span>
+          </div>
+          <p class="hint small" style="margin-top:0.4rem;">3 / 10 interessi selezionati</p>
+        </div>
+
+        <div class="card box-shadow">
+          <h2 class="pf-section-title">Privacy ricerca</h2>
+          <label class="check" style="display:flex; gap:0.4rem; align-items:center; font-size:0.85rem;">
+            <input type="checkbox" checked /> <span>Sono cercabile (mostrami nei risultati di Ricerca)</span>
+          </label>
+        </div>
+
+        <div style="display:flex; gap:0.6rem; margin-top:0.5rem;">
+          <button class="btn-primary" onclick="openSub('profilo','sub-profilo-vista')">Salva modifiche</button>
+          <button class="btn-secondary" onclick="openSub('profilo','sub-profilo-vista')">Annulla</button>
+        </div>
+      </div>
+
+      <!-- Profilo pubblico (altrui) -->
+      <div class="subpanel" id="sub-profilo-pubblico">
+        <div class="sub-header">
+          <button class="back-btn" onclick="closeProfile()">‹ Indietro</button>
+          <span class="sub-title pf-header-title">
+            <span class="avatar-bubble avatar-bubble-sm" style="background:var(--accent);">A</span>
+            <span>@anna.r</span>
+          </span>
+        </div>
+
+        <div class="pf-icon-actions">
+          <button class="pf-icon-btn" title="Blocca">⛔</button>
+          <button class="pf-icon-btn" title="Segnala profilo">⚑</button>
+        </div>
+
+        <header class="pf-hero">
+          <span class="avatar-bubble avatar-bubble-lg" style="background:var(--accent);">A</span>
+          <h2 class="pf-nick">@anna.r</h2>
+          <p class="pf-key-facts">29 anni · Lesbica · Roma (RM) · Relazione</p>
+        </header>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Descrizione</h2>
+          <p class="pf-bio">Appassionata di poesia contemporanea, vinili e lunghe passeggiate serali. Cerco persone con cui condividere conversazioni vere.</p>
+        </section>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Foto</h2>
+          <div class="pf-gallery">
+            <div class="ph">Foto 1</div>
+            <div class="ph">Foto 2</div>
+          </div>
+        </section>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Altre informazioni</h2>
+          <div class="pf-rows">
+            <div class="pf-row"><span class="pf-row-label">Pronomi</span><span class="pf-row-value">lei/lei</span></div>
+            <div class="pf-row"><span class="pf-row-label">Città</span><span class="pf-row-value">Roma (RM), Lazio</span></div>
+            <div class="pf-row"><span class="pf-row-label">Cerco</span><span class="pf-row-value">Relazione, Community</span></div>
+            <div class="pf-row"><span class="pf-row-label">Lingue</span><span class="pf-row-value">Italiano, Francese</span></div>
+            <div class="pf-row"><span class="pf-row-label">Interessi</span><span class="pf-row-value">Letteratura, Musica dal vivo</span></div>
+            <div class="pf-row"><span class="pf-row-label">Segno zodiacale</span><span class="pf-row-value">Acquario</span></div>
+          </div>
+        </section>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Contatti</h2>
+          <div class="pf-actions">
+            <button class="btn-primary">Manda messaggio</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ════════════════════ ALTRO (Impostazioni, Legal, Admin, Auth, ecc.) ════════════════════ -->
+    <section class="panel" id="panel-altro">
+
+      <!-- Hub "Altro" -->
+      <div class="subpanel active" id="sub-altro-hub">
+        <p class="hint-bar">Schermate raggiungibili dal menu ☰ o da Impostazioni</p>
+
+        <div class="card box-shadow">
+          <h2 class="pf-section-title">Account &amp; community</h2>
+          <button class="link" style="display:block; margin-bottom:0.5rem;" onclick="openSub('altro','sub-impostazioni')">Impostazioni</button>
+          <button class="link" style="display:block; margin-bottom:0.5rem;" onclick="openSub('altro','sub-bloccati')">Utenti bloccati</button>
+          <button class="link" style="display:block;" onclick="openSub('altro','sub-legal-about')">Chi siamo / Privacy / Termini</button>
+        </div>
+
+        <div class="card box-shadow">
+          <h2 class="pf-section-title">Moderazione (staff)</h2>
+          <button class="link" style="display:block;" onclick="openSub('altro','sub-admin')">Apri pannello Admin</button>
+        </div>
+
+        <div class="card box-shadow">
+          <h2 class="pf-section-title">Autenticazione &amp; onboarding</h2>
+          <button class="link" style="display:block; margin-bottom:0.5rem;" onclick="openSub('altro','sub-auth-login')">Login / Registrazione</button>
+          <button class="link" style="display:block; margin-bottom:0.5rem;" onclick="openSub('altro','sub-onboarding')">Onboarding (crea profilo)</button>
+          <button class="link" style="display:block; margin-bottom:0.5rem;" onclick="openSub('altro','sub-verifica')">Verifica identità</button>
+          <button class="link" style="display:block; margin-bottom:0.5rem;" onclick="openSub('altro','sub-verifica-pending')">Verifica in attesa</button>
+          <button class="link" style="display:block; margin-bottom:0.5rem;" onclick="openSub('altro','sub-pin-lock')">App bloccata (PIN)</button>
+          <button class="link" style="display:block;" onclick="openSub('altro','sub-update-password')">Nuova password</button>
+        </div>
+      </div>
+
+      <!-- Impostazioni -->
+      <div class="subpanel" id="sub-impostazioni">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-altro-hub')">‹ Altro</button>
+          <span class="sub-title">Impostazioni</span>
+        </div>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Notifiche</h2>
+          <label class="check" style="display:flex; gap:0.4rem; align-items:center; font-size:0.85rem; margin-bottom:0.4rem;">
+            <input type="checkbox" checked /> <span>Nuovi messaggi privati</span>
+          </label>
+          <label class="check" style="display:flex; gap:0.4rem; align-items:center; font-size:0.85rem; margin-bottom:0.4rem;">
+            <input type="checkbox" checked /> <span>Menzioni nelle stanze</span>
+          </label>
+          <label class="check" style="display:flex; gap:0.4rem; align-items:center; font-size:0.85rem;">
+            <input type="checkbox" /> <span>Riepilogo settimanale</span>
+          </label>
+        </section>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Blocco con PIN</h2>
+          <p class="hint">Proteggi l'app con un PIN da inserire ogni volta che la riapri.</p>
+          <div class="field">
+            <span>Imposta PIN (4-8 cifre)</span>
+            <input type="password" placeholder="••••" maxlength="8" />
+          </div>
+          <button class="btn-primary btn-sm" style="margin-top:0.5rem;">Attiva PIN</button>
+        </section>
+
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Privacy</h2>
+          <button class="link" style="display:block; margin-bottom:0.4rem;" onclick="openSub('altro','sub-bloccati')">Persone bloccate</button>
+          <button class="link" style="display:block; margin-bottom:0.4rem;" onclick="openSub('altro','sub-legal-privacy')">Privacy Policy</button>
+          <button class="link" style="display:block;" onclick="openSub('altro','sub-legal-terms')">Termini di servizio</button>
+        </section>
+      </div>
+
+      <!-- Utenti bloccati -->
+      <div class="subpanel" id="sub-bloccati">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-impostazioni')">‹ Impostazioni</button>
+          <span class="sub-title">Utenti bloccati</span>
+        </div>
+        <ul class="mod-people">
+          <li class="mod-row">
+            <span>@marcorossi</span>
+            <button class="btn-ghost btn-sm">Sblocca</button>
+          </li>
+          <li class="mod-row">
+            <span>@profilo_fake22</span>
+            <button class="btn-ghost btn-sm">Sblocca</button>
+          </li>
+        </ul>
+        <p class="hint" style="margin-top:0.6rem;">2 persone bloccate. Sbloccandole potranno di nuovo contattarti.</p>
+      </div>
+
+      <!-- Legal: Chi siamo -->
+      <div class="subpanel" id="sub-legal-about">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-altro-hub')">‹ Altro</button>
+          <span class="sub-title">Chi siamo</span>
+        </div>
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Chi siamo</h2>
+          <p>Abbiamo creato Vesper perché crediamo che le connessioni più belle nascano quando ci si sente davvero liberi di essere se stessi.</p>
+          <p>Vesper è uno spazio pensato per donne, persone trans, non-binary e tutte le soggettività che non si identificano come uomini cisgender.</p>
+          <p>Qui la gentilezza è il requisito fondamentale. La nostra moderazione è attiva per mantenere alta la qualità del clima e proteggere la tua tranquillità.</p>
+          <p>Siamo qui per chi cerca legami basati sull'ascolto e sull'autenticità.</p>
+        </section>
+        <div class="seg-row">
+          <button class="seg" onclick="openSub('altro','sub-legal-privacy')">Privacy Policy</button>
+          <button class="seg" onclick="openSub('altro','sub-legal-terms')">Termini di servizio</button>
+        </div>
+      </div>
+
+      <!-- Legal: Privacy -->
+      <div class="subpanel" id="sub-legal-privacy">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-impostazioni')">‹ Impostazioni</button>
+          <span class="sub-title">Privacy Policy</span>
+        </div>
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Titolare del trattamento</h2>
+          <p>Il titolare del trattamento dei dati personali raccolti tramite Vesper è il gestore dell'app, contattabile all'indirizzo privacy@vesperapp.it.</p>
+          <h2 class="pf-section-title">Quali dati raccogliamo</h2>
+          <p>Dati di account, dati di profilo, dato biometrico (video di verifica), contenuti generati dall'utente, dati tecnici per le notifiche push.</p>
+          <h2 class="pf-section-title">I tuoi diritti</h2>
+          <p>Puoi richiedere accesso, rettifica, cancellazione, portabilità dei dati e opposizione al trattamento scrivendo a privacy@vesperapp.it.</p>
+          <p class="hint">Bozza informativa — verrà validata con un consulente legale prima del lancio pubblico.</p>
+        </section>
+      </div>
+
+      <!-- Legal: Termini -->
+      <div class="subpanel" id="sub-legal-terms">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-impostazioni')">‹ Impostazioni</button>
+          <span class="sub-title">Termini di servizio</span>
+        </div>
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Chi può iscriversi</h2>
+          <p>Vesper è uno spazio dedicato alla community lesbica, bisessuale e queer femminile. Sono benvenute donne cis, donne trans, uomini trans e persone non-binary AFAB.</p>
+          <h2 class="pf-section-title">Età minima</h2>
+          <p>L'iscrizione a Vesper è consentita esclusivamente a persone maggiorenni (18 anni compiuti).</p>
+          <h2 class="pf-section-title">Regole della community</h2>
+          <p>Sono vietati molestie, hate speech, minacce, doxxing, spam e account falsi. Le violazioni possono dare luogo ad avvisi, mute o ban.</p>
+          <p class="hint">Bozza informativa — verrà validata con un consulente legale prima del lancio pubblico.</p>
+        </section>
+      </div>
+
+      <!-- ════ ADMIN ════ -->
+      <div class="subpanel" id="sub-admin">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-altro-hub')">‹ Altro</button>
+          <span class="sub-title">Moderazione</span>
+        </div>
+
+        <div class="admin-subnav">
+          <button class="active" data-admin="stats" onclick="adminTab('stats')">Statistiche</button>
+          <button data-admin="verifiche" onclick="adminTab('verifiche')">Verifiche <span class="badge-sm">2</span></button>
+          <button data-admin="foto" onclick="adminTab('foto')">Foto <span class="badge-sm">3</span></button>
+          <button data-admin="segnalazioni" onclick="adminTab('segnalazioni')">Segnalazioni <span class="badge-sm">1</span></button>
+          <button data-admin="ai" onclick="adminTab('ai')">Flag AI <span class="badge-sm">4</span></button>
+          <button data-admin="reputazione" onclick="adminTab('reputazione')">Reputazione</button>
+          <button data-admin="moderatori" onclick="adminTab('moderatori')">Moderatori</button>
+        </div>
+
+        <!-- Statistiche -->
+        <div class="admin-pane active" id="admin-stats">
+          <div class="stats-section">
+            <h3 class="stats-title">Utenti</h3>
+            <div class="stat-row"><span>Totale iscritte</span><span class="stat-value">1.284</span></div>
+            <div class="stat-row"><span>Nuove (ultimi 7gg)</span><span class="stat-value">37</span></div>
+            <div class="stat-row"><span>Verifiche in attesa</span><span class="stat-value warn">2</span></div>
+          </div>
+          <div class="stats-section">
+            <h3 class="stats-title">Moderazione</h3>
+            <div class="stat-row"><span>Segnalazioni aperte</span><span class="stat-value warn">1</span></div>
+            <div class="stat-row"><span>In revisione (secondo parere)</span><span class="stat-value warn">2</span></div>
+            <div class="stat-row"><span>Flag AI da esaminare</span><span class="stat-value warn">4</span></div>
+          </div>
+        </div>
+
+        <!-- Verifiche -->
+        <div class="admin-pane" id="admin-verifiche">
+          <div class="mod-list">
+            <div class="mod-photo">
+              <div class="mod-photo-img ph">video</div>
+              <div class="mod-photo-body">
+                <p class="mod-photo-who">@nuova_iscritta</p>
+                <p class="muted small">Richiesta 2 ore fa</p>
+                <div class="mod-photo-actions">
+                  <button class="btn-approve">Approva</button>
+                  <button class="btn-reject">Rifiuta</button>
+                </div>
+              </div>
+            </div>
+            <div class="mod-photo">
+              <div class="mod-photo-img ph">video</div>
+              <div class="mod-photo-body">
+                <p class="mod-photo-who">@vale_22</p>
+                <p class="muted small">Richiesta 1 giorno fa</p>
+                <div class="mod-photo-actions">
+                  <button class="btn-approve">Approva</button>
+                  <button class="btn-reject">Rifiuta</button>
+                </div>
+              </div>
+            </div>
+            <p class="hint small">Motivo di rifiuto predefinito: "Viso non visibile o coperto"</p>
+          </div>
+        </div>
+
+        <!-- Foto -->
+        <div class="admin-pane" id="admin-foto">
+          <div class="mod-list">
+            <div class="mod-photo">
+              <div class="mod-photo-img ph">foto</div>
+              <div class="mod-photo-body">
+                <p class="mod-photo-who">@giuliab <span class="muted">· principale</span></p>
+                <p class="muted small">12 giu 2026, 18:42</p>
+                <div class="mod-photo-actions">
+                  <button class="btn-approve">Approva</button>
+                  <button class="btn-reject">Rifiuta</button>
+                </div>
+              </div>
+            </div>
+            <div class="mod-photo">
+              <div class="mod-photo-img ph">foto</div>
+              <div class="mod-photo-body">
+                <p class="mod-photo-who">@anna.r</p>
+                <p class="muted small">12 giu 2026, 09:10</p>
+                <div class="mod-photo-actions">
+                  <button class="btn-approve">Approva</button>
+                  <button class="btn-reject">Rifiuta</button>
+                </div>
+              </div>
+            </div>
+            <div class="mod-photo">
+              <div class="mod-photo-img ph">foto</div>
+              <div class="mod-photo-body">
+                <p class="mod-photo-who">@sara_m</p>
+                <p class="muted small">11 giu 2026, 21:05</p>
+                <div class="mod-photo-actions">
+                  <button class="btn-approve">Approva</button>
+                  <button class="btn-reject">Rifiuta</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segnalazioni -->
+        <div class="admin-pane" id="admin-segnalazioni">
+          <div class="seg-row">
+            <button class="seg on">Aperte</button>
+            <button class="seg">In revisione</button>
+            <button class="seg">Tutte</button>
+          </div>
+          <div class="mod-list">
+            <div class="card box-shadow">
+              <div class="mod-row"><span><strong>Messaggio</strong> · segnalato da @lorenzo_t</span><span class="muted small">2 ore fa</span></div>
+              <p class="small">"Contenuto offensivo nella stanza Foyer, motivo: linguaggio aggressivo"</p>
+              <div class="mod-photo-actions">
+                <button class="btn-approve">Conferma</button>
+                <button class="btn-reject">Rigetta</button>
+                <button class="btn-ghost btn-sm">In revisione</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flag AI -->
+        <div class="admin-pane" id="admin-ai">
+          <div class="mod-list">
+            <div class="card box-shadow">
+              <div class="mod-row"><span>@profilo_fake22 · Foyer</span><span class="muted small">10:15</span></div>
+              <p class="small">"messaggio segnalato automaticamente per linguaggio potenzialmente offensivo…"</p>
+              <button class="btn-ghost btn-sm">Archivia</button>
+            </div>
+            <div class="card box-shadow">
+              <div class="mod-row"><span>@marcorossi · DM</span><span class="muted small">ieri</span></div>
+              <p class="small">"messaggio segnalato per possibile spam/link sospetto"</p>
+              <button class="btn-ghost btn-sm">Archivia</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reputazione -->
+        <div class="admin-pane" id="admin-reputazione">
+          <form class="rep-search" style="display:flex; gap:0.4rem; margin-bottom:0.75rem;">
+            <input type="text" placeholder="Cerca per nickname…" value="anna.r" style="flex:1;" />
+            <button type="button" class="btn-primary btn-sm">Cerca</button>
+          </form>
+          <div class="card box-shadow">
+            <h2 class="pf-section-title">@anna.r</h2>
+            <p>Punteggio reputazione: <span class="rep-neutral" style="font-weight:800;">Neutro (0)</span></p>
+            <h3 class="stats-title" style="margin-top:0.6rem;">Storico eventi</h3>
+            <div class="mod-row"><span>Warning · linguaggio scorretto</span><span class="muted small">3 mesi fa</span></div>
+            <div class="seg-row" style="margin-top:0.6rem;">
+              <button class="btn-ghost btn-sm">+ Aggiungi evento</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Moderatori -->
+        <div class="admin-pane" id="admin-moderatori">
+          <div class="card box-shadow">
+            <h2 class="pf-section-title">Aggiungi moderatrice</h2>
+            <div style="display:flex; gap:0.4rem;">
+              <input type="text" placeholder="@nickname" style="flex:1;" />
+              <button class="btn-primary btn-sm">Aggiungi</button>
+            </div>
+          </div>
+          <ul class="mod-people">
+            <li class="mod-row"><span>@sara_m <span class="muted small">moderatrice</span></span><button class="btn-ghost btn-sm">Rimuovi</button></li>
+            <li class="mod-row"><span>@lorenzo_t <span class="muted small">moderatore</span></span><button class="btn-ghost btn-sm">Rimuovi</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ════ AUTH ════ -->
+      <div class="subpanel" id="sub-auth-login">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-altro-hub')">‹ Altro</button>
+          <span class="sub-title">Login / Registrazione</span>
+        </div>
+        <header class="brand" style="padding-top:0;">
+          <h1>Vesper</h1>
+          <p class="tagline">Accedi</p>
+        </header>
+        <section class="card box-shadow">
+          <form class="form">
+            <label class="field">
+              <span>Email</span>
+              <input type="email" placeholder="tu@esempio.it" value="anna.r@esempio.it" />
+            </label>
+            <label class="field">
+              <span>Password</span>
+              <input type="password" placeholder="la tua password" value="••••••••" />
+            </label>
+            <button type="button" class="link forgot">Password dimenticata?</button>
+            <button type="button" class="btn-primary">Accedi</button>
+          </form>
+          <button type="button" class="btn-secondary" style="margin-top:0.75rem; width:100%;">Registrati</button>
+        </section>
+      </div>
+
+      <!-- Onboarding -->
+      <div class="subpanel" id="sub-onboarding">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-altro-hub')">‹ Altro</button>
+          <span class="sub-title">Crea il tuo profilo</span>
+        </div>
+        <header class="brand" style="padding-top:0;">
+          <h1>Vesper</h1>
+          <p class="tagline">Crea il tuo profilo</p>
+        </header>
+        <section class="card box-shadow">
+          <form class="form">
+            <label class="field">
+              <span>Nickname</span>
+              <input type="text" placeholder="come vuoi farti chiamare" value="nuova_iscritta" />
+            </label>
+            <fieldset class="field">
+              <legend>Come ti identifichi</legend>
+              <div class="options">
+                <label class="chip chip-on"><input type="radio" name="mock-ob-id" checked /><span>Donna cisgender</span></label>
+                <label class="chip"><input type="radio" name="mock-ob-id" /><span>Donna transgender</span></label>
+                <label class="chip"><input type="radio" name="mock-ob-id" /><span>Uomo transgender</span></label>
+                <label class="chip"><input type="radio" name="mock-ob-id" /><span>Non-binary</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="field">
+              <legend>Orientamento (opzionale)</legend>
+              <div class="options">
+                <label class="chip chip-on"><input type="checkbox" checked /><span>Bisessuale</span></label>
+                <label class="chip"><input type="checkbox" /><span>Lesbica</span></label>
+                <label class="chip"><input type="checkbox" /><span>Queer</span></label>
+              </div>
+            </fieldset>
+            <label class="declare">
+              <input type="checkbox" checked />
+              <span>Dichiaro di appartenere a una delle categorie sopra indicate e di <strong>non essere un uomo cis</strong>.</span>
+            </label>
+            <button type="button" class="btn-primary">Entra nel Foyer</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- Verifica identità -->
+      <div class="subpanel" id="sub-verifica">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-altro-hub')">‹ Altro</button>
+          <span class="sub-title">Verifica identità</span>
+        </div>
+        <header class="brand" style="padding-top:0;">
+          <h1>Vesper</h1>
+        </header>
+        <section class="card box-shadow">
+          <h2 class="pf-section-title">Verifica la tua identità</h2>
+          <p class="muted">Per proteggere la community, verifichiamo che ogni profilo appartenga a una persona reale. Registreremo un breve video di 5 secondi.</p>
+          <ul class="verif-tips">
+            <li>Assicurati di essere in un ambiente ben illuminato</li>
+            <li>Tieni il viso ben visibile nella telecamera</li>
+            <li>Non coprire il viso con cappelli o maschere</li>
+            <li>Il video è visibile solo ai moderatori di Vesper</li>
+          </ul>
+          <div class="verif-video-wrap">anteprima fotocamera</div>
+          <button type="button" class="btn-primary">Inizia verifica</button>
+        </section>
+      </div>
+
+      <!-- Verifica in attesa -->
+      <div class="subpanel" id="sub-verifica-pending">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-altro-hub')">‹ Altro</button>
+          <span class="sub-title">Verifica in corso</span>
+        </div>
+        <header class="brand" style="padding-top:0;">
+          <h1>Vesper</h1>
+        </header>
+        <section class="card box-shadow">
+          <h2>Verifica in corso</h2>
+          <p class="muted">Il tuo video di verifica è stato ricevuto. I moderatori lo esamineranno al più presto — riceverai accesso all'app non appena approvato.</p>
+          <p class="hint">Puoi chiudere questa pagina e tornare più tardi.</p>
+        </section>
+      </div>
+
+      <!-- PIN lock -->
+      <div class="subpanel" id="sub-pin-lock">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-altro-hub')">‹ Altro</button>
+          <span class="sub-title">App bloccata</span>
+        </div>
+        <header class="brand" style="padding-top:0;">
+          <h1>Vesper</h1>
+          <p class="tagline">App bloccata</p>
+        </header>
+        <section class="card box-shadow">
+          <form class="form">
+            <label class="field">
+              <span>Inserisci il PIN</span>
+              <input type="password" maxlength="8" placeholder="••••" />
+            </label>
+            <button type="button" class="btn-primary">Sblocca</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- Update password -->
+      <div class="subpanel" id="sub-update-password">
+        <div class="sub-header">
+          <button class="back-btn" onclick="openSub('altro','sub-altro-hub')">‹ Altro</button>
+          <span class="sub-title">Nuova password</span>
+        </div>
+        <header class="brand" style="padding-top:0;">
+          <h1>Vesper</h1>
+          <p class="tagline">Nuova password</p>
+        </header>
+        <section class="card box-shadow">
+          <form class="form">
+            <label class="field">
+              <span>Nuova password</span>
+              <input type="password" placeholder="min 8 caratteri, lettere e numeri" />
+              <span class="hint">Almeno 8 caratteri, con lettere e numeri.</span>
+            </label>
+            <label class="field">
+              <span>Conferma password</span>
+              <input type="password" placeholder="ripeti la password" />
+            </label>
+            <button type="button" class="btn-primary">Imposta nuova password</button>
+          </form>
+        </section>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Drawer / burger menu -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+  <nav class="drawer" id="drawer">
+    <button class="drawer-item active" onclick="gotoTabFromDrawer('stanze')">Stanze</button>
+    <button class="drawer-item" onclick="gotoTabFromDrawer('ricerca')">Ricerca</button>
+    <button class="drawer-item" onclick="gotoTabFromDrawer('dm')">Messaggi <span class="badge-sm">5</span></button>
+    <button class="drawer-item" onclick="gotoTabFromDrawer('profilo')">Il Mio Profilo</button>
+
+    <p class="drawer-group-label">Admin Tab</p>
+    <div class="drawer-children">
+      <button class="drawer-item" onclick="gotoAdmin('stats')">Statistiche</button>
+      <button class="drawer-item" onclick="gotoAdmin('verifiche')">Verifiche <span class="badge-sm">2</span></button>
+      <button class="drawer-item" onclick="gotoAdmin('foto')">Foto <span class="badge-sm">3</span></button>
+      <button class="drawer-item" onclick="gotoAdmin('segnalazioni')">Segnalazioni <span class="badge-sm">1</span></button>
+      <button class="drawer-item" onclick="gotoAdmin('ai')">Flag AI <span class="badge-sm">4</span></button>
+      <button class="drawer-item" onclick="gotoAdmin('reputazione')">Reputazione</button>
+      <button class="drawer-item" onclick="gotoAdmin('moderatori')">Moderatori</button>
+    </div>
+
+    <button class="drawer-item" onclick="gotoSub('altro','sub-impostazioni')">Impostazioni</button>
+    <button class="drawer-item" onclick="gotoSub('altro','sub-legal-about')">Chi siamo</button>
+    <button class="drawer-item" onclick="gotoSub('altro','sub-legal-privacy')">Privacy Policy</button>
+    <button class="drawer-item" onclick="gotoSub('altro','sub-legal-terms')">Termini di servizio</button>
+    <button class="drawer-item" onclick="closeDrawer()">Segnala un bug</button>
+    <button class="drawer-item" onclick="closeDrawer()">Dacci un suggerimento</button>
+    <button class="drawer-item" onclick="closeDrawer()">Sostieni Vesper ↗</button>
+
+    <button class="drawer-signout">Esci</button>
+  </nav>
+
+  <!-- Toast globale -->
+  <div class="global-toast" id="toast">
+    <div class="global-toast-icon">@</div>
+    <div class="global-toast-text">
+      <div class="global-toast-title">Sei stata menzionata in "Letteratura &amp; Poesia"</div>
+      <div class="global-toast-sub">@anna.r: "Concordo, è bellissimo..."</div>
+    </div>
+    <button class="global-toast-close" aria-label="Chiudi">✕</button>
+  </div>
+
+</div>
+
+<div class="demo-controls">
+  <button id="toast-toggle">Mostra/Nascondi toast notifica</button>
+</div>
+
+<script>
+  // ── Tab bar (sezioni principali) ──────────────────────────
+  function activateTab(tabName) {
+    document.querySelectorAll('.tab').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+    document.querySelector('.tab[data-tab="' + tabName + '"]').classList.add('active');
+    document.getElementById('panel-' + tabName).classList.add('active');
+  }
+
+  document.querySelectorAll('.tab').forEach((btn) => {
+    btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+  });
+
+  // ── Sotto-pannelli (dentro ogni tab) ───────────────────────
+  function openSub(tabName, subId) {
+    const panel = document.getElementById('panel-' + tabName);
+    panel.querySelectorAll('.subpanel').forEach((p) => p.classList.remove('active'));
+    document.getElementById(subId).classList.add('active');
+    panel.scrollTop = 0;
+    const content = document.getElementById('content-root');
+    if (content) content.scrollTop = 0;
+  }
+
+  // Apertura profilo pubblico da Ricerca: passa al tab Profilo e mostra il sotto-pannello pubblico
+  let profileReturnTab = 'ricerca';
+  function openProfile(kind) {
+    // ricorda da dove siamo arrivati per il tasto "indietro"
+    const activeTab = document.querySelector('.tab.active');
+    profileReturnTab = activeTab ? activeTab.dataset.tab : 'ricerca';
+    activateTab('profilo');
+    openSub('profilo', 'sub-profilo-pubblico');
+  }
+  function closeProfile() {
+    activateTab(profileReturnTab);
+  }
+
+  // ── Filtri ricerca: toggle sezioni e tab nickname/filtri ───
+  function toggleFilter(headBtn) {
+    headBtn.parentElement.classList.toggle('open');
+  }
+  function searchTab(which) {
+    const nickBtn = document.getElementById('ricerca-tab-nick');
+    const filtriBtn = document.getElementById('ricerca-tab-filtri');
+    const nickForm = document.getElementById('ricerca-nick-form');
+    const filtriForm = document.getElementById('ricerca-filtri-form');
+    if (which === 'nick') {
+      nickBtn.classList.add('on'); filtriBtn.classList.remove('on');
+      nickForm.style.display = ''; filtriForm.style.display = 'none';
+    } else {
+      filtriBtn.classList.add('on'); nickBtn.classList.remove('on');
+      filtriForm.style.display = ''; nickForm.style.display = 'none';
+    }
+  }
+
+  // ── Admin sotto-tab ─────────────────────────────────────────
+  function adminTab(name) {
+    document.querySelectorAll('.admin-subnav button').forEach((b) => b.classList.remove('active'));
+    document.querySelector('.admin-subnav button[data-admin="' + name + '"]').classList.add('active');
+    document.querySelectorAll('.admin-pane').forEach((p) => p.classList.remove('active'));
+    document.getElementById('admin-' + name).classList.add('active');
+  }
+
+  // ── Burger menu drawer ──────────────────────────────────────
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  document.getElementById('burger-btn').addEventListener('click', () => {
+    drawer.classList.add('show');
+    overlay.classList.add('show');
+  });
+  function closeDrawer() {
+    drawer.classList.remove('show');
+    overlay.classList.remove('show');
+  }
+  overlay.addEventListener('click', closeDrawer);
+
+  function gotoTabFromDrawer(tabName) {
+    activateTab(tabName);
+    closeDrawer();
+    document.querySelectorAll('.drawer-item').forEach((b) => b.classList.remove('active'));
+  }
+  function gotoSub(tabName, subId) {
+    activateTab(tabName);
+    openSub(tabName, subId);
+    closeDrawer();
+  }
+  function gotoAdmin(tabKey) {
+    activateTab('altro');
+    openSub('altro', 'sub-admin');
+    adminTab(tabKey);
+    closeDrawer();
+  }
+
+  // ── Toast ─────────────────────────────────────────────────
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-toggle').addEventListener('click', () => {
+    toast.classList.toggle('show');
+  });
+  toast.querySelector('.global-toast-close').addEventListener('click', (e) => {
+    e.stopPropagation();
+    toast.classList.remove('show');
+  });
+  setTimeout(() => toast.classList.add('show'), 800);
+</script>
+</body>
+</html>
