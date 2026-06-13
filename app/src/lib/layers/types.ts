@@ -3,15 +3,16 @@
 export type Layer = 1 | 2 | 3
 
 export interface LayerRequirements {
-  minDays: number
+  minHours: number
   minMessages: number
-  maxGraveReports: number
 }
 
 // Soglie provvisorie: da calibrare dopo 3 mesi dal lancio (punti_aperti.md §3).
+// Il requisito di reputazione (punteggio >= -1) è gestito server-side
+// (RPC promote_my_layer / check_my_layer_eligibility) e decade nel tempo.
 export const LAYER_REQUIREMENTS: Record<2 | 3, LayerRequirements> = {
-  2: { minDays: 7, minMessages: 20, maxGraveReports: 0 },
-  3: { minDays: 30, minMessages: 100, maxGraveReports: 0 },
+  2: { minHours: 48, minMessages: 15 },
+  3: { minHours: 30 * 24, minMessages: 100 },
 }
 
 // Permessi per strato: cosa si sblocca a ciascun livello.
