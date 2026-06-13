@@ -299,7 +299,7 @@ export function ProfileEditor({
   }))
 
   useEffect(() => {
-    checkLayerEligibility(profile.id)
+    checkLayerEligibility()
       .then((e) => setLayerEligibility(e))
       .catch(() => {})
   }, [profile.id])
@@ -982,14 +982,33 @@ export function ProfileEditor({
                 {layerEligibility.eligible ? (
                   <p className="ok" role="status">Hai soddisfatto tutti i requisiti. L'avanzamento avviene automaticamente al tuo prossimo accesso.</p>
                 ) : (
-                  <ul className="layer-requirements">
-                    {layerEligibility.missingDays > 0 && (
-                      <li>ancora <strong>{layerEligibility.missingDays} giorni</strong> di permanenza</li>
+                  <>
+                    {(layerEligibility.missingHours > 0 || layerEligibility.missingMessages > 0) && (
+                      <ul className="layer-requirements">
+                        {layerEligibility.missingHours > 0 && (
+                          <li>
+                            ancora{' '}
+                            <strong>
+                              {layerEligibility.missingHours >= 24
+                                ? `${Math.ceil(layerEligibility.missingHours / 24)} giorni`
+                                : `${layerEligibility.missingHours} ore`}
+                            </strong>{' '}
+                            di permanenza
+                          </li>
+                        )}
+                        {layerEligibility.missingMessages > 0 && (
+                          <li>ancora <strong>{layerEligibility.missingMessages} messaggi</strong> in chatroom</li>
+                        )}
+                      </ul>
                     )}
-                    {layerEligibility.missingMessages > 0 && (
-                      <li>ancora <strong>{layerEligibility.missingMessages} messaggi</strong> in chatroom</li>
+                    {!layerEligibility.reputationOk && (
+                      <p className="hint">
+                        Per ora non hai ancora i requisiti per scrivere messaggi privati.
+                        Continua a partecipare in modo positivo nelle chat: la situazione si aggiorna
+                        automaticamente nel tempo.
+                      </p>
                     )}
-                  </ul>
+                  </>
                 )}
               </>
             )}
