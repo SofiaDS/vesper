@@ -90,35 +90,36 @@ export const CHILDREN_OPTIONS: { value: ChildrenStatus; label: string }[] = [
   { value: 'non_ho_figli', label: 'Non ho figli' },
   { value: 'vorrei_figli', label: 'Vorrei averne' },
   { value: 'non_vorrei_figli', label: 'Non ne vorrei' },
+  { value: 'non_so', label: 'Non so ancora'}
 ]
 
 export const DIET_OPTIONS: { value: Diet; label: string }[] = [
-  { value: 'vegetariana', label: 'Vegetarianə' },
-  { value: 'vegana', label: 'Veganə' },
-  { value: 'flexitariana', label: 'Flexitarianə' },
-  { value: 'onnivora', label: 'Onnivorə' },
-  { value: 'onnivora_consapevole', label: 'Onnivorə consapevole' },
+  { value: 'vegetariana', label: 'Vegetariana' },
+  { value: 'vegana', label: 'Vegana' },
+  { value: 'flexitariana', label: 'Flexitariana' },
+  { value: 'onnivora', label: 'Onnivora' },
+  { value: 'onnivora_consapevole', label: 'Onnivora consapevole' },
   { value: 'altro', label: 'Altro' },
 ]
 
 export const RELIGION_OPTIONS: { value: Religion; label: string }[] = [
-  { value: 'cattolicesimo', label: 'Cattolicesimə' },
+  { value: 'cattolicesimo', label: 'Cattolicesimo' },
   { value: 'islam', label: 'Islam' },
-  { value: 'ebraismo', label: 'Ebraismə' },
-  { value: 'buddismo', label: 'Buddismə' },
-  { value: 'induismo', label: 'Induismə' },
+  { value: 'ebraismo', label: 'Ebraismo' },
+  { value: 'buddismo', label: 'Buddismo' },
+  { value: 'induismo', label: 'Induismo' },
   { value: 'spiritualita', label: 'Spiritualità personale' },
-  { value: 'ateismo', label: 'Ateə' },
-  { value: 'agnosticismo', label: 'Agnosticə' },
+  { value: 'ateismo', label: 'Ateismo' },
+  { value: 'agnosticismo', label: 'Agnosticismo' },
   { value: 'altro', label: 'Altro' },
 ]
 
 export const POLITICS_OPTIONS: { value: Politics; label: string }[] = [
-  { value: 'progressista', label: 'Progressistə' },
-  { value: 'conservatrice', label: 'Conservatorə' },
-  { value: 'moderata', label: 'Moderatə' },
-  { value: 'libertaria', label: 'Libertariə' },
-  { value: 'anarchica', label: 'Anarchicə' },
+  { value: 'progressista', label: 'Progressista' },
+  { value: 'conservatrice', label: 'Conservatore' },
+  { value: 'moderata', label: 'Moderato' },
+  { value: 'libertaria', label: 'Libertario' },
+  { value: 'anarchica', label: 'Anarchico' },
   { value: 'socialista', label: 'Socialista' },
   { value: 'comunista', label: 'Comunista' },
   { value: 'altro', label: 'Altro' },
@@ -152,8 +153,8 @@ export const SPORT_OPTIONS: { value: Sport; label: string }[] = [
 ]
 
 export const DM_FILTER_OPTIONS: { value: DmFilter; label: string }[] = [
-  { value: 'tutte', label: 'Tutte' },
+  { value: 'tuttə', label: 'tuttə' },
   { value: 'citta', label: 'Dalla mia città' },
   { value: 'intenti', label: 'Con i miei stessi intenti' },
-  { value: 'verificate', label: 'Solo verificate' },
+  { value: 'verificatə', label: 'Solo verificatə' },
 ]

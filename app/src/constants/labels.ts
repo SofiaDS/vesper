@@ -40,7 +40,6 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
   francese: 'Francese',
   tedesco: 'Tedesco',
   lis: 'Lingua dei segni italiana (LIS)',
-  altro: 'Altra lingua',
 }
 
 export const SMOKING_LABELS: Record<Smoking, string> = {

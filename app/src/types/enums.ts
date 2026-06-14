@@ -55,13 +55,13 @@ export type Language =
   | 'francese'
   | 'tedesco'
   | 'lis'
-  | 'altro'
 
 export type ChildrenStatus =
   | 'ho_figli'
   | 'non_ho_figli'
   | 'vorrei_figli'
   | 'non_vorrei_figli'
+  | 'non_so'
 
 export type Diet =
   | 'vegetariana'
@@ -110,7 +110,7 @@ export type Smoking = 'fuma' | 'no' | 'occasionalmente' | 'non_dico'
 
 export type Sport = 'regolarmente' | 'saltuariamente' | 'no' | 'non_dico'
 
-export type DmFilter = 'tutte' | 'citta' | 'intenti' | 'verificate'
+export type DmFilter = 'tuttə' | 'citta' | 'intenti' | 'verificatə'
 
 export type Zodiac =
   | 'ariete'

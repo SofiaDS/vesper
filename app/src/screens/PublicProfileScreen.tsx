@@ -14,7 +14,6 @@ import type {
   Intent,
   RelationshipStatus,
   RelationshipType,
-  Language,
   ChildrenStatus,
   Diet,
   Religion,
@@ -43,7 +42,7 @@ type PublicProfile = {
   intents: Intent[] | null
   relationship_status: RelationshipStatus | null
   relationship_type: RelationshipType | null
-  languages: Language[] | null
+  languages: string[] | null
   children_status: ChildrenStatus | null
   has_pets: boolean | null
   pets_detail: string | null
