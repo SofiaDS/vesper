@@ -19,7 +19,7 @@ export const IDENTITY_OPTIONS: { value: IdentityCategory; label: string }[] = [
   { value: 'donna_cis', label: 'Donna cis' },
   { value: 'donna_trans', label: 'Donna trans' },
   { value: 'uomo_trans', label: 'Uomo trans' },
-  { value: 'nonbinary', label: 'Non binarie' },
+  { value: 'nonbinary', label: 'Non binary' },
   { value: 'genderqueer', label: 'Genderqueer' },
   { value: 'agender', label: 'Agender' },
   { value: 'bigender', label: 'Bigender' },
