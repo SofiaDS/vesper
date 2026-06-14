@@ -35,8 +35,8 @@ export type Intent =
   | 'mge'
   | 'relazione_aperta'
   | 'relazione_platonica'
-  | 'altro'
   | 'supporto'
+  | 'altro'
 
 export type RelationshipStatus = 'single' | 'in_relazione' | 'non_dico'
 

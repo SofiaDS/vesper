@@ -57,7 +57,9 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
                   onClick={() => canOpen && onOpen(room)}
                   disabled={!canOpen}
                 >
-                  <span className="room-name">{room.name}</span>
+                  <span className="room-name-row">
+                    <span className="room-name">{room.name}</span>
+                  </span>
                   {room.description && (
                     <span className="room-desc">{room.description}</span>
                   )}
