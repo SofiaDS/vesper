@@ -5,6 +5,8 @@ import {
   BIO_MAX,
   PRONOUNS_MAX,
   MAX_INTERESTS,
+  MAX_LANGUAGES,
+  LANGUAGE_MAX_LEN,
   PETS_DETAIL_MAX,
   EDUCATION_INSTITUTE_MAX,
   INTEREST_CATEGORIES,
@@ -50,7 +52,6 @@ import type {
   Intent,
   RelationshipStatus,
   RelationshipType,
-  Language,
   ChildrenStatus,
   Diet,
   Religion,
@@ -224,7 +225,8 @@ export function ProfileEditor({
   const [intents, setIntents] = useState<Intent[]>(profile.intents ?? [])
   const [relStatus, setRelStatus] = useState<RelationshipStatus | null>(profile.relationship_status ?? null)
   const [relType, setRelType] = useState<RelationshipType | null>(profile.relationship_type ?? null)
-  const [languages, setLanguages] = useState<Language[]>(profile.languages ?? [])
+  const [languages, setLanguages] = useState<string[]>(profile.languages ?? [])
+  const [newLanguage, setNewLanguage] = useState('')
   const [childrenStatus, setChildrenStatus] = useState<ChildrenStatus | null>(profile.children_status ?? null)
   const [hasPets, setHasPets] = useState<boolean | null>(profile.has_pets ?? null)
   const [petsDetail, setPetsDetail] = useState(profile.pets_detail ?? '')
@@ -342,6 +344,28 @@ export function ProfileEditor({
   }
 
   const customInterests = interests.filter((t) => !INTEREST_SUGGESTIONS.includes(t))
+
+  function addLanguage(raw: string) {
+    const tag = raw.trim().toLowerCase()
+    if (!tag) return
+    setLanguages((prev) => {
+      if (prev.includes(tag) || prev.length >= MAX_LANGUAGES) return prev
+      return [...prev, tag]
+    })
+    setNewLanguage('')
+  }
+
+  function toggleLanguage(tag: string) {
+    setLanguages((prev) =>
+      prev.includes(tag)
+        ? prev.filter((t) => t !== tag)
+        : prev.length >= MAX_LANGUAGES
+          ? prev
+          : [...prev, tag],
+    )
+  }
+
+  const customLanguages = languages.filter((t) => !LANGUAGE_OPTIONS.some((o) => o.value === t))
 
   function onCityInput(v: string) {
     setCityQuery(v)
@@ -868,17 +892,56 @@ export function ProfileEditor({
             </div>
           </fieldset>
 
-          <MultiChoiceField
-            legend="Lingue parlate"
-            options={languageOpts}
-            selected={languages}
-            onToggle={(v) => setLanguages(toggle(languages, v))}
-          >
+          <fieldset className="field">
+            <legend>
+              Lingue parlate <span className="muted">({languages.length}/{MAX_LANGUAGES})</span>
+            </legend>
+            <div className="options">
+              {languageOpts.map((opt) => (
+                <label key={opt.value} className="chip">
+                  <input
+                    type="checkbox"
+                    checked={languages.includes(opt.value)}
+                    onChange={() => toggleLanguage(opt.value)}
+                    disabled={!languages.includes(opt.value) && languages.length >= MAX_LANGUAGES}
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+            </div>
+            {customLanguages.length > 0 && (
+              <div className="options">
+                {customLanguages.map((tag) => (
+                  <button type="button" key={tag} className="chip sel" onClick={() => toggleLanguage(tag)}>
+                    {tag} ✕
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className="composer inline-add">
+              <input
+                type="text"
+                value={newLanguage}
+                onChange={(e) => setNewLanguage(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLanguage(newLanguage) } }}
+                placeholder="Altra lingua…"
+                maxLength={LANGUAGE_MAX_LEN}
+                disabled={languages.length >= MAX_LANGUAGES}
+              />
+              <button
+                type="button"
+                className="btn-primary btn-sm"
+                onClick={() => addLanguage(newLanguage)}
+                disabled={!newLanguage.trim() || languages.length >= MAX_LANGUAGES}
+              >
+                Aggiungi
+              </button>
+            </div>
             <ShowInProfileToggle
               checked={vis.show_languages}
               onChange={(v) => setVisFlag('show_languages', v)}
             />
-          </MultiChoiceField>
+          </fieldset>
         </FilterSection>
 
         <FilterSection

@@ -50,7 +50,7 @@ export interface ProfileFacts {
   birth_date: string | null
   relationship_status: RelationshipStatus | null
   relationship_type: RelationshipType | null
-  languages: Language[] | null
+  languages: string[] | null
   interests: string[] | null
   children_status: ChildrenStatus | null
   has_pets: boolean | null
@@ -100,7 +100,7 @@ export function buildProfileRows(f: ProfileFacts): React.ReactNode[] {
   if (f.languages && f.languages.length > 0)
     rows.push(
       <ProfileRow key="lang" label="Lingue parlate">
-        {f.languages.map((l) => LANGUAGE_LABELS[l]).join(', ')}
+        {f.languages.map((l) => LANGUAGE_LABELS[l as Language] ?? l).join(', ')}
       </ProfileRow>,
     )
   if (f.interests && f.interests.length > 0)

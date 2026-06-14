@@ -25,7 +25,7 @@ export interface DmMessage {
 
 const DM_PAGE_SIZE = 50
 
-// In v1 il filtro DM avanzato (citta/intenti/verificate) non è ancora applicato:
+// In v1 il filtro DM avanzato (citta/intenti/verificatə) non è ancora applicato:
 // la struttura è qui per uso futuro (permessi_e_strati.md §1.1).
 export async function checkDmFilter(_toUserId: string): Promise<boolean> {
   return true
