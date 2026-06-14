@@ -161,7 +161,7 @@ code {
 .field input[type='text'] {
   width: 100%;
   padding: 0.65rem 0.75rem;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -245,7 +245,7 @@ code {
   margin-top: 0.25rem;
   padding: 0.7rem 1rem;
   border: 0;
-  border-radius: 35px;
+  border-radius: 8px;
   background: var(--accent);
   color: var(--bg);
   font-size: 1rem;
@@ -275,7 +275,7 @@ code {
   margin-top: 0.6rem;
   padding: 0.7rem 1rem;
   border: 1.5px solid rgba(232, 177, 78, 0.4);
-  border-radius: 35px;
+  border-radius: 8px;
   background: none;
   color: var(--accent-text);
   font-size: 1rem;
@@ -378,15 +378,15 @@ code {
   flex-direction: column;
   gap: 0.15rem;
   padding: 0.55rem 0.85rem;
-  border-radius: 16px 16px 16px 4px;
+  border-radius: 12px;
   background: var(--surface);
   color: var(--text);
 }
 
 .msg-mine {
-  background: var(--accent);
-  color: var(--bg);
-  border-radius: 16px 16px 4px 16px;
+  background: rgba(232, 177, 78, 0.12);
+  border: 1px solid rgba(232, 177, 78, 0.4);
+  color: var(--text);
 }
 
 .msg-body {
@@ -411,7 +411,7 @@ code {
   flex: 1;
   min-width: 0;
   padding: 0.65rem 0.75rem;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -580,10 +580,19 @@ code {
   flex-shrink: 0;
 }
 
-.room-action {
+.room-name-row {
   display: flex;
   align-items: center;
-  padding-right: 0.75rem;
+  gap: 0.4rem;
+}
+
+.room-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.85rem 0.75rem;
 }
 
 .btn-sm {
@@ -693,7 +702,7 @@ body:has(.install-banner) .rooms-hint {
   padding: 0.45rem 0.85rem;
   font-size: 0.85rem;
   border: 1px solid rgba(236, 106, 85, 0.5);
-  border-radius: 35px;
+  border-radius: 8px;
   background: none;
   color: var(--error-text);
   font-weight: 600;
@@ -704,11 +713,6 @@ body:has(.install-banner) .rooms-hint {
 .btn-danger:disabled {
   opacity: 0.5;
   cursor: default;
-}
-
-/* Più bottoni affiancati nell'area azione di una stanza */
-.room-action {
-  gap: 0.4rem;
 }
 
 /* Link "Password dimenticata?" sotto il campo password */
@@ -834,7 +838,7 @@ body:has(.install-banner) .rooms-hint {
   resize: vertical;
   min-height: 88px;
   padding: 0.65rem 0.75rem;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -959,6 +963,15 @@ body:has(.install-banner) .rooms-hint {
   border-radius: 12px;
   border: 1px solid rgba(232, 177, 78, 0.2);
   background: rgba(247, 239, 221, 0.04);
+}
+
+.pf-section-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  opacity: 0.45;
 }
 
 .pf-nick {
@@ -1220,7 +1233,12 @@ body:has(.install-banner) .rooms-hint {
   justify-content: space-between;
   align-items: baseline;
   gap: 0.6rem;
-  padding: 0.3rem 0;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(232, 177, 78, 0.12);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
 }
 
 .stat-label {
@@ -1287,7 +1305,7 @@ body:has(.install-banner) .rooms-hint {
 .btn-approve,
 .btn-reject {
   border: 0;
-  border-radius: 35px;
+  border-radius: 8px;
   padding: 0.4rem 0.8rem;
   font: inherit;
   font-weight: 600;
@@ -1746,7 +1764,7 @@ body:has(.install-banner) .rooms-hint {
   box-sizing: border-box;
   resize: vertical;
   border: 1px solid rgba(247, 239, 221, 0.18);
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 0.65rem 0.75rem;
   font: inherit;
   background: rgba(247, 239, 221, 0.05);
@@ -1988,7 +2006,7 @@ body:has(.install-banner) .rooms-hint {
 .seg {
   flex: 1;
   padding: 0.5rem 0.6rem;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: transparent;
   color: var(--text);
@@ -2009,7 +2027,7 @@ body:has(.install-banner) .rooms-hint {
   flex: 1;
   width: 100%;
   padding: 0.6rem 0.7rem;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -2218,9 +2236,13 @@ body:has(.install-banner) .rooms-hint {
 }
 .search-aff {
   font-size: 0.72rem;
-  opacity: 0.8;
+  font-weight: 700;
   white-space: nowrap;
   flex: 0 0 auto;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  color: var(--accent-text);
 }
 .search-more {
   align-self: center;
@@ -2280,6 +2302,40 @@ button.dm-conv:hover {
   font-size: 0.78rem;
 }
 
+.dm-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.dm-avatar {
+  flex: 0 0 auto;
+}
+
+.dm-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.dm-info-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.dm-info-bottom {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
 .dm-request-actions {
   display: flex;
   gap: 0.5rem;
@@ -2299,7 +2355,7 @@ button.dm-conv:hover {
   flex: 1;
   min-width: 0;
   padding: 0.55rem 0.75rem;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -2780,7 +2836,7 @@ button.dm-conv:hover {
   justify-content: space-between;
   gap: 0.6rem;
   padding: 0.7rem 0.9rem;
-  border-radius: 12px;
+  border-radius: 8px;
   border: none;
   background: transparent;
   color: var(--text);

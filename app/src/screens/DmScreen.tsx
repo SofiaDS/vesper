@@ -6,6 +6,7 @@ import { MessageComposer } from '../components/MessageComposer'
 import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
 import { useMessageReactions } from '../hooks/useMessageReactions'
+import { glyphFor } from '../lib/profile/formatters'
 import {
   listDmConversations,
   acceptDmRequest,
@@ -347,25 +348,36 @@ function ListView({
               <p className="dm-section-title">Richieste ({incoming.length})</p>
               {incoming.map((c) => (
                 <div key={c.id} className="dm-conv">
-                  <span className="dm-conv-name">@{c.other_nickname}</span>
-                  <span className="dm-conv-meta hint">{formatDate(c.created_at)}</span>
-                  <div className="dm-request-actions">
-                    <button
-                      type="button"
-                      className="btn-primary btn-sm"
-                      onClick={() => accept(c.id)}
-                      disabled={busy === c.id}
-                    >
-                      {busy === c.id ? 'Attendi…' : 'Accetta'}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-ghost btn-sm"
-                      onClick={() => reject(c.id)}
-                      disabled={busy === c.id}
-                    >
-                      Rifiuta
-                    </button>
+                  <div className="dm-row">
+                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
+                      {glyphFor(null, c.other_nickname)}
+                    </span>
+                    <div className="dm-info">
+                      <div className="dm-info-top">
+                        <span className="dm-conv-name">@{c.other_nickname}</span>
+                        <span className="dm-conv-meta hint">{formatDate(c.created_at)}</span>
+                      </div>
+                      <div className="dm-info-bottom">
+                        <div className="dm-request-actions">
+                          <button
+                            type="button"
+                            className="btn-primary btn-sm"
+                            onClick={() => accept(c.id)}
+                            disabled={busy === c.id}
+                          >
+                            {busy === c.id ? 'Attendi…' : 'Accetta'}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-ghost btn-sm"
+                            onClick={() => reject(c.id)}
+                            disabled={busy === c.id}
+                          >
+                            Rifiuta
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -384,10 +396,19 @@ function ListView({
                   className="dm-conv"
                   onClick={() => onOpen(c)}
                 >
-                  <span className="dm-conv-name">@{c.other_nickname}</span>
-                  <span className="dm-conv-meta hint">
-                    {formatDate(c.updated_at)}
-                  </span>
+                  <div className="dm-row">
+                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
+                      {glyphFor(null, c.other_nickname)}
+                    </span>
+                    <div className="dm-info">
+                      <div className="dm-info-top">
+                        <span className="dm-conv-name">@{c.other_nickname}</span>
+                        <span className="dm-conv-meta hint">
+                          {formatDate(c.updated_at)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </button>
               ))}
             </section>
@@ -398,10 +419,19 @@ function ListView({
               <p className="dm-section-title">In attesa di risposta</p>
               {outgoing.map((c) => (
                 <div key={c.id} className="dm-conv">
-                  <span className="dm-conv-name">@{c.other_nickname}</span>
-                  <span className="dm-conv-meta hint">
-                    In attesa · {formatDate(c.created_at)}
-                  </span>
+                  <div className="dm-row">
+                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
+                      {glyphFor(null, c.other_nickname)}
+                    </span>
+                    <div className="dm-info">
+                      <div className="dm-info-top">
+                        <span className="dm-conv-name">@{c.other_nickname}</span>
+                        <span className="dm-conv-meta hint">
+                          In attesa · {formatDate(c.created_at)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </section>
