@@ -22,7 +22,7 @@ interface BurgerMenuContextValue {
 
 const BurgerMenuContext = createContext<BurgerMenuContextValue | null>(null)
 
-function useBurgerMenu(): BurgerMenuContextValue {
+export function useBurgerMenu(): BurgerMenuContextValue {
   const ctx = useContext(BurgerMenuContext)
   if (!ctx) throw new Error('useBurgerMenu va usato dentro <BurgerMenu>')
   return ctx

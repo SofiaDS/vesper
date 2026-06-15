@@ -5,6 +5,7 @@ import { usePendingDmCount } from '../hooks/usePendingDmCount'
 import { useAdminPendingCounts } from '../hooks/useAdminPendingCounts'
 import { useBackNavigation } from '../hooks/useBackNavigation'
 import { BurgerMenu, type BurgerMenuItem } from '../components/BurgerMenu'
+import { TabBar, type TabBarItem } from '../components/TabBar'
 import { RoomsScreen } from './RoomsScreen'
 import { ChatScreen } from './ChatScreen'
 import { ProfileScreen } from './profile/ProfileScreen'
@@ -77,8 +78,9 @@ export function Home() {
     setLegalDoc(doc)
   }
 
-  const onLobby =
-    !room &&
+  // Nessuna delle schermate "secondarie" (raggiunte solo dal burger menu /
+  // tab "Altro") è aperta: la sezione "Stanze" (lista o chat) è quella attiva.
+  const inStanze =
     !showProfile &&
     !showAdmin &&
     !showBlocked &&
@@ -87,6 +89,8 @@ export function Home() {
     !showSettings &&
     !viewUserId &&
     !legalDoc
+
+  const onLobby = inStanze && !room
 
   // Etichetta della schermata corrente: usata solo per dare contesto a chi
   // legge le email di "Segnala un bug" / "Dacci un suggerimento" — stessa
@@ -148,6 +152,19 @@ export function Home() {
     },
   ]
 
+  const canDm = (profile?.strato ?? 0) >= 2
+  const tabItems: TabBarItem[] = [
+    { key: 'stanze', label: 'Stanze', onClick: goToRooms, active: inStanze },
+    ...(canDm
+      ? [{ key: 'dm', label: 'DM', onClick: () => openScreen(() => setShowDm(true)), active: showDm, badge: pendingDmCount } as TabBarItem]
+      : []),
+    { key: 'ricerca', label: 'Ricerca', onClick: () => openScreen(() => setShowSearch(true)), active: showSearch },
+    { key: 'profilo', label: 'Profilo', onClick: () => openScreen(() => setShowProfile(true)), active: showProfile },
+  ]
+  const altroBadge = isStaff
+    ? adminCounts.verifiche + adminCounts.foto + adminCounts.segnalazioni + adminCounts.ai
+    : undefined
+
   // Quante "schermate" sono aperte una sull'altra in questo momento (es.
   // Ricerca → Profilo pubblico = 2): serve a sapere se il prossimo `goBack`
   // riporta alla lobby, per decidere se ri-armare la guardia sulla history
@@ -192,6 +209,7 @@ export function Home() {
 
   return (
     <BurgerMenu items={menuItems} onSignOut={signOut}>
+      <TabBar items={tabItems} altroBadge={altroBadge} />
       {screen}
     </BurgerMenu>
   )
