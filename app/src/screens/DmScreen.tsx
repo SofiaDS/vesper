@@ -17,6 +17,8 @@ import {
   type DmMessage,
 } from '../lib/dm'
 import { isBlocked } from '../lib/blocks'
+import { markRead } from '../lib/reads'
+import { useDmUnread } from '../hooks/useUnreadCounts'
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
@@ -109,6 +111,12 @@ function ConversationView({
     }
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
+
+  // Segna la conversazione come letta entrando e uscendo (Step 5).
+  useEffect(() => {
+    markRead('dm', conversation.id)
+    return () => { markRead('dm', conversation.id) }
+  }, [conversation.id])
 
   async function loadOlder() {
     if (loadingOlder || messages.length === 0) return
@@ -256,6 +264,7 @@ function ListView({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
+  const unread = useDmUnread(myId)
 
   useEffect(() => {
     let alive = true
@@ -389,28 +398,40 @@ function ListView({
               {incoming.length > 0 && (
                 <p className="dm-section-title">Conversazioni</p>
               )}
-              {accepted.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  className="dm-conv"
-                  onClick={() => onOpen(c)}
-                >
-                  <div className="dm-row">
-                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
-                      {glyphFor(null, c.other_nickname)}
-                    </span>
-                    <div className="dm-info">
-                      <div className="dm-info-top">
-                        <span className="dm-conv-name">@{c.other_nickname}</span>
-                        <span className="dm-conv-meta hint">
-                          {formatDate(c.updated_at)}
-                        </span>
+              {accepted.map((c) => {
+                const n = unread.get(c.id) ?? 0
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className={n > 0 ? 'dm-conv has-unread' : 'dm-conv'}
+                    onClick={() => onOpen(c)}
+                  >
+                    <div className="dm-row">
+                      <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
+                        {glyphFor(null, c.other_nickname)}
+                      </span>
+                      <div className="dm-info">
+                        <div className="dm-info-top">
+                          <span className={n > 0 ? 'dm-conv-name unread' : 'dm-conv-name'}>
+                            {n > 0 && <span className="dm-unread-dot" aria-hidden="true">● </span>}
+                            @{c.other_nickname}
+                          </span>
+                          <span className="dm-conv-meta hint">
+                            {formatDate(c.updated_at)}
+                          </span>
+                        </div>
                       </div>
+                      {n > 0 && (
+                        <>
+                          <span className="unread-pill" aria-hidden="true">{n}</span>
+                          <span className="visually-hidden">{n} messaggi non letti</span>
+                        </>
+                      )}
                     </div>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                )
+              })}
             </section>
           )}
 

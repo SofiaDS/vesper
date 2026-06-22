@@ -5,7 +5,9 @@ import { useAuth } from '../auth/AuthProvider'
 import { usePendingDmCount } from '../hooks/usePendingDmCount'
 import { useAdminPendingCounts } from '../hooks/useAdminPendingCounts'
 import { useBackNavigation } from '../hooks/useBackNavigation'
+import { useMessageNotifications } from '../hooks/useMessageNotifications'
 import { TabBar, type TabBarItem } from '../components/TabBar'
+import { GlobalToast } from '../components/GlobalToast'
 import { AltroScreen } from './AltroScreen'
 import { RoomsScreen } from './RoomsScreen'
 import { ChatScreen } from './ChatScreen'
@@ -23,7 +25,7 @@ import { openSupportEmail } from '../lib/support'
 const SUPPORT_URL = 'https://www.example.com'
 
 // Shell post-login: gestisce la navigazione fra lobby, chat, profilo e moderazione.
-// Nessun router esterno: basta uno stato locale, raccolto nel burger menu fisso.
+// Nessun router esterno: basta uno stato locale, guidato dalla TabBar fissa.
 export function Home() {
   const { session, profile, signOut, isStaff } = useAuth()
   const myId = session?.user.id
@@ -64,14 +66,32 @@ export function Home() {
     openScreen()
   }
 
+  // Toast globale per nuovi messaggi/menzioni mentre sei in un'altra schermata.
+  // Sopprime i messaggi della stanza che stai leggendo e i DM mentre la sezione
+  // "Messaggi" è aperta. Al click apre la conversazione relativa.
+  const notif = useMessageNotifications({
+    myId,
+    myNickname: profile?.nickname,
+    activeRoomId: room?.id ?? null,
+    dmOpen: showDm,
+  })
+
+  function openFromToast() {
+    const t = notif.toast
+    if (!t) return
+    notif.dismiss()
+    if (t.kind === 'dm') openScreen(() => setShowDm(true))
+    else if (t.room) openScreen(() => setRoom(t.room!))
+  }
+
   // Apertura da dentro Impostazioni: non resetta showSettings, così il tasto
   // "indietro" dalla schermata legale torna ad Impostazioni e non alla lobby.
   function openLegalFromSettings(doc: LegalDoc) {
     setLegalDoc(doc)
   }
 
-  // Nessuna delle schermate "secondarie" (raggiunte solo dal burger menu /
-  // tab "Altro") è aperta: la sezione "Stanze" (lista o chat) è quella attiva.
+  // Nessuna delle schermate "secondarie" (raggiunte dalla tab "Altro" o da
+  // link interni) è aperta: la sezione "Stanze" (lista o chat) è quella attiva.
   const inStanze =
     !showProfile &&
     !showAdmin &&
@@ -135,7 +155,7 @@ export function Home() {
   let goBack = goToRooms
   if (showAdmin) {
     goBack = () => setShowAdmin(false)
-    screen = <AdminScreen tab={adminTab} onBack={goBack} />
+    screen = <AdminScreen tab={adminTab} counts={adminCounts} onTabChange={setAdminTab} onBack={goBack} />
   } else if (legalDoc) {
     goBack = () => setLegalDoc(null)
     screen = <LegalScreen doc={legalDoc} onBack={goBack} backLabel={showSettings ? '‹ Impostazioni' : showAltro ? '‹ Altro' : '‹ Stanze'} />
@@ -189,6 +209,7 @@ export function Home() {
     <>
       <TabBar items={tabItems} />
       {screen}
+      <GlobalToast toast={notif.toast} onOpen={openFromToast} onDismiss={notif.dismiss} />
     </>
   )
 }

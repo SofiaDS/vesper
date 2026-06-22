@@ -761,6 +761,69 @@ code {
   align-items: center;
   gap: 0.4rem;
 }
+/* Il nome può troncare; le pill hanno flex-shrink:0 e restano leggibili
+   sulla stessa riga invece di essere spinte a capo da nomi lunghi. */
+.room-name-row .room-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Badge "non letti"/"@menzione" sulle stanze (Step 4, vedi mockup). Tinte oro
+   neutre rispetto al tema (convenzione rgba dell'accento già usata altrove). */
+.room-card.has-unread {
+  border-color: rgba(232, 177, 78, 0.45);
+  background-color: rgba(232, 177, 78, 0.06);
+}
+.room-card.has-mention {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+/* `.room-name.unread` ha la stessa specificità dell'override light di
+   `.room-name`: viene dopo nel file, quindi vince in entrambi i temi. */
+.room-name.unread,
+[data-theme="light"] .room-name.unread {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+/* Nel tema chiaro l'oro pieno (--accent #B8841F) dà solo ~2.8:1 con la crema
+   (--bg): per il numero, che è informativo, uso il testo scuro (--text) → ~5.3:1
+   (AA ok). Il look del dark (testo scuro su oro) resta invariato. */
+[data-theme="light"] .unread-pill {
+  color: var(--text);
+}
+.unread-pill {
+  flex-shrink: 0;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--accent);
+  /* Testo scuro sull'oro pieno. In dark --bg è già scuro (≈9.9:1). In light
+     l'oro --accent (#B8841F) è medio-scuro: la crema --bg darebbe ~2.8:1, sotto
+     l'AA per un badge numerico significativo; l'override light sotto usa --text. */
+  color: var(--bg);
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mention-pill {
+  flex-shrink: 0;
+  height: 1.3rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  background: transparent;
+  border: 1.5px solid var(--accent);
+  color: var(--accent-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .room-action {
   display: flex;
@@ -1378,6 +1441,55 @@ body:has(.install-banner) .rooms-hint {
 }
 
 /* ===== Area moderazione (admin / moderatore) ===== */
+/* Sub-nav a pillole fra le sezioni di moderazione (sostituisce le sottovoci
+   del vecchio burger menu). Vedi mockup `.admin-subnav`. */
+.admin-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+.admin-subnav button {
+  display: inline-flex;
+  align-items: center;
+  /* --border/--muted del mockup non esistono in questo foglio: riuso le
+     convenzioni delle altre pillole (.chip/.seg) — bordo oro tenue e testo
+     --text leggermente smorzato. */
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  background: var(--surface);
+  color: var(--text);
+  opacity: 0.7;
+  border-radius: 999px;
+  /* min-height verso il target tattile (~44px) senza ingrandire il testo:
+     resta una riga di pillole compatta ma più comoda da toccare sul mobile. */
+  min-height: 36px;
+  padding: 0.4rem 0.8rem;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.admin-subnav button.active {
+  border-color: var(--accent);
+  color: var(--accent-text);
+  opacity: 1;
+  font-weight: 700;
+  background: rgba(232, 177, 78, 0.14);
+}
+.admin-subnav button .badge-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.3rem;
+  margin-left: 0.25rem;
+  border-radius: 999px;
+  background: var(--error);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
 .admin-filter {
   margin-bottom: 0.6rem;
   font-size: 0.85rem;
@@ -1609,6 +1721,8 @@ body:has(.install-banner) .rooms-hint {
   flex-shrink: 0;
   line-height: 1;
 }
+/* Nome mittente sopra la bolla: oro e in grassetto come `.chat-sender` nei
+   mockup (resta un button per aprire il profilo al click). */
 .msg-author {
   display: inline-block;
   align-self: flex-start;
@@ -1617,14 +1731,12 @@ body:has(.install-banner) .rooms-hint {
   border: none;
   background: none;
   font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text);
-  opacity: 0.6;
+  font-weight: 700;
+  color: var(--accent-text);
   cursor: pointer;
 }
 .msg-author:hover {
   text-decoration: underline;
-  opacity: 0.9;
 }
 /* Riga unica con reazioni (a sx) e azioni rispondi/reagisci/segnala (a dx) */
 .msg-meta {
@@ -1877,6 +1989,106 @@ body:has(.install-banner) .rooms-hint {
   background: rgba(232, 177, 78, 0.14);
 }
 
+/* --- Toast globale notifiche (vedi mockup `.global-toast`) ---
+   Fisso in basso, centrato e largo come l'app; sopra il composer ma sotto le
+   modali. `--surface-2` del mockup non esiste qui: uso `--surface`. */
+.global-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translate(-50%, 0);
+  width: calc(100% - 1.2rem);
+  max-width: 420px;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+  animation: global-toast-in 0.25s ease;
+}
+@keyframes global-toast-in {
+  from { transform: translate(-50%, 120%); opacity: 0; }
+  to   { transform: translate(-50%, 0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .global-toast { animation: none; }
+}
+/* Area cliccabile (icona + testo): un button per non annidare bottoni con la X. */
+.global-toast-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.global-toast-icon {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(232, 177, 78, 0.15);
+  border: 1.5px solid var(--accent);
+  color: var(--accent-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+.global-toast-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.global-toast-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.global-toast-sub {
+  font-size: 0.74rem;
+  color: var(--text);
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.global-toast-close {
+  flex-shrink: 0;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -0.4rem -0.3rem -0.4rem 0;
+  background: none;
+  border: none;
+  color: var(--text);
+  opacity: 0.6;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.global-toast-close:hover {
+  opacity: 1;
+}
+
 /* --- Modale generica (es. segnalazione) --- */
 .modal-overlay {
   position: fixed;
@@ -2037,26 +2249,27 @@ body:has(.install-banner) .rooms-hint {
   font-size: 0.92rem;
 }
 
-/* --- Galleria foto profilo: striscia di miniature + lightbox --- */
+/* --- Galleria foto profilo: griglia 3 colonne + lightbox (vedi mockup
+   `.pf-gallery`) --- */
 .gallery-strip {
-  display: flex;
-  gap: 0.6rem;
-  overflow-x: auto;
-  padding-bottom: 0.2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
 }
-.gallery-strip.loading {
-  height: 160px;
-  border-radius: 12px;
+/* Stato di caricamento: celle quadrate vuote che riprendono la griglia 3
+   colonne, così non c'è salto di layout quando arrivano le foto. */
+.gallery-ph {
+  aspect-ratio: 1;
+  border-radius: 8px;
   background: rgba(247, 239, 221, 0.05);
 }
 
 .gallery-thumb {
-  flex: 0 0 auto;
-  width: 160px;
-  height: 200px;
+  width: 100%;
+  aspect-ratio: 1;
   padding: 0;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   background: rgba(247, 239, 221, 0.05);
@@ -2469,6 +2682,22 @@ button.dm-conv:hover {
   background: rgba(247, 239, 221, 0.08);
 }
 
+/* Conversazione DM con messaggi non letti (Step 5): bordo/sfondo oro tenue,
+   nome in grassetto col pallino, contatore (.unread-pill, condiviso con Step 4). */
+.dm-conv.has-unread {
+  border-color: rgba(232, 177, 78, 0.5);
+  background: rgba(232, 177, 78, 0.06);
+}
+.dm-conv-name.unread {
+  font-weight: 700;
+}
+.dm-unread-dot {
+  color: var(--accent);
+}
+.dm-row .unread-pill {
+  align-self: center;
+}
+
 .dm-conv-name {
   flex: 1;
   min-width: 0;
@@ -2849,6 +3078,11 @@ button.dm-conv:hover {
 [data-theme="light"] .rep-prompt {
   background: rgba(23, 21, 32, 0.07);
   /*border-color: rgba(130, 90, 0, 0.25);*/
+}
+
+[data-theme="light"] .gallery-thumb,
+[data-theme="light"] .gallery-ph {
+  background: rgba(23, 21, 32, 0.07);
 }
 
 [data-theme="light"] .roster {

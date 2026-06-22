@@ -29,7 +29,8 @@ function loadCounts(): Promise<AdminPendingCounts> {
   }))
 }
 
-// Conteggi "da revisionare" per le voci di moderazione nel burger menu.
+// Conteggi "da revisionare" per le sezioni di moderazione (badge della tab
+// "Altro" e della sub-nav admin).
 // Live via realtime (come usePendingDmCount): un cambiamento su una delle
 // tabelle coinvolte fa ricalcolare i 4 conteggi, così lo staff vede i numeri
 // aggiornati subito invece che solo al refresh dell'app. I filtri sui singoli
