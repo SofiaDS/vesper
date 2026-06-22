@@ -40,8 +40,10 @@ Avvio dev server: `cd app && npm run dev` poi apri l'URL mostrato.
       utenti staff; con utente non-staff la card non deve comparire).
 - [ ] **Supporto** → "Segnala un bug" e "Dacci un suggerimento" aprono l'email
       precompilata; "Sostieni Vesper ↗" apre il link in **nuova scheda**.
-- [ ] **Sessione** → il toggle tema funziona (scuro ↔ chiaro) e "Esci" fa il
-      logout dall'app.
+- [ ] **Sessione** → il toggle tema funziona (scuro ↔ chiaro).
+- [ ] "Esci" apre un **dialog di conferma** ("Vuoi uscire?"); "Annulla" lo chiude
+      senza disconnettere, "Esci" fa il logout. Il dialog si chiude anche con
+      Esc / tap fuori, e il focus resta intrappolato dentro il dialog (tastiera).
 
 ## Navigazione e tasto "indietro" (importante)
 
@@ -63,6 +65,22 @@ Avvio dev server: `cd app && npm run dev` poi apri l'URL mostrato.
 - [ ] "Esci" e toggle tema (prima nel burger) restano raggiungibili **solo**
       dall'hub Altro e funzionano.
 - [ ] Nessuna schermata mostra header sbilanciato o spazio vuoto dove c'era il ☰.
+
+---
+
+## Proof icone (Phosphor + Fluent Emoji)
+
+- [ ] **Tab bar** → ogni voce ha un'icona Phosphor (duotone) sopra l'etichetta;
+      l'icona della tab attiva diventa oro, le altre restano attenuate.
+- [ ] Il **badge** (DM / Altro) compare come pallino in alto a destra sull'icona.
+- [ ] **Toggle tema** (Altro → Sessione) usa le icone Sole/Luna Phosphor al posto
+      delle emoji; cambia da Sole a Luna passando scuro↔chiaro.
+- [ ] **Utenti bloccati vuoto** → mostra l'emoji scudo (Fluent Emoji, da CDN)
+      sopra "Non hai bloccato nessuno" (serve connessione per vederla).
+- [ ] **Caricamento Utenti bloccati** → spinner Phosphor **SpinnerBall** che gira
+      (con scia oro). Con "riduci animazioni" di sistema attivo **non deve girare**
+      (resta fermo, il testo "Carico…" resta visibile).
+- [ ] Verifica icone/spinner in **dark e light**.
 
 ---
 

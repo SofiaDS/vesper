@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 export interface TabBarItem {
   key: string
   label: string
@@ -10,6 +12,8 @@ export interface TabBarItem {
   // usato per costruire l'aria-label del tab così che lo screen reader
   // annunci "DM, 3 messaggi non letti" invece del solo numero "DM 3".
   badgeLabel?: string
+  // Icona (decorativa) mostrata sopra l'etichetta.
+  icon?: ReactNode
 }
 
 // Tab bar fissa sotto l'header con le voci principali di navigazione
@@ -33,7 +37,12 @@ export function TabBar({ items }: { items: TabBarItem[] }) {
             aria-current={item.active ? 'page' : undefined}
             aria-label={ariaLabel}
           >
-            {item.label}
+            {item.icon && (
+              <span className="tab-icon" aria-hidden="true">
+                {item.icon}
+              </span>
+            )}
+            <span className="tab-label">{item.label}</span>
             {!!item.badge && (
               <span className={`tab-badge${item.mention ? ' mention' : ''}`} aria-hidden="true">
                 {item.badge}

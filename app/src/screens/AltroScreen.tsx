@@ -1,5 +1,8 @@
+import { useRef, useState } from 'react'
+import { Sun, Moon } from '@phosphor-icons/react'
 import { AppHeader } from '../components/AppHeader'
 import { useTheme } from '../hooks/useTheme'
+import { useModalA11y } from '../hooks/useModalA11y'
 import { LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
 
 // Hub "Altro": sostituisce il vecchio burger menu (rimosso dagli header) con
@@ -30,6 +33,9 @@ export function AltroScreen({
 }) {
   const { theme, toggle: toggleTheme } = useTheme()
   const isDark = theme === 'dark'
+  const [confirmLogout, setConfirmLogout] = useState(false)
+  const logoutModalRef = useRef<HTMLDivElement | null>(null)
+  useModalA11y(logoutModalRef, confirmLogout, () => setConfirmLogout(false))
 
   return (
     <main className="app profile">
@@ -89,13 +95,41 @@ export function AltroScreen({
           onClick={toggleTheme}
           aria-label={isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro'}
         >
-          <span aria-hidden="true">{isDark ? '☀' : '🌙'}</span>
+          <span className="link-icon" aria-hidden="true">
+            {isDark ? <Sun size={20} weight="duotone" /> : <Moon size={20} weight="duotone" />}
+          </span>
           {isDark ? 'Tema chiaro' : 'Tema scuro'}
         </button>
-        <button type="button" className="link link-row link-danger" onClick={onSignOut}>
+        <button type="button" className="link link-row link-danger" onClick={() => setConfirmLogout(true)}>
           Esci
         </button>
       </section>
+
+      {confirmLogout && (
+        <div className="modal-overlay" onClick={() => setConfirmLogout(false)}>
+          <div
+            ref={logoutModalRef}
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="modal-title">Vuoi uscire?</h2>
+            <p className="muted small-inline">
+              Verrai disconnessa e tornerai alla schermata di accesso.
+            </p>
+            <div className="modal-actions modal-actions-col">
+              <button type="button" className="btn-danger" onClick={onSignOut}>
+                Esci
+              </button>
+              <button type="button" className="btn-ghost" onClick={() => setConfirmLogout(false)}>
+                Annulla
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
