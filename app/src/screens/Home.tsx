@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { House, ChatCircleDots, MagnifyingGlass, User, DotsThreeOutline } from '@phosphor-icons/react'
 import type { Chatroom } from '../types'
 import { useAuth } from '../auth/AuthProvider'
 import { usePendingDmCount } from '../hooks/usePendingDmCount'
@@ -114,13 +115,13 @@ export function Home() {
     ? adminCounts.verifiche + adminCounts.foto + adminCounts.segnalazioni + adminCounts.ai
     : undefined
   const tabItems: TabBarItem[] = [
-    { key: 'stanze', label: 'Stanze', onClick: goToRooms, active: inStanze },
+    { key: 'stanze', label: 'Stanze', icon: <House size={22} weight="duotone" />, onClick: goToRooms, active: inStanze },
     ...(canDm
-      ? [{ key: 'dm', label: 'DM', onClick: () => openScreen(() => setShowDm(true)), active: showDm, badge: pendingDmCount, badgeLabel: 'messaggi non letti' } as TabBarItem]
+      ? [{ key: 'dm', label: 'DM', icon: <ChatCircleDots size={22} weight="duotone" />, onClick: () => openScreen(() => setShowDm(true)), active: showDm, badge: pendingDmCount, badgeLabel: 'messaggi non letti' } as TabBarItem]
       : []),
-    { key: 'ricerca', label: 'Ricerca', onClick: () => openScreen(() => setShowSearch(true)), active: showSearch },
-    { key: 'profilo', label: 'Profilo', onClick: () => openScreen(() => setShowProfile(true)), active: showProfile },
-    { key: 'altro', label: 'Altro', onClick: () => openScreen(() => setShowAltro(true)), active: showAltro, badge: altroBadge, mention: true, badgeLabel: 'elementi in attesa di moderazione' },
+    { key: 'ricerca', label: 'Ricerca', icon: <MagnifyingGlass size={22} weight="duotone" />, onClick: () => openScreen(() => setShowSearch(true)), active: showSearch },
+    { key: 'profilo', label: 'Profilo', icon: <User size={22} weight="duotone" />, onClick: () => openScreen(() => setShowProfile(true)), active: showProfile },
+    { key: 'altro', label: 'Altro', icon: <DotsThreeOutline size={22} weight="duotone" />, onClick: () => openScreen(() => setShowAltro(true)), active: showAltro, badge: altroBadge, mention: true, badgeLabel: 'elementi in attesa di moderazione' },
   ]
 
   // Quante "schermate" sono aperte una sull'altra in questo momento (es.
