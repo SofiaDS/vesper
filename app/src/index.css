@@ -48,6 +48,15 @@
   border: 0;
 }
 
+/* Focus ring globale visibile da tastiera (WCAG 2.4.7). Usa l'oro --accent,
+   con offset così resta leggibile anche su elementi con sfondo proprio.
+   :focus-visible evita di mostrare l'anello sui click col mouse. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 html {
   height: 100%;
   overflow-x: hidden;
@@ -309,6 +318,30 @@ code {
   cursor: pointer;
   font: inherit;
   text-decoration: underline;
+}
+
+/* Voci di lista a piena larghezza dentro le card (hub "Altro", Impostazioni):
+   touch target ≥44px (WCAG 2.5.5) e area cliccabile su tutta la riga, invece
+   del solo testo sottolineato. La spaziatura passa dal padding, non dal
+   margin-top, così le righe restano allineate e tappabili una dietro l'altra. */
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 0;
+  padding: 0.5rem 0;
+  text-align: left;
+}
+.link-row + .link-row {
+  border-top: 1px solid rgba(232, 177, 78, 0.12);
+}
+
+/* "Esci": azione di sessione/distruttiva, differenziata dal colore oro delle
+   altre voci. --error-text mantiene ≥4.5:1 in entrambi i temi (vedi :root). */
+.link-danger {
+  color: var(--error-text);
 }
 
 /* --- Chat (Foyer) --- */
@@ -1478,8 +1511,12 @@ body:has(.install-banner) .rooms-hint {
 }
 
 /* --- Profilo altrui: header bilanciato --- */
+/* Riserva ai due lati dell'header la stessa larghezza del back button (44px),
+   così il titolo resta centrato in modo simmetrico anche quando manca la
+   freccia o il lato destro (dopo la rimozione del burger menu). */
 .link-placeholder {
-  width: 1px;
+  width: 44px;
+  flex-shrink: 0;
 }
 
 /* --- Autore messaggio cliccabile + footer con segnala --- */
@@ -2785,6 +2822,13 @@ button.dm-conv:hover {
   background: rgba(154, 106, 0, 0.18);
   border-color: var(--accent);
   color: var(--accent-text);
+}
+
+/* Badge "menzione" (tab Altro): nel tema chiaro il testo --bg sull'oro --accent
+   scende a ~2.8:1. Fissiamo il numero sullo scuro inchiostro, che resta ≥4.5:1
+   sull'oro chiaro del light theme (e dell'oro scuro del dark). */
+[data-theme="light"] .tab-badge.mention {
+  color: #171520;
 }
 
 /* ── Theme toggle pill ────────────────────────────────── */
