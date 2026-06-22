@@ -68,6 +68,71 @@ Avvio dev server: `cd app && npm run dev` poi apri l'URL mostrato.
 
 ---
 
+## Step 11 — Toast notifiche in-app (nuovi messaggi / menzioni / DM)
+
+Serve **due account** (A e B). Fai login con A su un dispositivo/finestra e con
+B su un'altra (o usa una finestra in incognito).
+
+- [ ] Mentre A è su una schermata **diversa** dalla chat di una stanza X (es.
+      lista Stanze, Profilo, Ricerca), B scrive in X → ad A compare un **toast**
+      in basso "Nuovo messaggio da @B" con nome stanza e anteprima.
+- [ ] **Menzione**: B scrive "@A ciao" in X → il toast di A dice "@A **ti ha
+      menzionata**" (icona @).
+- [ ] **DM**: B invia un messaggio privato ad A mentre A **non** è nella sezione
+      Messaggi → toast "Nuovo messaggio da @B · In privato".
+- [ ] **Click sul toast** apre la conversazione giusta (la stanza, o la sezione
+      Messaggi).
+- [ ] Il toast **scompare da solo** dopo qualche secondo, e la **✕** lo chiude
+      subito.
+- [ ] **Niente toast quando lo stai già guardando**: se A è dentro la stanza X,
+      i messaggi di X **non** generano toast; se A è nella sezione Messaggi, i
+      DM non generano toast.
+- [ ] **Niente toast dai propri messaggi** né da utenti **bloccate**.
+- [ ] Il toast è leggibile e non rotto in **dark e light** (testo non tagliato,
+      ✕ sempre visibile anche con nick/stanza lunghi).
+- [ ] Con "**riduci animazioni**" di sistema attivo il toast appare senza
+      scivolare (resta comunque visibile e centrato).
+
+> ⚠️ **Verifica privacy/RLS (importante, riguarda Supabase):** A **non** deve
+> ricevere toast per messaggi di stanze di cui **non è membro**. Test: con un
+> terzo account in una stanza dove A non è entrata, scrivi → ad A **non** deve
+> arrivare nulla (controlla anche la console del browser: nessun messaggio di
+> quella stanza). Se invece arrivasse, la RLS non sta filtrando il realtime:
+> avvisami e restringo le sottoscrizioni alle sole stanze dell'utente.
+
+---
+
+## Step 4 — Badge non letti / menzione nelle Stanze
+
+> Richiede la migration `read_markers` applicata (vedi
+> `supabase_step4_5_istruzioni.md`). Senza, semplicemente non compaiono badge.
+> Serve un secondo account (B). Ricorda: il rollout segna tutto "già letto",
+> quindi i badge compaiono solo per messaggi **nuovi**.
+
+- [ ] B scrive in una stanza X dove sei iscritta; **senza** aprirla, vai alla
+      lista Stanze → la card di X mostra **contatore** (pallino oro col numero)
+      e il nome stanza in **oro**; la card ha sfondo/bordo oro tenue.
+- [ ] Apri X e torna indietro → il badge **sparisce** (l'hai letta).
+- [ ] B ti **menziona** ("@tuonick ...") in X → la card mostra anche il
+      **pill menzione** (`@`) e ha il **bordo oro pieno** (ring).
+- [ ] Mentre sei sulla lista Stanze, un nuovo messaggio di B fa **comparire/
+      aggiornare** il badge in tempo reale (entro ~1s).
+- [ ] I **tuoi** messaggi non aumentano il contatore.
+- [ ] Verifica in **dark e light** (numero leggibile dentro il pill oro).
+
+## Step 5 — Conversazioni DM non lette
+
+> Stesse premesse dello Step 4.
+
+- [ ] B ti invia un DM (conversazione già accettata) mentre **non** sei dentro
+      quella conversazione → nella lista Messaggi la riga mostra **pallino ●**,
+      nome in grassetto e **contatore** non letti a destra.
+- [ ] Apri la conversazione e torna alla lista → gli indicatori **spariscono**.
+- [ ] I **tuoi** messaggi non contano come non letti.
+- [ ] Verifica in **dark e light**.
+
+---
+
 ## Proof icone (Phosphor + Fluent Emoji)
 
 - [ ] **Tab bar** → ogni voce ha un'icona Phosphor (duotone) sopra l'etichetta;

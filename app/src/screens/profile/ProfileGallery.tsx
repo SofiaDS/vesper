@@ -4,7 +4,7 @@ import { useModalA11y } from '../../hooks/useModalA11y'
 
 type GalleryPhoto = { id: string; url: string }
 
-// Galleria foto del profilo: striscia di miniature grandi e scorrevoli che si
+// Galleria foto del profilo: griglia 3 colonne di miniature quadrate che si
 // aprono a schermo intero (con navigazione) cliccandoci — usata sia per il
 // proprio profilo che per quello altrui (vedi ProfileLayout). Sostituisce il
 // vecchio PhotoCarousel a foto singola.
@@ -47,7 +47,14 @@ export function ProfileGallery({
 
   useModalA11y(lightboxRef, opened != null, () => setOpenIdx(null))
 
-  if (loading) return <div className="gallery-strip loading" />
+  if (loading)
+    return (
+      <div className="gallery-strip" aria-busy="true">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="gallery-ph" />
+        ))}
+      </div>
+    )
   if (items.length === 0) return <p className="hint">Nessuna foto da mostrare.</p>
 
   return (

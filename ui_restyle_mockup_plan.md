@@ -15,6 +15,21 @@ frontend".
 
 ---
 
+## STATO (aggiornato 22 giu 2026)
+- ✅ **Fatti**: Step 1 (header oro), Step 2 (TabBar), Step 3 (hub Altro),
+  Step 7 (`.pf-icon-btn`), Step 8 (toggle ricerca + `.search-cards-grid`),
+  Step 9 (`.msg-author` → stile `.chat-sender`), Step 10 (`.admin-subnav`),
+  Step 12 (`.brand`), Step 6 (galleria a griglia 3 col),
+  Step 11 (toast globale notifiche), Step 4 (badge non letti/menzione stanze),
+  Step 5 (DM non letti — esclusa la presenza online, vedi sotto).
+- ⏳ **Pendente solo l'apply Supabase**: Step 4/5 richiedono la migration
+  `read_markers` (vedi `supabase_step4_5_istruzioni.md`); il client è già
+  pronto e tollera l'assenza della migration (nessun badge finché non applicata).
+- 🛑 **Non fatto (fuori scope, niente sistema di presenza)**: il `presence-dot`
+  online/offline dello Step 5.
+
+---
+
 ## Step 1 — Header centrato in oro (solo CSS)
 - `.app-header h1` → `color: var(--accent-text)`, `text-align: center`,
   `.app-header-center` → `justify-content: center`.
@@ -60,7 +75,13 @@ sotto l'header, come nel mockup (righe ~584-590 di `app-mockup-light.html`).
 - Riusa `.card`, `.pf-section-title`, `.link` già esistenti/stilizzati.
 - Nessun nuovo dato. Dipende da Step 2.
 
-## Step 4 — Stanze: badge "non letti" / "@menzione" (richiede nuovi dati)
+## Step 4 — Stanze: badge "non letti" / "@menzione" ✅ FATTO (22 giu 2026, serve apply Supabase)
+> Migration `read_markers` + RPC `room_unread_counts()`/`mark_read()` + trigger
+> di seed all'ingresso stanza + backfill (vedi `supabase_step4_5_istruzioni.md`).
+> Client: `lib/reads.ts`, `hooks/useUnreadCounts.ts` (`useRoomUnread`),
+> `RoomsScreen.tsx` (classi `has-unread`/`has-mention`, `.unread-pill`,
+> `.mention-pill`), `ChatScreen.tsx` (`markRead` entrando/uscendo).
+
 - `.room-card.has-unread` / `.has-mention`, `.unread-pill`, `.mention-pill`
   (mockup righe 336-362).
 - **Richiede nuova logica**: per ogni stanza, sapere se l'utente ha
@@ -70,7 +91,13 @@ sotto l'header, come nel mockup (righe ~584-590 di `app-mockup-light.html`).
 - Da fare **dopo** aver verificato con l'utente se questa feature è
   desiderata (è un pezzo di prodotto a sé, non solo restyle).
 
-## Step 5 — DM: stato "non letto" (richiede nuovi dati)
+## Step 5 — DM: stato "non letto" ✅ FATTO (parte unread; presenza no) (22 giu 2026, serve apply Supabase)
+> Stessa migration `read_markers` + RPC `dm_unread_counts()`. Client:
+> `useDmUnread` + `DmScreen.tsx` (riga `.dm-conv.has-unread`, pallino `●`,
+> nome in grassetto, `.unread-pill`); `markRead('dm', …)` aprendo/uscendo dalla
+> conversazione. **Escluso** il `presence-dot` online/offline (manca un sistema
+> di presenza realtime — fuori scope, da valutare a parte).
+
 - `.dm-row.unread-row`, `.dm-avatar.unread-avatar`, `.dm-name.unread`,
   `.dm-time.unread`, `.dm-preview.unread`, pallino "●" prima del nome
   (mockup righe 734-778).
@@ -80,7 +107,12 @@ sotto l'header, come nel mockup (righe ~584-590 di `app-mockup-light.html`).
 - `presence-dot` (online/offline) richiede anche un sistema di presenza —
   probabilmente fuori scope per ora (nessun realtime presence implementato).
 
-## Step 6 — Profilo: galleria foto a griglia 3 colonne
+## Step 6 — Profilo: galleria foto a griglia 3 colonne ✅ FATTO (22 giu 2026)
+> `ProfileGallery.tsx` ora usa `.gallery-strip` come grid 3 col (celle quadrate
+> `aspect-ratio:1`, radius 8px come mockup `.pf-gallery`), mantenendo il
+> lightbox al click. La cella tratteggiata "+ Aggiungi" del mockup non serve:
+> l'upload foto è gestito altrove (`PhotoUploadDialog`/editor profilo).
+
 - Mockup `.pf-gallery` (righe 456-461): grid 3 colonne, ph quadrati con
   border tratteggiato per "+ Aggiungi".
 - Oggi `ProfileGallery.tsx` è uno strip orizzontale con lightbox — **diversa
@@ -105,19 +137,40 @@ sotto l'header, come nel mockup (righe ~584-590 di `app-mockup-light.html`).
   serve solo restyle CSS o anche il toggle vista lista/griglia (nuovo stato
   locale, no nuovi dati).
 
-## Step 9 — Chat: dettagli minori
+## Step 9 — Chat: dettagli minori ✅ FATTO (22 giu 2026)
 - `.chat-sender` (nome mittente sopra la bolla, colore accent-text) vs
   attuale `.msg-author` — verificare coerenza stile.
 - `.composer-row` sticky bottom — verificare che il composer attuale sia
   già sticky (probabile sia ok).
 - Solo CSS, basso rischio.
 
-## Step 10 — Admin: sub-nav a pillole
+## Step 10 — Admin: sub-nav a pillole ✅ FATTO (22 giu 2026)
+> Era anche un **bug**: rimosso il burger menu (Step 2), il pannello Admin
+> non aveva più modo di cambiare sezione (restava bloccato su "Statistiche").
+> Risolto con `.admin-subnav` (pillole + badge rossi) in `AdminScreen.tsx`,
+> conteggi riusati da `useAdminPendingCounts` passati da `Home.tsx`.
+
 - `.admin-subnav button` (righe 549-559): pillole con badge rosso per le
   sotto-sezioni admin, invece dell'attuale lista nel burger menu — diventa
   rilevante solo dopo Step 2/3 (quando Admin entra nell'hub "Altro").
 
-## Step 11 — Toast globale (richiede nuova logica)
+## Step 11 — Toast globale ✅ FATTO (22 giu 2026)
+> Implementato **senza modifiche a Supabase**: `messages` e `dm_messages` sono
+> già nella publication realtime e protette da RLS (`messages_select_member` =
+> `is_member`; `dm_messages` select = partecipante), quindi una sottoscrizione
+> `postgres_changes` senza filtro consegna solo le righe leggibili dall'utente.
+> - `hooks/useMessageNotifications.ts`: listener realtime cross-screen (riusa
+>   `useChatCache` per nickname + bloccati). Sopprime i messaggi della stanza
+>   che stai leggendo e i DM mentre la sezione Messaggi è aperta; rileva le
+>   menzioni `@mionick`; auto-dismiss 6s.
+> - `components/GlobalToast.tsx` + `.global-toast` in `index.css` (port del
+>   mockup, `--surface-2`→`--surface`, fixed bottom, reduced-motion, a11y).
+> - Wire in `Home.tsx`: al click apre la stanza / la sezione DM.
+> - ⚠️ **Da verificare lato tuo**: che Realtime applichi davvero la RLS sui
+>   `postgres_changes` nel progetto (comportamento standard con RLS attiva, ma
+>   confermalo — è ciò che impedisce a un utente di ricevere messaggi di stanze
+>   di cui non è membro). Vedi nota in fondo.
+
 - `.global-toast` (righe 524-540): notifica in-app per nuovi messaggi/
   menzioni mentre si è in un'altra schermata.
 - **Richiede nuovo sistema di notifiche in-app** (stato globale + realtime
