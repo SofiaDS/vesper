@@ -6,6 +6,7 @@ import { MessageComposer } from '../components/MessageComposer'
 import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
 import { useMessageReactions } from '../hooks/useMessageReactions'
+import { glyphFor } from '../lib/profile/formatters'
 import {
   listDmConversations,
   acceptDmRequest,
@@ -16,6 +17,9 @@ import {
   type DmMessage,
 } from '../lib/dm'
 import { isBlocked } from '../lib/blocks'
+import { markRead } from '../lib/reads'
+import { useDmUnread } from '../hooks/useUnreadCounts'
+import { useOnlinePresence } from '../hooks/useOnlinePresence'
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
@@ -56,6 +60,7 @@ function ConversationView({
       : conversation.from_user_id
 
   const reactions = useMessageReactions({ scope: 'dm', scopeId: conversation.id, myId })
+  const isOnline = useOnlinePresence([otherId]).has(otherId)
 
   useEffect(() => {
     let alive = true
@@ -109,6 +114,12 @@ function ConversationView({
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
 
+  // Segna la conversazione come letta entrando e uscendo (Step 5).
+  useEffect(() => {
+    markRead('dm', conversation.id)
+    return () => { markRead('dm', conversation.id) }
+  }, [conversation.id])
+
   async function loadOlder() {
     if (loadingOlder || messages.length === 0) return
     setLoadingOlder(true)
@@ -153,14 +164,22 @@ function ConversationView({
         backLabel="‹ Messaggi"
         onBack={onBack}
         title={
-          <button
-            type="button"
-            className="link"
-            style={{ margin: 0, fontSize: '1.1rem', textDecoration: 'none' }}
-            onClick={() => onOpenProfile(otherId)}
-          >
-            @{conversation.other_nickname}
-          </button>
+          <span className="dm-title">
+            <button
+              type="button"
+              className="link"
+              style={{ margin: 0, fontSize: '1.1rem', textDecoration: 'none' }}
+              onClick={() => onOpenProfile(otherId)}
+            >
+              @{conversation.other_nickname}
+            </button>
+            {isOnline && (
+              <span className="dm-title-online">
+                <span className="presence-dot presence-dot-inline" aria-hidden="true" />
+                online
+              </span>
+            )}
+          </span>
         }
       />
 
@@ -255,6 +274,7 @@ function ListView({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
+  const unread = useDmUnread(myId)
 
   useEffect(() => {
     let alive = true
@@ -332,6 +352,9 @@ function ListView({
   const accepted = convs.filter((c) => c.status === 'accepted')
   const outgoing = convs.filter((c) => c.from_user_id === myId && c.status === 'pending')
 
+  const otherIdOf = (c: DmConversation) => (c.from_user_id === myId ? c.to_user_id : c.from_user_id)
+  const onlineIds = useOnlinePresence(accepted.map(otherIdOf))
+
   return (
     <main className="app rooms">
       <AppHeader backLabel="‹ Stanze" onBack={onBack} title="Messaggi" />
@@ -347,25 +370,36 @@ function ListView({
               <p className="dm-section-title">Richieste ({incoming.length})</p>
               {incoming.map((c) => (
                 <div key={c.id} className="dm-conv">
-                  <span className="dm-conv-name">@{c.other_nickname}</span>
-                  <span className="dm-conv-meta hint">{formatDate(c.created_at)}</span>
-                  <div className="dm-request-actions">
-                    <button
-                      type="button"
-                      className="btn-primary btn-sm"
-                      onClick={() => accept(c.id)}
-                      disabled={busy === c.id}
-                    >
-                      {busy === c.id ? 'Attendi…' : 'Accetta'}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-ghost btn-sm"
-                      onClick={() => reject(c.id)}
-                      disabled={busy === c.id}
-                    >
-                      Rifiuta
-                    </button>
+                  <div className="dm-row">
+                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
+                      {glyphFor(null, c.other_nickname)}
+                    </span>
+                    <div className="dm-info">
+                      <div className="dm-info-top">
+                        <span className="dm-conv-name">@{c.other_nickname}</span>
+                        <span className="dm-conv-meta hint">{formatDate(c.created_at)}</span>
+                      </div>
+                      <div className="dm-info-bottom">
+                        <div className="dm-request-actions">
+                          <button
+                            type="button"
+                            className="btn-primary btn-sm"
+                            onClick={() => accept(c.id)}
+                            disabled={busy === c.id}
+                          >
+                            {busy === c.id ? 'Attendi…' : 'Accetta'}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-ghost btn-sm"
+                            onClick={() => reject(c.id)}
+                            disabled={busy === c.id}
+                          >
+                            Rifiuta
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -377,19 +411,47 @@ function ListView({
               {incoming.length > 0 && (
                 <p className="dm-section-title">Conversazioni</p>
               )}
-              {accepted.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  className="dm-conv"
-                  onClick={() => onOpen(c)}
-                >
-                  <span className="dm-conv-name">@{c.other_nickname}</span>
-                  <span className="dm-conv-meta hint">
-                    {formatDate(c.updated_at)}
-                  </span>
-                </button>
-              ))}
+              {accepted.map((c) => {
+                const n = unread.get(c.id) ?? 0
+                const isOnline = onlineIds.has(otherIdOf(c))
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className={n > 0 ? 'dm-conv has-unread' : 'dm-conv'}
+                    onClick={() => onOpen(c)}
+                  >
+                    <div className="dm-row">
+                      <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
+                        {glyphFor(null, c.other_nickname)}
+                        {isOnline && (
+                          <>
+                            <span className="presence-dot" aria-hidden="true" />
+                            <span className="visually-hidden">online</span>
+                          </>
+                        )}
+                      </span>
+                      <div className="dm-info">
+                        <div className="dm-info-top">
+                          <span className={n > 0 ? 'dm-conv-name unread' : 'dm-conv-name'}>
+                            {n > 0 && <span className="dm-unread-dot" aria-hidden="true">● </span>}
+                            @{c.other_nickname}
+                          </span>
+                          <span className="dm-conv-meta hint">
+                            {formatDate(c.updated_at)}
+                          </span>
+                        </div>
+                      </div>
+                      {n > 0 && (
+                        <>
+                          <span className="unread-pill" aria-hidden="true">{n}</span>
+                          <span className="visually-hidden">{n} messaggi non letti</span>
+                        </>
+                      )}
+                    </div>
+                  </button>
+                )
+              })}
             </section>
           )}
 
@@ -398,10 +460,19 @@ function ListView({
               <p className="dm-section-title">In attesa di risposta</p>
               {outgoing.map((c) => (
                 <div key={c.id} className="dm-conv">
-                  <span className="dm-conv-name">@{c.other_nickname}</span>
-                  <span className="dm-conv-meta hint">
-                    In attesa · {formatDate(c.created_at)}
-                  </span>
+                  <div className="dm-row">
+                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
+                      {glyphFor(null, c.other_nickname)}
+                    </span>
+                    <div className="dm-info">
+                      <div className="dm-info-top">
+                        <span className="dm-conv-name">@{c.other_nickname}</span>
+                        <span className="dm-conv-meta hint">
+                          In attesa · {formatDate(c.created_at)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </section>

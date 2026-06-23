@@ -14,6 +14,7 @@ import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
 import { useMessageReactions } from '../hooks/useMessageReactions'
 import { promoteLayer } from '../lib/layers'
+import { markRead } from '../lib/reads'
 import { glyphFor } from '../lib/profile/formatters'
 import type { Chatroom } from '../types'
 import type { ChatMessage } from '../hooks/useChatMessages'
@@ -82,6 +83,13 @@ export function ChatScreen({
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     bottomRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
   }, [messages.length])
+
+  // Segna la stanza come letta entrando e (di nuovo) uscendo, così i messaggi
+  // arrivati mentre la guardavi non restano contati come non letti (Step 4).
+  useEffect(() => {
+    markRead('room', room.id)
+    return () => { markRead('room', room.id) }
+  }, [room.id])
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault()

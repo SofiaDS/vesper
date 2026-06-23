@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
-import { BurgerMenuButton } from './BurgerMenu'
 
 // Header comune a tutte le schermate post-login: back a sinistra (se non siamo
-// in homeScreen), titolo al centro, burger menu a destra.
+// in homeScreen), titolo al centro. La navigazione vive nella tab bar + hub
+// "Altro" (il burger menu è stato rimosso).
 export function AppHeader({
   title,
   extra,
@@ -30,7 +30,7 @@ export function AppHeader({
         <h1>{title}</h1>
         {extra}
       </div>
-      <BurgerMenuButton />
+      <span className="link-placeholder" />
     </header>
   )
 }

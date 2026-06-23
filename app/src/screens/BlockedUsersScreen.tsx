@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { AppHeader } from '../components/AppHeader'
+import { AnimatedLoader } from '../components/AnimatedLoader'
 import { listBlockedUsers, unblockUser, type BlockedUser } from '../lib/blocks'
+
+// Fluent Emoji (Microsoft, MIT) servito da CDN: nessun peso nel bundle.
+const SHIELD_EMOJI = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji/assets/Shield/Flat/shield_flat.svg'
 
 // Gestione dei propri blocchi: elenco delle persone bloccate con sblocco.
 export function BlockedUsersScreen({ onBack, backLabel = '‹ Profilo' }: { onBack: () => void; backLabel?: string }) {
@@ -42,11 +46,14 @@ export function BlockedUsersScreen({ onBack, backLabel = '‹ Profilo' }: { onBa
     <main className="app profile">
       <AppHeader backLabel={backLabel} onBack={onBack} title="Utenti bloccati" />
 
-      {loading && <p className="muted">Carico…</p>}
+      {loading && <AnimatedLoader />}
       {error && <p className="err chat-error" role="alert">{error}</p>}
 
       {!loading && !error && users.length === 0 && (
-        <p className="hint">Non hai bloccato nessuno.</p>
+        <div className="empty-state">
+          <img src={SHIELD_EMOJI} alt="" width={64} height={64} loading="lazy" />
+          <p className="hint">Non hai bloccato nessuno.</p>
+        </div>
       )}
 
       {users.length > 0 && (

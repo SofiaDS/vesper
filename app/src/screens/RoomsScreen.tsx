@@ -2,6 +2,7 @@ import { useAuth } from '../auth/AuthProvider'
 import { AppHeader } from '../components/AppHeader'
 import { useRooms } from '../hooks/useRooms'
 import { useRoomOnlineCount } from '../hooks/useRoomOnlineCount'
+import { useRoomUnread } from '../hooks/useUnreadCounts'
 import { MAX_TEMATICHE } from '../constants/limits'
 import type { Chatroom } from '../types'
 
@@ -27,6 +28,8 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
     retry,
   } = useRooms(myId)
 
+  const unread = useRoomUnread(myId)
+
   return (
     <main className="app rooms">
       <AppHeader title="Vesper" />
@@ -49,15 +52,38 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
             const canOpen = isFoyer || isJoined
             const blockedByCap = !isJoined && !isFoyer && capReached
             const working = busyRoom === room.id
+            const u = unread.get(room.id)
+            const cardClass = u?.hasMention
+              ? 'room-card has-mention'
+              : u
+              ? 'room-card has-unread'
+              : 'room-card'
             return (
-              <li key={room.id} className="room-card">
+              <li key={room.id} className={cardClass}>
                 <button
                   type="button"
                   className="room-main"
                   onClick={() => canOpen && onOpen(room)}
                   disabled={!canOpen}
                 >
-                  <span className="room-name">{room.name}</span>
+                  <span className="room-name-row">
+                    <span className={u ? 'room-name unread' : 'room-name'}>{room.name}</span>
+                    {u?.hasMention && (
+                      <span className="mention-pill" aria-hidden="true">
+                        @
+                      </span>
+                    )}
+                    {u && (
+                      <span className="unread-pill" aria-hidden="true">
+                        {u.unread}
+                      </span>
+                    )}
+                    {u && (
+                      <span className="visually-hidden">
+                        {u.unread} messaggi non letti{u.hasMention ? ', sei stata menzionata' : ''}
+                      </span>
+                    )}
+                  </span>
                   {room.description && (
                     <span className="room-desc">{room.description}</span>
                   )}
