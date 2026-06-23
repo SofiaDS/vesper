@@ -136,6 +136,21 @@ export function VerificationScreen() {
   // Cleanup stream alla chiusura del componente
   useEffect(() => () => stopCamera(), [])
 
+  // Aggancia lo stream della fotocamera al <video> di anteprima quando il box
+  // è montato (step 'camera' o 'recording'). startCamera() imposta streamRef
+  // PRIMA di setStep('camera'), quindi qui lo stream è già disponibile al primo
+  // render del video. Senza questo l'anteprima resta nera anche se la
+  // registrazione (MediaRecorder sullo stream) funziona. Il play() esplicito
+  // serve su mobile/TWA dove l'autoPlay non sempre parte da solo.
+  useEffect(() => {
+    const video = liveRef.current
+    const stream = streamRef.current
+    if (video && stream && (step === 'camera' || step === 'recording')) {
+      video.srcObject = stream
+      video.play().catch(() => {})
+    }
+  }, [step])
+
   // Aggiorna il preview video quando cambia il previewUrl
   useEffect(() => {
     if (previewRef.current && previewUrl) {
