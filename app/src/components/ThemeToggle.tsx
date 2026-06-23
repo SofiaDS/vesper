@@ -1,3 +1,4 @@
+import { Sun, Moon } from '@phosphor-icons/react'
 import { useTheme } from '../hooks/useTheme'
 
 export function ThemeToggle() {
@@ -11,7 +12,7 @@ export function ThemeToggle() {
       aria-label={isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro'}
       title={isDark ? 'Tema chiaro' : 'Tema scuro'}
     >
-      {isDark ? '☀' : '🌙'}
+      {isDark ? <Sun size={20} weight="duotone" /> : <Moon size={20} weight="duotone" />}
     </button>
   )
 }
