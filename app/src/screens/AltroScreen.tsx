@@ -1,5 +1,20 @@
 import { useRef, useState } from 'react'
-import { Sun, Moon } from '@phosphor-icons/react'
+import {
+  Sun,
+  Moon,
+  Gear,
+  Prohibit,
+  Info,
+  ShieldCheck,
+  FileText,
+  ShieldStar,
+  Bug,
+  Lightbulb,
+  Heart,
+  SignOut,
+  CaretRight,
+  ArrowUpRight,
+} from '@phosphor-icons/react'
 import { AppHeader } from '../components/AppHeader'
 import { useTheme } from '../hooks/useTheme'
 import { useModalA11y } from '../hooks/useModalA11y'
@@ -43,47 +58,83 @@ export function AltroScreen({
 
       <section className="card box-shadow">
         <h2 className="pf-section-title">Account &amp; community</h2>
-        <button type="button" className="link link-row" onClick={onOpenSettings}>
-          Impostazioni
+        <button type="button" className="nav-row" onClick={onOpenSettings}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <Gear size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">Impostazioni</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
-        <button type="button" className="link link-row" onClick={onOpenBlocked}>
-          Utenti bloccati
+        <button type="button" className="nav-row" onClick={onOpenBlocked}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <Prohibit size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">Utenti bloccati</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
-        <button type="button" className="link link-row" onClick={() => onOpenLegal('about')}>
-          {LEGAL_DOC_LABELS.about}
+        <button type="button" className="nav-row" onClick={() => onOpenLegal('about')}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <Info size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">{LEGAL_DOC_LABELS.about}</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
-        <button type="button" className="link link-row" onClick={() => onOpenLegal('privacy')}>
-          {LEGAL_DOC_LABELS.privacy}
+        <button type="button" className="nav-row" onClick={() => onOpenLegal('privacy')}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <ShieldCheck size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">{LEGAL_DOC_LABELS.privacy}</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
-        <button type="button" className="link link-row" onClick={() => onOpenLegal('terms')}>
-          {LEGAL_DOC_LABELS.terms}
+        <button type="button" className="nav-row" onClick={() => onOpenLegal('terms')}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <FileText size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">{LEGAL_DOC_LABELS.terms}</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
       </section>
 
       {isStaff && (
         <section className="card box-shadow" style={{ marginTop: '1rem' }}>
           <h2 className="pf-section-title">Moderazione (staff)</h2>
-          <button type="button" className="link link-row" onClick={onOpenAdmin}>
-            Apri pannello Admin
+          <button type="button" className="nav-row" onClick={onOpenAdmin}>
+            <span className="nav-row-ico" aria-hidden="true">
+              <ShieldStar size={20} weight="duotone" />
+            </span>
+            <span className="nav-row-label">Apri pannello Admin</span>
+            <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
           </button>
         </section>
       )}
 
       <section className="card box-shadow" style={{ marginTop: '1rem' }}>
         <h2 className="pf-section-title">Supporto</h2>
-        <button type="button" className="link link-row" onClick={onReportBug}>
-          Segnala un bug
+        <button type="button" className="nav-row" onClick={onReportBug}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <Bug size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">Segnala un bug</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
-        <button type="button" className="link link-row" onClick={onSuggest}>
-          Dacci un suggerimento
+        <button type="button" className="nav-row" onClick={onSuggest}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <Lightbulb size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">Dacci un suggerimento</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
         <button
           type="button"
-          className="link link-row"
+          className="nav-row"
           onClick={onSupportLink}
           aria-label="Sostieni Vesper, si apre in una nuova scheda"
         >
-          Sostieni Vesper ↗
+          <span className="nav-row-ico" aria-hidden="true">
+            <Heart size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">Sostieni Vesper</span>
+          <ArrowUpRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
       </section>
 
@@ -91,17 +142,24 @@ export function AltroScreen({
         <h2 className="pf-section-title">Sessione</h2>
         <button
           type="button"
-          className="link link-row"
+          className="nav-row"
           onClick={toggleTheme}
           aria-label={isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro'}
         >
-          <span className="link-icon" aria-hidden="true">
+          <span className="nav-row-ico" aria-hidden="true">
             {isDark ? <Sun size={20} weight="duotone" /> : <Moon size={20} weight="duotone" />}
           </span>
-          {isDark ? 'Tema chiaro' : 'Tema scuro'}
+          <span className="nav-row-label">{isDark ? 'Tema chiaro' : 'Tema scuro'}</span>
         </button>
-        <button type="button" className="link link-row link-danger" onClick={() => setConfirmLogout(true)}>
-          Esci
+        <button
+          type="button"
+          className="nav-row nav-row-danger"
+          onClick={() => setConfirmLogout(true)}
+        >
+          <span className="nav-row-ico" aria-hidden="true">
+            <SignOut size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">Esci</span>
         </button>
       </section>
 
