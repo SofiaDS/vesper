@@ -26,7 +26,7 @@
 
   /* Altezze fisse di header e tab bar, riusate per il padding di #root e
      per i calcoli di altezza delle schermate (es. .chat). */
-  --header-h: 2.5rem;
+  --header-h: 3.25rem;
   --tabbar-h: 3.4rem;
 
   color-scheme: dark;
@@ -550,13 +550,14 @@ code {
   top: 0;
   right: 0;
   width: 98%;
+  height: var(--header-h);
+  box-sizing: border-box;
   z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  padding: 0.6rem 0 0.75rem;
-  margin-bottom: 1rem;
+  padding: 0;
   background: var(--bg);
   border-bottom: 1px solid rgba(232, 177, 78, 0.18);
 }
