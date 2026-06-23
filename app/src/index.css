@@ -1,3 +1,33 @@
+/* ── Font ad alta leggibilità (self-hostati in /public/fonts) ──────────────
+   Atkinson Hyperlegible (Braille Institute) è il carattere di base dell'app.
+   OpenDyslexic è il carattere alternativo, attivabile dall'utente dal toggle
+   in Impostazioni › Accessibilità (vedi useFont / [data-font="dyslexic"]). */
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  font-weight: 400; font-style: normal; font-display: swap;
+  src: url('/fonts/Atkinson-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  font-weight: 700; font-style: normal; font-display: swap;
+  src: url('/fonts/Atkinson-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  font-weight: 400; font-style: italic; font-display: swap;
+  src: url('/fonts/Atkinson-Italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-weight: 400; font-style: normal; font-display: swap;
+  src: url('/fonts/OpenDyslexic-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-weight: 700; font-style: normal; font-display: swap;
+  src: url('/fonts/OpenDyslexic-Bold.woff2') format('woff2');
+}
+
 :root {
   /* Palette "Inchiostro & oro" (vedi branding.md) */
   --bg:      #171520;
@@ -29,10 +59,21 @@
   --header-h: 3.25rem;
   --tabbar-h: 3.4rem;
 
+  /* Carattere di base dell'app. Commutato a OpenDyslexic dal toggle
+     accessibilità via [data-font="dyslexic"] su <html> (vedi sotto). */
+  --font-body: 'Atkinson Hyperlegible', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
   color-scheme: dark;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: var(--font-body);
   background-color: var(--bg);
   color: var(--text);
+}
+
+/* Toggle "Carattere ad alta leggibilità" (Impostazioni › Accessibilità):
+   sostituisce il font di base con OpenDyslexic, mantenendo Atkinson come
+   fallback. `html[...]` batte la specificità di :root, qualunque sia l'ordine. */
+html[data-font="dyslexic"] {
+  --font-body: 'OpenDyslexic', 'Atkinson Hyperlegible', system-ui, sans-serif;
 }
 
 * {
