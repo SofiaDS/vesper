@@ -21,12 +21,13 @@ frontend".
   Step 9 (`.msg-author` → stile `.chat-sender`), Step 10 (`.admin-subnav`),
   Step 12 (`.brand`), Step 6 (galleria a griglia 3 col),
   Step 11 (toast globale notifiche), Step 4 (badge non letti/menzione stanze),
-  Step 5 (DM non letti — esclusa la presenza online, vedi sotto).
-- ⏳ **Pendente solo l'apply Supabase**: Step 4/5 richiedono la migration
-  `read_markers` (vedi `supabase_step4_5_istruzioni.md`); il client è già
-  pronto e tollera l'assenza della migration (nessun badge finché non applicata).
-- 🛑 **Non fatto (fuori scope, niente sistema di presenza)**: il `presence-dot`
-  online/offline dello Step 5.
+  Step 5 completo (DM non letti **+ presenza online** via last_seen).
+- ✅ **Migration applicate al progetto live (23 giu 2026)**: `read_markers` e
+  `user_presence` sono entrambe applicate — badge non letti e pallino online
+  sono operativi (vedi `supabase_step4_5_istruzioni.md` per il dettaglio).
+- ✅ **Restyle completo**: tutti i 12 step dei mockup sono implementati.
+- ⏳ **Resta da fare (verifiche manuali utente, vedi `test.md`)**: i test in
+  browser, in particolare la verifica RLS-su-realtime del toast (Step 11).
 
 ---
 

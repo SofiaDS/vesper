@@ -85,3 +85,43 @@ torna indietro → il badge sparisce (l'hai letta). Stessa cosa per i DM.
   da una chat; `mark_read('dm', <conversation_id>)` quando apri/esci da un DM.
 - Le funzioni sono `security definer` ma sicure: ogni query è vincolata a
   `auth.uid()`, quindi un'utente vede solo i propri conteggi.
+
+---
+
+## Presenza online (Step 5 — pallino "online")
+
+**Seconda migration**, separata, per l'indicatore "online" nei DM:
+`supabase/migrations/20260623000000_user_presence.sql`. Applicala allo **stesso
+modo** (CLI `supabase db push`, oppure incolla il file nell'SQL Editor e Run).
+Anche questa è opzionale: senza, semplicemente non compaiono i pallini verdi.
+
+### Cosa aggiunge (presenza)
+
+- Tabella `user_presence` (una riga per utente, `last_seen_at`).
+- RPC `touch_last_seen()` — "heartbeat": il client la chiama ogni ~60s mentre la
+  scheda è in primo piano per dire "sono attiva adesso".
+- RPC `users_online(ids)` — dato un elenco di utenti, restituisce **solo** quelli
+  online (last_seen negli ultimi 150s) **e** con `show_online = true`.
+
+### Perché una tabella separata (privacy)
+
+`profiles` è leggibile da chiunque (`profiles_select_authenticated USING (true)`),
+quindi mettere `last_seen` lì lo esporrebbe **anche per chi ha disattivato**
+`show_online`. Nella tabella `user_presence` ogni riga è leggibile **solo** dalla
+diretta interessata; la presenza altrui passa **esclusivamente** da
+`users_online()`, che filtra su `show_online` e **non** restituisce mai
+l'orario grezzo (solo "online sì/no"). Verificato in review backend.
+
+### Come verificare (presenza)
+
+```sql
+-- tabella + funzioni esistono?
+select * from public.user_presence limit 1;            -- 0 righe va bene
+select proname from pg_proc
+where proname in ('touch_last_seen', 'users_online');  -- 2 righe
+```
+
+Nell'app (due account, B con `show_online` attivo): apri i DM con A → accanto
+all'avatar di B compare il **pallino verde** se B ha l'app aperta in primo piano;
+chiudi/min­imizza B e dopo ~2-3 min il pallino sparisce. Se B disattiva
+"mostra online" nelle impostazioni, A non deve più vederlo online.

@@ -93,12 +93,29 @@ B su un'altra (o usa una finestra in incognito).
 - [ ] Con "**riduci animazioni**" di sistema attivo il toast appare senza
       scivolare (resta comunque visibile e centrato).
 
-> ⚠️ **Verifica privacy/RLS (importante, riguarda Supabase):** A **non** deve
-> ricevere toast per messaggi di stanze di cui **non è membro**. Test: con un
-> terzo account in una stanza dove A non è entrata, scrivi → ad A **non** deve
-> arrivare nulla (controlla anche la console del browser: nessun messaggio di
-> quella stanza). Se invece arrivasse, la RLS non sta filtrando il realtime:
-> avvisami e restringo le sottoscrizioni alle sole stanze dell'utente.
+### ⚠️ Verifica privacy/RLS sul realtime (importante)
+
+È solo un test di **comportamento**: conferma che Supabase Realtime filtri i
+`postgres_changes` per RLS, cioè che A **non** riceva i messaggi di stanze di
+cui non fa parte. È l'unica cosa che impedisce al toast di mostrare messaggi che
+A non dovrebbe vedere. Serve una stanza **tematica** (non la foyer: lì sono
+iscritte tutte). I badge non letti (Step 4/5) NON c'entrano: sono calcolati
+lato server con `auth.uid()`, sicuri a prescindere.
+
+- [ ] **Setup:** A **non** è iscritta a una tematica X (se lo è, "Lascia
+      stanza"); B è dentro X. A resta su una schermata **non-chat** (lista
+      Stanze o Profilo).
+- [ ] B scrive in X → ad A **non** deve comparire **nessun toast**.
+      - ✅ Nessun toast = la RLS filtra il realtime, **tutto ok**.
+      - ❌ Compare un toast per X (stanza non di A) = la RLS **non** filtra:
+        avvisami, restringo la sottoscrizione alle sole stanze dell'utente.
+- [ ] **Controprova positiva:** sempre con A su schermata non-chat, B scrive
+      nella **foyer** → ad A il toast **deve** comparire (A è membro). Così sai
+      che il "niente toast" sopra era il filtro RLS e non un bug generico.
+- [ ] **(Opzionale, sicurezza 100%)** Sul browser di A: DevTools → **Network**
+      → filtro **WS** → connessione Realtime → tab **Messages**. Mentre B scrive
+      in X, **non** deve arrivare nessun frame col `chatroom_id`/corpo di quel
+      messaggio. Se arriva, la RLS non filtra.
 
 ---
 
@@ -130,6 +147,23 @@ B su un'altra (o usa una finestra in incognito).
 - [ ] Apri la conversazione e torna alla lista → gli indicatori **spariscono**.
 - [ ] I **tuoi** messaggi non contano come non letti.
 - [ ] Verifica in **dark e light**.
+
+## Step 5 (presenza) — pallino "online" nei DM
+
+> Richiede la migration `user_presence` applicata (vedi
+> `supabase_step4_5_istruzioni.md`, sezione Presenza online). Serve B con
+> "mostra online" **attivo** nelle impostazioni.
+
+- [ ] Con B che ha l'app aperta in **primo piano**, nella lista Messaggi di A
+      l'avatar di B mostra un **pallino verde** in basso a destra (può metterci
+      fino a ~1 min ad apparire al primo heartbeat).
+- [ ] Anche nell'**header della conversazione** con B compare "● online".
+- [ ] B **minimizza/chiude** la scheda → dopo ~2-3 min il pallino **sparisce**
+      (offline).
+- [ ] B disattiva **"mostra online"** nelle impostazioni → A **non** lo vede più
+      online (anche se B è attivo).
+- [ ] Il pallino verde si distingue bene sull'avatar oro, in **dark e light**;
+      il testo "online" è leggibile (contrasto).
 
 ---
 
