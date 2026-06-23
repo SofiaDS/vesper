@@ -14,6 +14,9 @@
   /* --error resta invariato per sfondi/bordi/badge (3:1 ok);
      --error-text è una variante più chiara per il *testo* (4.5:1+). */
   --error-text: #FF6B7A;
+  /* --success come testo (es. "online" in DM, Step 5). In tema scuro
+     #4caf7d su --bg è già ~6.5:1, quindi coincide con --success. */
+  --success-text: var(--success);
 
   /* Corallo (branding.md, non ancora wired come accento secondario generale):
      usato qui per .rep-mid (sistema reputazione staff), per distinguerlo
@@ -2720,6 +2723,40 @@ button.dm-conv:hover {
 
 .dm-avatar {
   flex: 0 0 auto;
+  position: relative;
+}
+
+/* Pallino presenza online (Step 5, vedi mockup `.presence-dot`): verde, in
+   basso a destra sull'avatar, con bordo nel colore di sfondo per staccarsi. */
+.presence-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--success);
+  border: 2px solid var(--bg);
+}
+/* Variante inline (header conversazione): nel flusso, senza posizionamento. */
+.presence-dot-inline {
+  position: static;
+  width: 8px;
+  height: 8px;
+  border: none;
+}
+.dm-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dm-title-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--success-text);
 }
 
 .dm-info {
@@ -3066,6 +3103,9 @@ button.dm-conv:hover {
      --accent e --error non bastano come colore del testo (contrasto < 4.5:1). */
   --accent-text: #7A5510;
   --error-text:  #B91C3C;
+  /* Verde scurito per il *testo* (--success #1f7a48 su --bg chiaro è ~4.2:1,
+     sotto la soglia AA 4.5:1). Vedi nota in :root. */
+  --success-text: #1a6b3f;
   /* Corallo scurito per restare ≥4.5:1 su sfondi chiari (vedi nota in :root). */
   --rep-mid-text: #994537;
 

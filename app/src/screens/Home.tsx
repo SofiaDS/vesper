@@ -6,6 +6,7 @@ import { usePendingDmCount } from '../hooks/usePendingDmCount'
 import { useAdminPendingCounts } from '../hooks/useAdminPendingCounts'
 import { useBackNavigation } from '../hooks/useBackNavigation'
 import { useMessageNotifications } from '../hooks/useMessageNotifications'
+import { useHeartbeat } from '../hooks/useHeartbeat'
 import { TabBar, type TabBarItem } from '../components/TabBar'
 import { GlobalToast } from '../components/GlobalToast'
 import { AltroScreen } from './AltroScreen'
@@ -31,6 +32,9 @@ export function Home() {
   const myId = session?.user.id
   const pendingDmCount = usePendingDmCount((profile?.strato ?? 0) >= 2 ? myId : undefined)
   const adminCounts = useAdminPendingCounts(isStaff)
+
+  // Heartbeat di presenza online (per il pallino nei DM, Step 5).
+  useHeartbeat(myId)
 
   const [room, setRoom] = useState<Chatroom | null>(null)
   const [showProfile, setShowProfile] = useState(false)

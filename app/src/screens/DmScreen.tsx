@@ -19,6 +19,7 @@ import {
 import { isBlocked } from '../lib/blocks'
 import { markRead } from '../lib/reads'
 import { useDmUnread } from '../hooks/useUnreadCounts'
+import { useOnlinePresence } from '../hooks/useOnlinePresence'
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
@@ -59,6 +60,7 @@ function ConversationView({
       : conversation.from_user_id
 
   const reactions = useMessageReactions({ scope: 'dm', scopeId: conversation.id, myId })
+  const isOnline = useOnlinePresence([otherId]).has(otherId)
 
   useEffect(() => {
     let alive = true
@@ -162,14 +164,22 @@ function ConversationView({
         backLabel="‹ Messaggi"
         onBack={onBack}
         title={
-          <button
-            type="button"
-            className="link"
-            style={{ margin: 0, fontSize: '1.1rem', textDecoration: 'none' }}
-            onClick={() => onOpenProfile(otherId)}
-          >
-            @{conversation.other_nickname}
-          </button>
+          <span className="dm-title">
+            <button
+              type="button"
+              className="link"
+              style={{ margin: 0, fontSize: '1.1rem', textDecoration: 'none' }}
+              onClick={() => onOpenProfile(otherId)}
+            >
+              @{conversation.other_nickname}
+            </button>
+            {isOnline && (
+              <span className="dm-title-online">
+                <span className="presence-dot presence-dot-inline" aria-hidden="true" />
+                online
+              </span>
+            )}
+          </span>
         }
       />
 
@@ -342,6 +352,9 @@ function ListView({
   const accepted = convs.filter((c) => c.status === 'accepted')
   const outgoing = convs.filter((c) => c.from_user_id === myId && c.status === 'pending')
 
+  const otherIdOf = (c: DmConversation) => (c.from_user_id === myId ? c.to_user_id : c.from_user_id)
+  const onlineIds = useOnlinePresence(accepted.map(otherIdOf))
+
   return (
     <main className="app rooms">
       <AppHeader backLabel="‹ Stanze" onBack={onBack} title="Messaggi" />
@@ -400,6 +413,7 @@ function ListView({
               )}
               {accepted.map((c) => {
                 const n = unread.get(c.id) ?? 0
+                const isOnline = onlineIds.has(otherIdOf(c))
                 return (
                   <button
                     key={c.id}
@@ -410,6 +424,12 @@ function ListView({
                     <div className="dm-row">
                       <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
                         {glyphFor(null, c.other_nickname)}
+                        {isOnline && (
+                          <>
+                            <span className="presence-dot" aria-hidden="true" />
+                            <span className="visually-hidden">online</span>
+                          </>
+                        )}
                       </span>
                       <div className="dm-info">
                         <div className="dm-info-top">
