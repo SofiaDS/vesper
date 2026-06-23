@@ -65,8 +65,7 @@ async function loadFlags(): Promise<FlaggedMessage[]> {
 }
 
 async function archiveFlag(id: number, source: 'chatroom' | 'dm') {
-  const table = source === 'chatroom' ? 'messages' : 'dm_messages'
-  const { error } = await supabase.from(table).update({ ai_flag_archived: true }).eq('id', id)
+  const { error } = await supabase.rpc('archive_ai_flag', { p_id: id, p_source: source })
   if (error) throw error
 }
 
@@ -87,7 +86,13 @@ export function AiFlags() {
 
   async function archive(id: number, source: 'chatroom' | 'dm') {
     setBusy(id); setErr(null)
-    try { await archiveFlag(id, source); await load() }
+    try {
+      await archiveFlag(id, source)
+      await load()
+      // Chiede al badge della sub-nav admin di ricalcolare il conteggio "Flag AI"
+      // (non si aggiorna da solo: l'UPDATE di ai_flag_archived non arriva via realtime).
+      window.dispatchEvent(new Event('vesper:admin-counts-refresh'))
+    }
     catch (e) { setErr(e instanceof Error ? e.message : 'Operazione non riuscita.') }
     finally { setBusy(null) }
   }

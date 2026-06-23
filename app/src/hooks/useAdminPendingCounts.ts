@@ -52,6 +52,12 @@ export function useAdminPendingCounts(enabled: boolean): AdminPendingCounts {
 
     refresh()
 
+    // Oltre al realtime, un'azione di moderazione (es. archiviare un flag AI)
+    // può chiedere esplicitamente un ricalcolo: il realtime su alcune tabelle
+    // (es. UPDATE di ai_flag_archived su messages/dm_messages) può non essere
+    // pubblicato/consegnato, quindi non ci affidiamo solo ad esso.
+    window.addEventListener('vesper:admin-counts-refresh', refresh)
+
     const ch = supabase
       .channel('admin_pending_counts')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, refresh)
@@ -65,6 +71,7 @@ export function useAdminPendingCounts(enabled: boolean): AdminPendingCounts {
 
     return () => {
       active.current = false
+      window.removeEventListener('vesper:admin-counts-refresh', refresh)
       supabase.removeChannel(ch)
     }
   }, [enabled])
