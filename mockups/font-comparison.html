@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Confronto font — Vesper (Atkinson · Luciole · Lexend · OpenDyslexic)</title>
+<style>
+  /* ═══════════ Webfont self-hostati (cartella ./fonts) ═══════════ */
+  @font-face { font-family:'Atkinson Hyperlegible'; font-weight:400; font-style:normal;
+    src:url('fonts/Atkinson-Regular.woff2') format('woff2'); font-display:swap; }
+  @font-face { font-family:'Atkinson Hyperlegible'; font-weight:700; font-style:normal;
+    src:url('fonts/Atkinson-Bold.woff2') format('woff2'); font-display:swap; }
+  @font-face { font-family:'Atkinson Hyperlegible'; font-weight:400; font-style:italic;
+    src:url('fonts/Atkinson-Italic.woff2') format('woff2'); font-display:swap; }
+
+  @font-face { font-family:'Luciole'; font-weight:400; font-style:normal;
+    src:url('fonts/Luciole-Regular.woff2') format('woff2'); font-display:swap; }
+  @font-face { font-family:'Luciole'; font-weight:700; font-style:normal;
+    src:url('fonts/Luciole-Bold.woff2') format('woff2'); font-display:swap; }
+
+  @font-face { font-family:'Lexend'; font-weight:100 900; font-style:normal;
+    src:url('fonts/Lexend-Variable.woff2') format('woff2'); font-display:swap; }
+
+  @font-face { font-family:'OpenDyslexic'; font-weight:400; font-style:normal;
+    src:url('fonts/OpenDyslexic-Regular.woff2') format('woff2'); font-display:swap; }
+  @font-face { font-family:'OpenDyslexic'; font-weight:700; font-style:normal;
+    src:url('fonts/OpenDyslexic-Bold.woff2') format('woff2'); font-display:swap; }
+
+  /* ═══════════ Palette dei due temi ═══════════ */
+  body[data-theme="dark"] {
+    --bg:#171520; --surface:#221f2e; --surface-2:#2b2738; --border:#34303f;
+    --accent:#e8b14e; --accent-text:#e8b14e; --text:#f7efdd; --muted:#a89db5;
+    --error:#FF6B7A; --success:#4caf7d; --ink:#171520;
+  }
+  body[data-theme="light"] {
+    --bg:#f0ece0; --surface:#e4dfd0; --surface-2:#d8d2c2; --border:rgba(130,90,0,0.22);
+    --accent:#B8841F; --accent-text:#7A5510; --text:#1a1626; --muted:#6c6557;
+    --error:#B91C3C; --success:#1a6b3f; --ink:#171520;
+  }
+
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; }
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:'Lexend',system-ui,sans-serif;
+    transition:background .2s ease,color .2s ease;
+    padding-bottom:3rem;
+  }
+
+  /* ═══════════ Barra di controllo (sticky) ═══════════ */
+  .toolbar {
+    position:sticky; top:0; z-index:50;
+    display:flex; flex-wrap:wrap; align-items:center; gap:1rem;
+    padding:0.85rem 1.2rem;
+    background:var(--surface); border-bottom:1px solid var(--border);
+    box-shadow:0 2px 12px rgba(0,0,0,0.18);
+  }
+  .toolbar h1 { font-size:1rem; margin:0; color:var(--accent-text); letter-spacing:0.02em; }
+  .toolbar .grp { display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:var(--muted); }
+  .toolbar button, .toolbar select {
+    font:inherit; font-size:0.82rem; cursor:pointer; color:var(--text);
+    background:var(--bg); border:1px solid var(--border); border-radius:999px;
+    padding:0.4rem 0.85rem;
+  }
+  .toolbar button.on { background:var(--accent); color:var(--ink); border-color:var(--accent); font-weight:700; }
+  .toolbar input[type=range]{ accent-color:var(--accent); }
+
+  .intro { max-width:1100px; margin:1.1rem auto 0; padding:0 1.2rem; color:var(--muted); font-size:0.88rem; line-height:1.5; }
+  .intro b { color:var(--text); }
+
+  /* ═══════════ Griglia colonne font ═══════════ */
+  .grid {
+    display:grid; gap:1.1rem; padding:1.2rem;
+    grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+    max-width:1500px; margin:0 auto;
+  }
+  .col { display:flex; flex-direction:column; gap:0.6rem; min-width:0; }
+  .col-head { padding:0 0.15rem; }
+  .col-name { margin:0; font-size:1.05rem; color:var(--accent-text); }
+  .col-tag  { margin:0.15rem 0 0; font-size:0.78rem; color:var(--muted); line-height:1.45; min-height:3.2em; }
+  .col-badge { display:inline-block; font-size:0.66rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.05em; padding:0.12rem 0.5rem; border-radius:999px; margin-left:0.4rem;
+    border:1px solid var(--accent); color:var(--accent-text); vertical-align:middle; }
+
+  /* Test sui caratteri ambigui */
+  .glyphs {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:0.6rem 0.75rem; font-size:1.05rem; line-height:1.7;
+  }
+  .glyphs .lab { display:block; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--muted); margin-bottom:0.25rem; font-family:'Lexend',sans-serif; }
+  .glyphs b { font-weight:700; }
+
+  /* ═══════════ Telefono / schermata reale ═══════════ */
+  .phone {
+    background:var(--bg); border:1px solid var(--border); border-radius:16px;
+    overflow:hidden; font-size:calc(15px * var(--fs,1));
+  }
+  .ph-header {
+    display:grid; grid-template-columns:1.6rem 1fr 1.6rem; align-items:center;
+    padding:0.7rem 0.85rem; border-bottom:1px solid var(--border);
+  }
+  .ph-header .brand { text-align:center; margin:0; font-size:1.15em; font-weight:700;
+    color:var(--accent-text); letter-spacing:0.05em; }
+  .ph-tabs { display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--border); }
+  .ph-tab { text-align:center; padding:0.5rem 0.1rem; font-size:0.74em; font-weight:600; color:var(--muted); }
+  .ph-tab.on { color:var(--accent-text); position:relative; }
+  .ph-tab.on::after { content:""; position:absolute; left:25%; right:25%; bottom:0; height:3px;
+    border-radius:3px 3px 0 0; background:var(--accent); }
+  .ph-body { padding:0.8rem 0.85rem 1rem; }
+
+  .sec-title { font-size:0.72em; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin:0 0 0.5rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0.7rem 0.8rem; margin-bottom:0.7rem; }
+
+  .room { display:flex; justify-content:space-between; align-items:center; gap:0.6rem;
+    background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0.6rem 0.75rem; margin-bottom:0.55rem; }
+  .room.mention { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .room-name { font-weight:700; font-size:0.98em; }
+  .room-name.unread { color:var(--accent-text); }
+  .room-desc { font-size:0.8em; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .room-on { font-size:0.72em; color:var(--success); margin-top:0.1rem; }
+  .pill { flex-shrink:0; min-width:1.3rem; height:1.3rem; padding:0 0.4rem; border-radius:999px;
+    background:var(--accent); color:var(--ink); font-size:0.72em; font-weight:800;
+    display:flex; align-items:center; justify-content:center; }
+  .pill.men { background:transparent; border:1.5px solid var(--accent); color:var(--accent-text); white-space:nowrap; }
+
+  .msg { display:flex; gap:0.45rem; margin-bottom:0.5rem; align-items:flex-start; }
+  .msg.own { flex-direction:row-reverse; }
+  .ava { width:1.7rem; height:1.7rem; border-radius:50%; flex-shrink:0; color:var(--ink);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.78em; }
+  .bub { background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:0.45rem 0.65rem;
+    font-size:0.86em; line-height:1.45; max-width:80%; }
+  .msg.own .bub { background:rgba(232,177,78,0.12); border-color:rgba(232,177,78,0.4); }
+  .meta { font-size:0.68em; color:var(--muted); margin-bottom:0.15rem; }
+  .meta .tag { color:var(--accent-text); font-weight:700; }
+
+  .bio { font-size:0.88em; line-height:1.5; margin:0 0 0.6rem; }
+  .pf-row { display:flex; justify-content:space-between; gap:0.6rem; font-size:0.85em; padding:0.25rem 0; }
+  .pf-row .l { color:var(--muted); }
+
+  .field-lab { font-size:0.76em; color:var(--muted); font-weight:600; display:block; margin-bottom:0.25rem; }
+  .input { width:100%; background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:0.5rem 0.65rem; font:inherit; font-size:0.86em; }
+  .chips { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.5rem; }
+  .chip { font-size:0.78em; border-radius:999px; padding:0.28rem 0.65rem; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text); }
+  .chip.on { background:rgba(232,177,78,0.15); border-color:var(--accent); color:var(--accent-text); font-weight:700; }
+  .btn { background:var(--accent); color:var(--ink); border:none; border-radius:8px; padding:0.5rem 0.9rem;
+    font:inherit; font-weight:700; font-size:0.85em; cursor:pointer; margin-top:0.6rem; }
+  .small-note { font-size:0.74em; color:var(--muted); margin:0.4rem 0 0; line-height:1.4; }
+</style>
+</head>
+<body data-theme="dark" style="--fs:1;">
+
+  <div class="toolbar">
+    <h1>Vesper · confronto font</h1>
+    <div class="grp">
+      <span>Tema:</span>
+      <button id="btn-dark" class="on" onclick="setTheme('dark')">Scuro</button>
+      <button id="btn-light" onclick="setTheme('light')">Chiaro</button>
+    </div>
+    <div class="grp">
+      <span>Dimensione testo:</span>
+      <input type="range" min="0.9" max="1.5" step="0.05" value="1" oninput="setFs(this.value)" />
+      <span id="fs-val">100%</span>
+    </div>
+    <div class="grp" style="margin-left:auto;">
+      <em style="font-style:normal;">Apri in browser · prova a rimpicciolire/ingrandire il testo per simulare occhi diversi</em>
+    </div>
+  </div>
+
+  <p class="intro">
+    Stessa schermata reale di Vesper, resa in <b>4 caratteri ad alta leggibilità</b>. I primi tre sono i finalisti per il
+    font di base dell'app; <b>OpenDyslexic</b> è il candidato per il <b>toggle dislessia</b> nelle impostazioni (non come default).
+    Guarda soprattutto: distinzione tra <b>I l 1</b> e <b>O 0</b>, le lettere a corpo piccolo (descrizioni, meta dei messaggi)
+    e come "respira" il testo. Cambia tema e dimensione dalla barra in alto.
+  </p>
+
+  <div class="grid" id="grid"></div>
+
+<script>
+  const FONTS = [
+    { css:"'Atkinson Hyperlegible',sans-serif", name:"Atkinson Hyperlegible",
+      badge:"ipovedenti",
+      tag:"Braille Institute, pensato per ipovedenti. Lettere molto differenziate, look caldo e un filo tradizionale." },
+    { css:"'Luciole',sans-serif", name:"Luciole",
+      badge:"ipovedenti",
+      tag:"Sviluppato in Francia con un centro per la disabilità visiva. Forme ampie e aperte, ottimo a corpo piccolo." },
+    { css:"'Lexend',sans-serif", name:"Lexend",
+      badge:"fluenza lettura",
+      tag:"Spaziatura studiata sulla fluenza di lettura. Il più moderno/“social”, riduce l'affaticamento visivo." },
+    { css:"'OpenDyslexic',sans-serif", name:"OpenDyslexic",
+      badge:"toggle dislessia",
+      tag:"Base delle lettere appesantita contro il ribaltamento dei caratteri. Da offrire come opzione, non come default." },
+  ];
+
+  function phone(fontCss){ return `
+    <div class="phone" style="font-family:${fontCss};">
+      <div class="ph-header"><span></span><p class="brand">Vesper</p><span></span></div>
+      <div class="ph-tabs">
+        <div class="ph-tab on">Stanze</div><div class="ph-tab">DM</div>
+        <div class="ph-tab">Cerca</div><div class="ph-tab">Profilo</div>
+      </div>
+      <div class="ph-body">
+
+        <p class="sec-title">Stanze · 12 online</p>
+        <div class="room mention">
+          <div style="min-width:0;">
+            <div class="room-name unread">Letteratura &amp; Poesia</div>
+            <div class="room-desc">@anna.r ti ha risposto: «Il 1° verso è bellissimo»</div>
+            <div class="room-on">12 online</div>
+          </div>
+          <span class="pill men">@ menzione</span>
+        </div>
+        <div class="room">
+          <div style="min-width:0;">
+            <div class="room-name unread">Foyer</div>
+            <div class="room-desc">La hall principale, aperta a tutte</div>
+            <div class="room-on">42 online</div>
+          </div>
+          <span class="pill">24</span>
+        </div>
+
+        <p class="sec-title" style="margin-top:0.9rem;">Chat</p>
+        <div class="msg">
+          <div class="ava" style="background:#7FB7A3;">A</div>
+          <div><div class="meta">@anna.r · 18:02</div>
+            <div class="bub">Avete letto Szymborska? «Niente due volte» mi ha lasciata senza parole.</div></div>
+        </div>
+        <div class="msg own">
+          <div class="ava" style="background:var(--accent);">M</div>
+          <div><div class="meta">tu · 18:13</div>
+            <div class="bub">Sì! Adoro come dice cose enormi con parole semplici 😊</div></div>
+        </div>
+
+        <p class="sec-title" style="margin-top:0.9rem;">Profilo</p>
+        <div class="card">
+          <p class="bio">Appassionata di poesia e musica dal vivo. Cerco persone autentiche con cui
+            condividere serate tranquille — magari un concerto o un tè lungo.</p>
+          <div class="pf-row"><span class="l">Età</span><span>27 anni</span></div>
+          <div class="pf-row"><span class="l">Città</span><span>Bologna (BO)</span></div>
+          <div class="pf-row"><span class="l">Orientamento</span><span>Lesbica</span></div>
+        </div>
+
+        <label class="field-lab">Nickname</label>
+        <input class="input" value="martina_v 1990" />
+        <div class="chips">
+          <span class="chip on">Letteratura</span><span class="chip on">Musica</span>
+          <span class="chip">Cinema</span><span class="chip">Yoga</span>
+        </div>
+        <button class="btn">Salva modifiche</button>
+        <p class="small-note">0123456789 · lIllo · O0 · rn/m · bd pq · «àèìòù»</p>
+      </div>
+    </div>`;
+  }
+
+  function glyphs(fontCss){ return `
+    <div class="glyphs" style="font-family:${fontCss};">
+      <span class="lab">Caratteri ambigui</span>
+      <b>Illinois</b> · I l 1 &nbsp; O 0 &nbsp; rn m &nbsp; b d p q &nbsp; g a &nbsp; 5 S<br>
+      Ma la volpe, col suo balzo, ha raggiunto il quieto Fido.
+    </div>`;
+  }
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = FONTS.map(f => `
+    <div class="col">
+      <div class="col-head">
+        <h2 class="col-name">${f.name}<span class="col-badge">${f.badge}</span></h2>
+        <p class="col-tag">${f.tag}</p>
+      </div>
+      ${glyphs(f.css)}
+      ${phone(f.css)}
+    </div>`).join('');
+
+  function setTheme(t){
+    document.body.dataset.theme = t;
+    document.getElementById('btn-dark').classList.toggle('on', t==='dark');
+    document.getElementById('btn-light').classList.toggle('on', t==='light');
+  }
+  function setFs(v){
+    document.body.style.setProperty('--fs', v);
+    document.getElementById('fs-val').textContent = Math.round(v*100)+'%';
+  }
+</script>
+</body>
+</html>
