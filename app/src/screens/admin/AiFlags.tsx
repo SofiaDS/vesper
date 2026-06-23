@@ -65,8 +65,7 @@ async function loadFlags(): Promise<FlaggedMessage[]> {
 }
 
 async function archiveFlag(id: number, source: 'chatroom' | 'dm') {
-  const table = source === 'chatroom' ? 'messages' : 'dm_messages'
-  const { error } = await supabase.from(table).update({ ai_flag_archived: true }).eq('id', id)
+  const { error } = await supabase.rpc('archive_ai_flag', { p_id: id, p_source: source })
   if (error) throw error
 }
 
