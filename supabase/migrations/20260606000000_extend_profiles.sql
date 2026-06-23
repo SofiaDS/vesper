@@ -68,7 +68,7 @@ alter table public.profiles
 -- Filtro DM in ricezione (permessi_e_strati.md §1.1)
 alter table public.profiles
   add column if not exists dm_filter text not null default 'tutte'
-    check (dm_filter in ('tutte','citta','intenti','verificate'));
+    check (dm_filter in ('tutte','citta','intenti','verificatə'));
 
 -- Visibilità dei campi: ogni show_* controlla se il campo appare in public_profiles.
 -- Defaults: show_identity e show_orientation = true (campi centrali della piattaforma);

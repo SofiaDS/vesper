@@ -14,12 +14,20 @@
   /* --error resta invariato per sfondi/bordi/badge (3:1 ok);
      --error-text è una variante più chiara per il *testo* (4.5:1+). */
   --error-text: #FF6B7A;
+  /* --success come testo (es. "online" in DM, Step 5). In tema scuro
+     #4caf7d su --bg è già ~6.5:1, quindi coincide con --success. */
+  --success-text: var(--success);
 
   /* Corallo (branding.md, non ancora wired come accento secondario generale):
      usato qui per .rep-mid (sistema reputazione staff), per distinguerlo
      percettivamente da --accent-text (oro) e --error-text (rosso),
      posizionandosi visivamente "tra" i due. Contrasto ≥4.5:1 su --bg/--surface. */
   --rep-mid-text: #EC6A55;
+
+  /* Altezze fisse di header e tab bar, riusate per il padding di #root e
+     per i calcoli di altezza delle schermate (es. .chat). */
+  --header-h: 2.5rem;
+  --tabbar-h: 3.4rem;
 
   color-scheme: dark;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -43,6 +51,15 @@
   border: 0;
 }
 
+/* Focus ring globale visibile da tastiera (WCAG 2.4.7). Usa l'oro --accent,
+   con offset così resta leggibile anche su elementi con sfondo proprio.
+   :focus-visible evita di mostrare l'anello sui click col mouse. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 html {
   height: 100%;
   overflow-x: hidden;
@@ -62,7 +79,7 @@ body {
 #root {
   height: 100%;
   width:100%;
-  padding-top: 2.5rem;
+  padding-top: calc(var(--header-h) + var(--tabbar-h));
 }
 
 .app {
@@ -161,7 +178,7 @@ code {
 .field input[type='text'] {
   width: 100%;
   padding: 0.65rem 0.75rem;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -245,7 +262,7 @@ code {
   margin-top: 0.25rem;
   padding: 0.7rem 1rem;
   border: 0;
-  border-radius: 35px;
+  border-radius: 8px;
   background: var(--accent);
   color: var(--bg);
   font-size: 1rem;
@@ -275,7 +292,7 @@ code {
   margin-top: 0.6rem;
   padding: 0.7rem 1rem;
   border: 1.5px solid rgba(232, 177, 78, 0.4);
-  border-radius: 35px;
+  border-radius: 8px;
   background: none;
   color: var(--accent-text);
   font-size: 1rem;
@@ -306,13 +323,85 @@ code {
   text-decoration: underline;
 }
 
+/* Voci di lista a piena larghezza dentro le card (hub "Altro", Impostazioni):
+   touch target ≥44px (WCAG 2.5.5) e area cliccabile su tutta la riga, invece
+   del solo testo sottolineato. La spaziatura passa dal padding, non dal
+   margin-top, così le righe restano allineate e tappabili una dietro l'altra. */
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 0;
+  padding: 0.5rem 0;
+  text-align: left;
+}
+.link-row + .link-row {
+  border-top: 1px solid rgba(232, 177, 78, 0.12);
+}
+
+/* "Esci": azione di sessione/distruttiva, differenziata dal colore oro delle
+   altre voci. --error-text mantiene ≥4.5:1 in entrambi i temi (vedi :root). */
+.link-danger {
+  color: var(--error-text);
+}
+
+/* Icona (Phosphor) accanto al testo in una voce-riga: eredita colore/tema. */
+.link-icon {
+  display: inline-flex;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+/* Empty state con illustrazione (es. Fluent Emoji) sopra al testo. */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.empty-state img {
+  opacity: 0.95;
+}
+
+/* Loader (AnimatedLoader) in riga con la sua etichetta. */
+.loader-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Spinner Phosphor: rotazione continua, disattivata se l'utente ha chiesto
+   meno animazioni (WCAG 2.3.3). transform-origin centrato sull'svg. */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+  transform-origin: center;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
 /* --- Chat (Foyer) --- */
 .chat {
   width: 100%;
   max-width: 420px;
   min-width: 0;
   margin: 0 auto;
-  height: calc(100dvh - 3rem - 2.5rem);
+  height: calc(100dvh - 3rem - var(--header-h) - var(--tabbar-h));
   padding-top: 0.5rem;
   display: flex;
   flex-direction: column;
@@ -378,15 +467,15 @@ code {
   flex-direction: column;
   gap: 0.15rem;
   padding: 0.55rem 0.85rem;
-  border-radius: 16px 16px 16px 4px;
+  border-radius: 12px;
   background: var(--surface);
   color: var(--text);
 }
 
 .msg-mine {
-  background: var(--accent);
-  color: var(--bg);
-  border-radius: 16px 16px 4px 16px;
+  background: rgba(232, 177, 78, 0.12);
+  border: 1px solid rgba(232, 177, 78, 0.4);
+  color: var(--text);
 }
 
 .msg-body {
@@ -411,7 +500,7 @@ code {
   flex: 1;
   min-width: 0;
   padding: 0.65rem 0.75rem;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -477,6 +566,7 @@ code {
   min-width: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
 }
 
@@ -485,8 +575,9 @@ code {
   min-width: 0;
   margin: 0;
   font-size: 1.2rem;
-  color: var(--text);
+  color: var(--accent-text);
   letter-spacing: 0.04em;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -504,6 +595,94 @@ code {
   font-size: 1.5rem;
   line-height: 1;
   text-decoration: none;
+}
+
+/* --- Tab bar di navigazione principale, fissa sotto l'header --- */
+.tabbar {
+  position: fixed;
+  top: var(--header-h);
+  right: 0;
+  width: 98%;
+  height: var(--tabbar-h);
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(var(--tabbar-cols, 5), 1fr);
+  background: var(--bg);
+  border-bottom: 1px solid rgba(232, 177, 78, 0.18);
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--text);
+  opacity: 0.7;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.tab-icon {
+  display: inline-flex;
+  /* le icone Phosphor ereditano il colore via currentColor → seguono il tema */
+  line-height: 0;
+}
+
+.tab-label {
+  font-weight: 600;
+  font-size: 0.66rem;
+  letter-spacing: 0.01em;
+}
+
+.tab.active {
+  color: var(--accent-text);
+  opacity: 1;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--accent);
+}
+
+/* Nel tema chiaro l'oro pieno (--accent) ha contrasto <3:1 sullo sfondo:
+   uso l'oro più scuro (--accent-text) per la lineetta della tab attiva,
+   conforme a WCAG 1.4.11 (componenti UI ≥3:1). */
+[data-theme="light"] .tab.active::after {
+  background: var(--accent-text);
+}
+
+.tab-badge {
+  position: absolute;
+  top: 0.3rem;
+  left: calc(50% + 0.35rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.05rem;
+  height: 1.05rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--error);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tab-badge.mention {
+  background: var(--accent);
+  color: var(--bg);
 }
 
 .room-list {
@@ -580,10 +759,82 @@ code {
   flex-shrink: 0;
 }
 
-.room-action {
+.room-name-row {
   display: flex;
   align-items: center;
-  padding-right: 0.75rem;
+  gap: 0.4rem;
+}
+/* Il nome può troncare; le pill hanno flex-shrink:0 e restano leggibili
+   sulla stessa riga invece di essere spinte a capo da nomi lunghi. */
+.room-name-row .room-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Badge "non letti"/"@menzione" sulle stanze (Step 4, vedi mockup). Tinte oro
+   neutre rispetto al tema (convenzione rgba dell'accento già usata altrove). */
+.room-card.has-unread {
+  border-color: rgba(232, 177, 78, 0.45);
+  background-color: rgba(232, 177, 78, 0.06);
+}
+.room-card.has-mention {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+/* `.room-name.unread` ha la stessa specificità dell'override light di
+   `.room-name`: viene dopo nel file, quindi vince in entrambi i temi. */
+.room-name.unread,
+[data-theme="light"] .room-name.unread {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+/* Nel tema chiaro l'oro pieno (--accent #B8841F) dà solo ~2.8:1 con la crema
+   (--bg): per il numero, che è informativo, uso il testo scuro (--text) → ~5.3:1
+   (AA ok). Il look del dark (testo scuro su oro) resta invariato. */
+[data-theme="light"] .unread-pill {
+  color: var(--text);
+}
+.unread-pill {
+  flex-shrink: 0;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--accent);
+  /* Testo scuro sull'oro pieno. In dark --bg è già scuro (≈9.9:1). In light
+     l'oro --accent (#B8841F) è medio-scuro: la crema --bg darebbe ~2.8:1, sotto
+     l'AA per un badge numerico significativo; l'override light sotto usa --text. */
+  color: var(--bg);
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mention-pill {
+  flex-shrink: 0;
+  height: 1.3rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  background: transparent;
+  border: 1.5px solid var(--accent);
+  color: var(--accent-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.room-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.85rem 0.75rem;
 }
 
 .btn-sm {
@@ -693,7 +944,7 @@ body:has(.install-banner) .rooms-hint {
   padding: 0.45rem 0.85rem;
   font-size: 0.85rem;
   border: 1px solid rgba(236, 106, 85, 0.5);
-  border-radius: 35px;
+  border-radius: 8px;
   background: none;
   color: var(--error-text);
   font-weight: 600;
@@ -704,11 +955,6 @@ body:has(.install-banner) .rooms-hint {
 .btn-danger:disabled {
   opacity: 0.5;
   cursor: default;
-}
-
-/* Più bottoni affiancati nell'area azione di una stanza */
-.room-action {
-  gap: 0.4rem;
 }
 
 /* Link "Password dimenticata?" sotto il campo password */
@@ -834,7 +1080,7 @@ body:has(.install-banner) .rooms-hint {
   resize: vertical;
   min-height: 88px;
   padding: 0.65rem 0.75rem;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -959,6 +1205,15 @@ body:has(.install-banner) .rooms-hint {
   border-radius: 12px;
   border: 1px solid rgba(232, 177, 78, 0.2);
   background: rgba(247, 239, 221, 0.04);
+}
+
+.pf-section-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  opacity: 0.45;
 }
 
 .pf-nick {
@@ -1189,6 +1444,55 @@ body:has(.install-banner) .rooms-hint {
 }
 
 /* ===== Area moderazione (admin / moderatore) ===== */
+/* Sub-nav a pillole fra le sezioni di moderazione (sostituisce le sottovoci
+   del vecchio burger menu). Vedi mockup `.admin-subnav`. */
+.admin-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+.admin-subnav button {
+  display: inline-flex;
+  align-items: center;
+  /* --border/--muted del mockup non esistono in questo foglio: riuso le
+     convenzioni delle altre pillole (.chip/.seg) — bordo oro tenue e testo
+     --text leggermente smorzato. */
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  background: var(--surface);
+  color: var(--text);
+  opacity: 0.7;
+  border-radius: 999px;
+  /* min-height verso il target tattile (~44px) senza ingrandire il testo:
+     resta una riga di pillole compatta ma più comoda da toccare sul mobile. */
+  min-height: 36px;
+  padding: 0.4rem 0.8rem;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.admin-subnav button.active {
+  border-color: var(--accent);
+  color: var(--accent-text);
+  opacity: 1;
+  font-weight: 700;
+  background: rgba(232, 177, 78, 0.14);
+}
+.admin-subnav button .badge-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.3rem;
+  margin-left: 0.25rem;
+  border-radius: 999px;
+  background: var(--error);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
 .admin-filter {
   margin-bottom: 0.6rem;
   font-size: 0.85rem;
@@ -1220,7 +1524,12 @@ body:has(.install-banner) .rooms-hint {
   justify-content: space-between;
   align-items: baseline;
   gap: 0.6rem;
-  padding: 0.3rem 0;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(232, 177, 78, 0.12);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
 }
 
 .stat-label {
@@ -1287,7 +1596,7 @@ body:has(.install-banner) .rooms-hint {
 .btn-approve,
 .btn-reject {
   border: 0;
-  border-radius: 35px;
+  border-radius: 8px;
   padding: 0.4rem 0.8rem;
   font: inherit;
   font-weight: 600;
@@ -1386,8 +1695,12 @@ body:has(.install-banner) .rooms-hint {
 }
 
 /* --- Profilo altrui: header bilanciato --- */
+/* Riserva ai due lati dell'header la stessa larghezza del back button (44px),
+   così il titolo resta centrato in modo simmetrico anche quando manca la
+   freccia o il lato destro (dopo la rimozione del burger menu). */
 .link-placeholder {
-  width: 1px;
+  width: 44px;
+  flex-shrink: 0;
 }
 
 /* --- Autore messaggio cliccabile + footer con segnala --- */
@@ -1411,6 +1724,8 @@ body:has(.install-banner) .rooms-hint {
   flex-shrink: 0;
   line-height: 1;
 }
+/* Nome mittente sopra la bolla: oro e in grassetto come `.chat-sender` nei
+   mockup (resta un button per aprire il profilo al click). */
 .msg-author {
   display: inline-block;
   align-self: flex-start;
@@ -1419,14 +1734,12 @@ body:has(.install-banner) .rooms-hint {
   border: none;
   background: none;
   font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text);
-  opacity: 0.6;
+  font-weight: 700;
+  color: var(--accent-text);
   cursor: pointer;
 }
 .msg-author:hover {
   text-decoration: underline;
-  opacity: 0.9;
 }
 /* Riga unica con reazioni (a sx) e azioni rispondi/reagisci/segnala (a dx) */
 .msg-meta {
@@ -1679,6 +1992,106 @@ body:has(.install-banner) .rooms-hint {
   background: rgba(232, 177, 78, 0.14);
 }
 
+/* --- Toast globale notifiche (vedi mockup `.global-toast`) ---
+   Fisso in basso, centrato e largo come l'app; sopra il composer ma sotto le
+   modali. `--surface-2` del mockup non esiste qui: uso `--surface`. */
+.global-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translate(-50%, 0);
+  width: calc(100% - 1.2rem);
+  max-width: 420px;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+  animation: global-toast-in 0.25s ease;
+}
+@keyframes global-toast-in {
+  from { transform: translate(-50%, 120%); opacity: 0; }
+  to   { transform: translate(-50%, 0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .global-toast { animation: none; }
+}
+/* Area cliccabile (icona + testo): un button per non annidare bottoni con la X. */
+.global-toast-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.global-toast-icon {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(232, 177, 78, 0.15);
+  border: 1.5px solid var(--accent);
+  color: var(--accent-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+.global-toast-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.global-toast-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.global-toast-sub {
+  font-size: 0.74rem;
+  color: var(--text);
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.global-toast-close {
+  flex-shrink: 0;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -0.4rem -0.3rem -0.4rem 0;
+  background: none;
+  border: none;
+  color: var(--text);
+  opacity: 0.6;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.global-toast-close:hover {
+  opacity: 1;
+}
+
 /* --- Modale generica (es. segnalazione) --- */
 .modal-overlay {
   position: fixed;
@@ -1746,7 +2159,7 @@ body:has(.install-banner) .rooms-hint {
   box-sizing: border-box;
   resize: vertical;
   border: 1px solid rgba(247, 239, 221, 0.18);
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 0.65rem 0.75rem;
   font: inherit;
   background: rgba(247, 239, 221, 0.05);
@@ -1839,26 +2252,27 @@ body:has(.install-banner) .rooms-hint {
   font-size: 0.92rem;
 }
 
-/* --- Galleria foto profilo: striscia di miniature + lightbox --- */
+/* --- Galleria foto profilo: griglia 3 colonne + lightbox (vedi mockup
+   `.pf-gallery`) --- */
 .gallery-strip {
-  display: flex;
-  gap: 0.6rem;
-  overflow-x: auto;
-  padding-bottom: 0.2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
 }
-.gallery-strip.loading {
-  height: 160px;
-  border-radius: 12px;
+/* Stato di caricamento: celle quadrate vuote che riprendono la griglia 3
+   colonne, così non c'è salto di layout quando arrivano le foto. */
+.gallery-ph {
+  aspect-ratio: 1;
+  border-radius: 8px;
   background: rgba(247, 239, 221, 0.05);
 }
 
 .gallery-thumb {
-  flex: 0 0 auto;
-  width: 160px;
-  height: 200px;
+  width: 100%;
+  aspect-ratio: 1;
   padding: 0;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   background: rgba(247, 239, 221, 0.05);
@@ -1988,7 +2402,7 @@ body:has(.install-banner) .rooms-hint {
 .seg {
   flex: 1;
   padding: 0.5rem 0.6rem;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: transparent;
   color: var(--text);
@@ -2009,7 +2423,7 @@ body:has(.install-banner) .rooms-hint {
   flex: 1;
   width: 100%;
   padding: 0.6rem 0.7rem;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -2218,9 +2632,13 @@ body:has(.install-banner) .rooms-hint {
 }
 .search-aff {
   font-size: 0.72rem;
-  opacity: 0.8;
+  font-weight: 700;
   white-space: nowrap;
   flex: 0 0 auto;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  color: var(--accent-text);
 }
 .search-more {
   align-self: center;
@@ -2267,6 +2685,22 @@ button.dm-conv:hover {
   background: rgba(247, 239, 221, 0.08);
 }
 
+/* Conversazione DM con messaggi non letti (Step 5): bordo/sfondo oro tenue,
+   nome in grassetto col pallino, contatore (.unread-pill, condiviso con Step 4). */
+.dm-conv.has-unread {
+  border-color: rgba(232, 177, 78, 0.5);
+  background: rgba(232, 177, 78, 0.06);
+}
+.dm-conv-name.unread {
+  font-weight: 700;
+}
+.dm-unread-dot {
+  color: var(--accent);
+}
+.dm-row .unread-pill {
+  align-self: center;
+}
+
 .dm-conv-name {
   flex: 1;
   min-width: 0;
@@ -2278,6 +2712,74 @@ button.dm-conv:hover {
 .dm-conv-meta {
   flex-shrink: 0;
   font-size: 0.78rem;
+}
+
+.dm-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.dm-avatar {
+  flex: 0 0 auto;
+  position: relative;
+}
+
+/* Pallino presenza online (Step 5, vedi mockup `.presence-dot`): verde, in
+   basso a destra sull'avatar, con bordo nel colore di sfondo per staccarsi. */
+.presence-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--success);
+  border: 2px solid var(--bg);
+}
+/* Variante inline (header conversazione): nel flusso, senza posizionamento. */
+.presence-dot-inline {
+  position: static;
+  width: 8px;
+  height: 8px;
+  border: none;
+}
+.dm-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dm-title-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--success-text);
+}
+
+.dm-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.dm-info-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.dm-info-bottom {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .dm-request-actions {
@@ -2299,7 +2801,7 @@ button.dm-conv:hover {
   flex: 1;
   min-width: 0;
   padding: 0.55rem 0.75rem;
-  border-radius: 9px;
+  border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
@@ -2601,6 +3103,9 @@ button.dm-conv:hover {
      --accent e --error non bastano come colore del testo (contrasto < 4.5:1). */
   --accent-text: #7A5510;
   --error-text:  #B91C3C;
+  /* Verde scurito per il *testo* (--success #1f7a48 su --bg chiaro è ~4.2:1,
+     sotto la soglia AA 4.5:1). Vedi nota in :root. */
+  --success-text: #1a6b3f;
   /* Corallo scurito per restare ≥4.5:1 su sfondi chiari (vedi nota in :root). */
   --rep-mid-text: #994537;
 
@@ -2613,6 +3118,11 @@ button.dm-conv:hover {
 [data-theme="light"] .rep-prompt {
   background: rgba(23, 21, 32, 0.07);
   /*border-color: rgba(130, 90, 0, 0.25);*/
+}
+
+[data-theme="light"] .gallery-thumb,
+[data-theme="light"] .gallery-ph {
+  background: rgba(23, 21, 32, 0.07);
 }
 
 [data-theme="light"] .roster {
@@ -2655,6 +3165,13 @@ button.dm-conv:hover {
   background: rgba(154, 106, 0, 0.18);
   border-color: var(--accent);
   color: var(--accent-text);
+}
+
+/* Badge "menzione" (tab Altro): nel tema chiaro il testo --bg sull'oro --accent
+   scende a ~2.8:1. Fissiamo il numero sullo scuro inchiostro, che resta ≥4.5:1
+   sull'oro chiaro del light theme (e dell'oro scuro del dark). */
+[data-theme="light"] .tab-badge.mention {
+  color: #171520;
 }
 
 /* ── Theme toggle pill ────────────────────────────────── */
@@ -2780,7 +3297,7 @@ button.dm-conv:hover {
   justify-content: space-between;
   gap: 0.6rem;
   padding: 0.7rem 0.9rem;
-  border-radius: 12px;
+  border-radius: 8px;
   border: none;
   background: transparent;
   color: var(--text);

@@ -168,7 +168,7 @@ export function ReportsModeration() {
             <option value="reviewed">In revisione</option>
             <option value="actioned">Confermate</option>
             <option value="dismissed">Rigettate</option>
-            <option value="all">Tutte</option>
+            <option value="all">tuttə</option>
           </select>
         </label>
       </div>

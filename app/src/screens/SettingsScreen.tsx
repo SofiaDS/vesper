@@ -14,7 +14,7 @@ export function SettingsScreen({
 }) {
   return (
     <main className="app profile">
-      <AppHeader backLabel="‹ Stanze" onBack={onBack} title="Impostazioni" />
+      <AppHeader backLabel="‹ Altro" onBack={onBack} title="Impostazioni" />
 
       <section className="card box-shadow">
         <h2 className="pf-section-title">Notifiche</h2>
@@ -28,13 +28,13 @@ export function SettingsScreen({
 
       <section className="card box-shadow" style={{ marginTop: '1rem' }}>
         <h2 className="pf-section-title">Privacy</h2>
-        <button type="button" className="link" style={{ display: 'block' }} onClick={onOpenBlocked}>
+        <button type="button" className="link link-row" onClick={onOpenBlocked}>
           Persone bloccate
         </button>
-        <button type="button" className="link" style={{ display: 'block' }} onClick={() => onOpenLegal('privacy')}>
+        <button type="button" className="link link-row" onClick={() => onOpenLegal('privacy')}>
           {LEGAL_DOC_LABELS.privacy}
         </button>
-        <button type="button" className="link" style={{ display: 'block' }} onClick={() => onOpenLegal('terms')}>
+        <button type="button" className="link link-row" onClick={() => onOpenLegal('terms')}>
           {LEGAL_DOC_LABELS.terms}
         </button>
       </section>

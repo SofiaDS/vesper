@@ -4,7 +4,6 @@ import type {
   Intent,
   RelationshipStatus,
   RelationshipType,
-  Language,
   ChildrenStatus,
   Diet,
   Religion,
@@ -34,7 +33,7 @@ export interface Profile {
   intents: Intent[]
   relationship_status: RelationshipStatus | null
   relationship_type: RelationshipType | null
-  languages: Language[]
+  languages: string[]
   children_status: ChildrenStatus | null
   has_pets: boolean | null
   pets_detail: string | null

@@ -1,10 +1,15 @@
 import { useState } from 'react'
+import { House, ChatCircleDots, MagnifyingGlass, User, DotsThreeOutline } from '@phosphor-icons/react'
 import type { Chatroom } from '../types'
 import { useAuth } from '../auth/AuthProvider'
 import { usePendingDmCount } from '../hooks/usePendingDmCount'
 import { useAdminPendingCounts } from '../hooks/useAdminPendingCounts'
 import { useBackNavigation } from '../hooks/useBackNavigation'
-import { BurgerMenu, type BurgerMenuItem } from '../components/BurgerMenu'
+import { useMessageNotifications } from '../hooks/useMessageNotifications'
+import { useHeartbeat } from '../hooks/useHeartbeat'
+import { TabBar, type TabBarItem } from '../components/TabBar'
+import { GlobalToast } from '../components/GlobalToast'
+import { AltroScreen } from './AltroScreen'
 import { RoomsScreen } from './RoomsScreen'
 import { ChatScreen } from './ChatScreen'
 import { ProfileScreen } from './profile/ProfileScreen'
@@ -21,12 +26,15 @@ import { openSupportEmail } from '../lib/support'
 const SUPPORT_URL = 'https://www.example.com'
 
 // Shell post-login: gestisce la navigazione fra lobby, chat, profilo e moderazione.
-// Nessun router esterno: basta uno stato locale, raccolto nel burger menu fisso.
+// Nessun router esterno: basta uno stato locale, guidato dalla TabBar fissa.
 export function Home() {
-  const { session, profile, signOut, isStaff, isAdmin } = useAuth()
+  const { session, profile, signOut, isStaff } = useAuth()
   const myId = session?.user.id
   const pendingDmCount = usePendingDmCount((profile?.strato ?? 0) >= 2 ? myId : undefined)
   const adminCounts = useAdminPendingCounts(isStaff)
+
+  // Heartbeat di presenza online (per il pallino nei DM, Step 5).
+  useHeartbeat(myId)
 
   const [room, setRoom] = useState<Chatroom | null>(null)
   const [showProfile, setShowProfile] = useState(false)
@@ -36,6 +44,7 @@ export function Home() {
   const [showSearch, setShowSearch] = useState(false)
   const [showDm, setShowDm] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showAltro, setShowAltro] = useState(false)
   const [viewUserId, setViewUserId] = useState<string | null>(null)
   const [legalDoc, setLegalDoc] = useState<LegalDoc | null>(null)
 
@@ -51,6 +60,7 @@ export function Home() {
     setShowSearch(false)
     setShowDm(false)
     setShowSettings(false)
+    setShowAltro(false)
     setViewUserId(null)
     setLegalDoc(null)
     open?.()
@@ -60,15 +70,22 @@ export function Home() {
     openScreen()
   }
 
-  function openAdmin(tab: AdminTab) {
-    openScreen(() => {
-      setAdminTab(tab)
-      setShowAdmin(true)
-    })
-  }
+  // Toast globale per nuovi messaggi/menzioni mentre sei in un'altra schermata.
+  // Sopprime i messaggi della stanza che stai leggendo e i DM mentre la sezione
+  // "Messaggi" è aperta. Al click apre la conversazione relativa.
+  const notif = useMessageNotifications({
+    myId,
+    myNickname: profile?.nickname,
+    activeRoomId: room?.id ?? null,
+    dmOpen: showDm,
+  })
 
-  function openLegal(doc: LegalDoc) {
-    openScreen(() => setLegalDoc(doc))
+  function openFromToast() {
+    const t = notif.toast
+    if (!t) return
+    notif.dismiss()
+    if (t.kind === 'dm') openScreen(() => setShowDm(true))
+    else if (t.room) openScreen(() => setRoom(t.room!))
   }
 
   // Apertura da dentro Impostazioni: non resetta showSettings, così il tasto
@@ -77,16 +94,20 @@ export function Home() {
     setLegalDoc(doc)
   }
 
-  const onLobby =
-    !room &&
+  // Nessuna delle schermate "secondarie" (raggiunte dalla tab "Altro" o da
+  // link interni) è aperta: la sezione "Stanze" (lista o chat) è quella attiva.
+  const inStanze =
     !showProfile &&
     !showAdmin &&
     !showBlocked &&
     !showSearch &&
     !showDm &&
     !showSettings &&
+    !showAltro &&
     !viewUserId &&
     !legalDoc
+
+  const onLobby = inStanze && !room
 
   // Etichetta della schermata corrente: usata solo per dare contesto a chi
   // legge le email di "Segnala un bug" / "Dacci un suggerimento" — stessa
@@ -99,6 +120,8 @@ export function Home() {
     ? 'Utenti bloccati'
     : showSettings
     ? 'Impostazioni'
+    : showAltro
+    ? 'Altro'
     : viewUserId
     ? 'Profilo pubblico'
     : showSearch
@@ -111,61 +134,38 @@ export function Home() {
     ? room.name
     : 'Stanze'
 
-  const menuItems: BurgerMenuItem[] = [
-    { label: 'Stanze', onClick: goToRooms, active: onLobby },
-    { label: 'Ricerca', onClick: () => openScreen(() => setShowSearch(true)), active: showSearch },
-    ...((profile?.strato ?? 0) >= 2
-      ? [{ label: 'Messaggi', onClick: () => openScreen(() => setShowDm(true)), active: showDm, badge: pendingDmCount }]
+  const canDm = (profile?.strato ?? 0) >= 2
+  const altroBadge = isStaff
+    ? adminCounts.verifiche + adminCounts.foto + adminCounts.segnalazioni + adminCounts.ai
+    : undefined
+  const tabItems: TabBarItem[] = [
+    { key: 'stanze', label: 'Stanze', icon: <House size={22} weight="duotone" />, onClick: goToRooms, active: inStanze },
+    ...(canDm
+      ? [{ key: 'dm', label: 'DM', icon: <ChatCircleDots size={22} weight="duotone" />, onClick: () => openScreen(() => setShowDm(true)), active: showDm, badge: pendingDmCount, badgeLabel: 'messaggi non letti' } as TabBarItem]
       : []),
-    { label: 'Il Mio Profilo', onClick: () => openScreen(() => setShowProfile(true)), active: showProfile },
-    ...(isStaff
-      ? [{
-          label: 'Admin Tab',
-          active: showAdmin,
-          children: [
-            { label: ADMIN_TAB_LABELS.stats, onClick: () => openAdmin('stats'), active: showAdmin && adminTab === 'stats' },
-            { label: ADMIN_TAB_LABELS.verifiche, onClick: () => openAdmin('verifiche'), active: showAdmin && adminTab === 'verifiche', badge: adminCounts.verifiche },
-            { label: ADMIN_TAB_LABELS.foto, onClick: () => openAdmin('foto'), active: showAdmin && adminTab === 'foto', badge: adminCounts.foto },
-            { label: ADMIN_TAB_LABELS.segnalazioni, onClick: () => openAdmin('segnalazioni'), active: showAdmin && adminTab === 'segnalazioni', badge: adminCounts.segnalazioni },
-            { label: ADMIN_TAB_LABELS.ai, onClick: () => openAdmin('ai'), active: showAdmin && adminTab === 'ai', badge: adminCounts.ai },
-            { label: ADMIN_TAB_LABELS.reputazione, onClick: () => openAdmin('reputazione'), active: showAdmin && adminTab === 'reputazione' },
-            ...(isAdmin
-              ? [{ label: ADMIN_TAB_LABELS.moderatori, onClick: () => openAdmin('moderatori'), active: showAdmin && adminTab === 'moderatori' }]
-              : []),
-          ],
-        }]
-      : []),
-    { label: 'Impostazioni', onClick: () => openScreen(() => setShowSettings(true)), active: showSettings },
-    { label: LEGAL_DOC_LABELS.about, onClick: () => openLegal('about'), active: legalDoc === 'about' },
-    { label: LEGAL_DOC_LABELS.privacy, onClick: () => openLegal('privacy'), active: legalDoc === 'privacy' },
-    { label: LEGAL_DOC_LABELS.terms, onClick: () => openLegal('terms'), active: legalDoc === 'terms' },
-    { label: 'Segnala un bug', onClick: () => openSupportEmail({ type: 'bug', screen: currentScreenLabel, userId: myId }) },
-    { label: 'Dacci un suggerimento', onClick: () => openSupportEmail({ type: 'feedback', screen: currentScreenLabel, userId: myId }) },
-    {
-      label: 'Sostieni Vesper ↗',
-      ariaLabel: 'Sostieni Vesper, si apre in una nuova scheda',
-      onClick: () => window.open(SUPPORT_URL, '_blank', 'noopener,noreferrer'),
-    },
+    { key: 'ricerca', label: 'Ricerca', icon: <MagnifyingGlass size={22} weight="duotone" />, onClick: () => openScreen(() => setShowSearch(true)), active: showSearch },
+    { key: 'profilo', label: 'Profilo', icon: <User size={22} weight="duotone" />, onClick: () => openScreen(() => setShowProfile(true)), active: showProfile },
+    { key: 'altro', label: 'Altro', icon: <DotsThreeOutline size={22} weight="duotone" />, onClick: () => openScreen(() => setShowAltro(true)), active: showAltro, badge: altroBadge, mention: true, badgeLabel: 'elementi in attesa di moderazione' },
   ]
 
   // Quante "schermate" sono aperte una sull'altra in questo momento (es.
   // Ricerca → Profilo pubblico = 2): serve a sapere se il prossimo `goBack`
   // riporta alla lobby, per decidere se ri-armare la guardia sulla history
   // (vedi useBackNavigation).
-  const stackDepth = [room, showProfile, showAdmin, showBlocked, showSearch, showDm, showSettings, viewUserId, legalDoc]
+  const stackDepth = [room, showProfile, showAdmin, showBlocked, showSearch, showDm, showSettings, showAltro, viewUserId, legalDoc]
     .filter(Boolean).length
 
   let screen: React.ReactNode
   let goBack = goToRooms
   if (showAdmin) {
     goBack = () => setShowAdmin(false)
-    screen = <AdminScreen tab={adminTab} onBack={goBack} />
+    screen = <AdminScreen tab={adminTab} counts={adminCounts} onTabChange={setAdminTab} onBack={goBack} />
   } else if (legalDoc) {
     goBack = () => setLegalDoc(null)
-    screen = <LegalScreen doc={legalDoc} onBack={goBack} backLabel={showSettings ? '‹ Impostazioni' : '‹ Stanze'} />
+    screen = <LegalScreen doc={legalDoc} onBack={goBack} backLabel={showSettings ? '‹ Impostazioni' : showAltro ? '‹ Altro' : '‹ Stanze'} />
   } else if (showBlocked) {
     goBack = () => setShowBlocked(false)
-    screen = <BlockedUsersScreen onBack={goBack} backLabel={showSettings ? '‹ Impostazioni' : '‹ Profilo'} />
+    screen = <BlockedUsersScreen onBack={goBack} backLabel={showSettings ? '‹ Impostazioni' : showAltro ? '‹ Altro' : '‹ Profilo'} />
   } else if (showSettings) {
     goBack = () => setShowSettings(false)
     screen = <SettingsScreen onBack={goBack} onOpenBlocked={() => setShowBlocked(true)} onOpenLegal={openLegalFromSettings} />
@@ -181,6 +181,25 @@ export function Home() {
   } else if (showProfile) {
     goBack = () => setShowProfile(false)
     screen = <ProfileScreen onBack={goBack} />
+  } else if (showAltro) {
+    goBack = goToRooms
+    screen = (
+      <AltroScreen
+        isStaff={isStaff}
+        onBack={goToRooms}
+        onOpenSettings={() => setShowSettings(true)}
+        onOpenBlocked={() => setShowBlocked(true)}
+        onOpenLegal={(doc) => setLegalDoc(doc)}
+        onOpenAdmin={() => {
+          setAdminTab('stats')
+          setShowAdmin(true)
+        }}
+        onReportBug={() => openSupportEmail({ type: 'bug', screen: currentScreenLabel, userId: myId })}
+        onSuggest={() => openSupportEmail({ type: 'feedback', screen: currentScreenLabel, userId: myId })}
+        onSupportLink={() => window.open(SUPPORT_URL, '_blank', 'noopener,noreferrer')}
+        onSignOut={signOut}
+      />
+    )
   } else if (room) {
     goBack = () => setRoom(null)
     screen = <ChatScreen room={room} onBack={goBack} onOpenProfile={setViewUserId} />
@@ -191,8 +210,10 @@ export function Home() {
   useBackNavigation({ active: !onLobby, exitsOnBack: stackDepth <= 1, onBack: goBack })
 
   return (
-    <BurgerMenu items={menuItems} onSignOut={signOut}>
+    <>
+      <TabBar items={tabItems} />
       {screen}
-    </BurgerMenu>
+      <GlobalToast toast={notif.toast} onOpen={openFromToast} onDismiss={notif.dismiss} />
+    </>
   )
 }

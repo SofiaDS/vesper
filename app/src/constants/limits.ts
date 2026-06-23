@@ -2,6 +2,8 @@
 export const BIO_MAX = 300
 export const PRONOUNS_MAX = 40
 export const MAX_INTERESTS = 4
+export const MAX_LANGUAGES = 8
+export const LANGUAGE_MAX_LEN = 30
 export const PETS_DETAIL_MAX = 140
 export const EDUCATION_INSTITUTE_MAX = 100
 
