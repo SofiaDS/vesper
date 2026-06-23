@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hub "Altro" — varianti di stile</title>
+<style>
+  :root {
+    --bg:      #171520;
+    --surface: #221f2e;
+    --surface-2: #2b2738;
+    --accent:  #e8b14e;
+    --accent-2: #ec6a55;
+    --text:    #f7efdd;
+    --error:   #ff6b78;
+    --muted: #a89db5;
+    --hairline: #34303f;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  body { padding: 1.5rem; }
+  .lab-intro { max-width: 1200px; margin: 0 auto 1.5rem; }
+  .lab-intro h1 { color: var(--accent); font-size: 1.3rem; margin: 0 0 0.3rem; }
+  .lab-intro p { color: var(--muted); font-size: 0.9rem; margin: 0; }
+
+  .grid {
+    display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;
+    max-width: 1300px; margin: 0 auto;
+  }
+  .col { width: 360px; }
+  .col-tag {
+    text-align: center; font-size: 0.95rem; font-weight: 700; color: var(--accent);
+    margin-bottom: 0.2rem;
+  }
+  .col-desc { text-align: center; font-size: 0.76rem; color: var(--muted); margin-bottom: 0.9rem; min-height: 2.4rem; }
+
+  .phone {
+    background: var(--bg); border: 1px solid var(--hairline); border-radius: 18px;
+    padding: 0.5rem 0.9rem 1.2rem; overflow: hidden;
+  }
+  .app-header {
+    display: grid; grid-template-columns: 2rem 1fr 2rem; align-items: center;
+    padding: 0.8rem 0; border-bottom: 1px solid var(--hairline); margin-bottom: 0.9rem;
+  }
+  .app-header .back { color: var(--accent); background: none; border: none; font-size: 1.3rem; cursor: pointer; justify-self: start; }
+  .app-header h1 { margin: 0; text-align: center; font-size: 1.05rem; font-weight: 700; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 14px; padding: 0.5rem 0.4rem; margin-bottom: 0.9rem;
+  }
+  .pf-section-title {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--muted); margin: 0.4rem 0.7rem 0.4rem; font-weight: 700;
+  }
+
+  /* base row */
+  .row {
+    display: flex; align-items: center; gap: 0.75rem; width: 100%;
+    min-height: 48px; padding: 0.55rem 0.7rem; background: none; border: none;
+    color: var(--text); font: inherit; text-align: left; cursor: pointer;
+    border-radius: 10px;
+  }
+  .row .label { flex: 1; font-size: 0.92rem; }
+  .row .chev { color: var(--muted); font-size: 1.1rem; line-height: 1; }
+  .row .ico {
+    width: 1.2rem; height: 1.2rem; flex-shrink: 0; color: var(--accent);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .row.danger .label { color: var(--error); }
+  .row.danger .ico { color: var(--error); }
+  svg { width: 100%; height: 100%; }
+
+  /* ════ VARIANTE A — iOS-style: hairline divider + chevron, hover fill ════ */
+  .vA .row + .row { box-shadow: inset 0 1px 0 rgba(168,157,181,0.12); }
+  .vA .row:hover { background: rgba(232,177,78,0.06); }
+
+  /* ════ VARIANTE B — icone in pastiglia + chevron, righe più ariose ════ */
+  .vB .row { gap: 0.85rem; }
+  .vB .ico {
+    width: 2rem; height: 2rem; border-radius: 9px;
+    background: rgba(232,177,78,0.12); padding: 0.4rem;
+  }
+  .vB .row.danger .ico { background: rgba(255,107,120,0.12); }
+  .vB .row + .row { box-shadow: inset 0 1px 0 rgba(168,157,181,0.10); }
+  .vB .row:hover { background: rgba(232,177,78,0.06); }
+
+  /* ════ VARIANTE C — tile separate, nessun divider, hover sollevato ════ */
+  .vC.card { background: none; border: none; padding: 0; }
+  .vC .pf-section-title { margin-left: 0.2rem; }
+  .vC .row {
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 11px; margin-bottom: 0.45rem; min-height: 50px;
+    transition: border-color 0.15s, transform 0.05s;
+  }
+  .vC .row:hover { border-color: rgba(232,177,78,0.5); }
+  .vC .row:active { transform: scale(0.99); }
+  .vC .ico {
+    width: 1.9rem; height: 1.9rem; border-radius: 8px;
+    background: rgba(232,177,78,0.12); padding: 0.38rem;
+  }
+  .vC .row.danger { border-color: rgba(255,107,120,0.35); }
+  .vC .row.danger .ico { background: rgba(255,107,120,0.12); }
+</style>
+</head>
+<body>
+  <div class="lab-intro">
+    <h1>Hub "Altro" — 3 stili moderni a confronto</h1>
+    <p>Stesse voci e sezioni di adesso, ma senza sottolineature. Area cliccabile su tutta la riga, hover, e un'icona/freccia che le rende "tappabili" come in un'app nativa.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- ═══════════════ VARIANTE A ═══════════════ -->
+    <div class="col">
+      <div class="col-tag">A · Lista pulita</div>
+      <div class="col-desc">Stile impostazioni iOS: solo testo + freccia, divisori sottilissimi, riga che si illumina al passaggio. Minimale.</div>
+      <div class="phone vA">
+        <div class="app-header"><button class="back">‹</button><h1>Altro</h1><span></span></div>
+
+        <section class="card">
+          <h2 class="pf-section-title">Account &amp; community</h2>
+          <button class="row"><span class="label">Impostazioni</span><span class="chev">›</span></button>
+          <button class="row"><span class="label">Utenti bloccati</span><span class="chev">›</span></button>
+          <button class="row"><span class="label">Chi siamo</span><span class="chev">›</span></button>
+          <button class="row"><span class="label">Privacy</span><span class="chev">›</span></button>
+          <button class="row"><span class="label">Termini di servizio</span><span class="chev">›</span></button>
+        </section>
+
+        <section class="card">
+          <h2 class="pf-section-title">Supporto</h2>
+          <button class="row"><span class="label">Segnala un bug</span><span class="chev">›</span></button>
+          <button class="row"><span class="label">Dacci un suggerimento</span><span class="chev">›</span></button>
+          <button class="row"><span class="label">Sostieni Vesper ↗</span><span class="chev">›</span></button>
+        </section>
+
+        <section class="card">
+          <h2 class="pf-section-title">Sessione</h2>
+          <button class="row"><span class="label">Tema chiaro</span><span class="chev">›</span></button>
+          <button class="row danger"><span class="label">Esci</span></button>
+        </section>
+      </div>
+    </div>
+
+    <!-- ═══════════════ VARIANTE B ═══════════════ -->
+    <div class="col">
+      <div class="col-tag">B · Icone in pastiglia</div>
+      <div class="col-desc">Ogni voce ha un'icona in un quadratino dorato + freccia. Più ricca e riconoscibile a colpo d'occhio. Stile app moderne.</div>
+      <div class="phone vB">
+        <div class="app-header"><button class="back">‹</button><h1>Altro</h1><span></span></div>
+
+        <section class="card">
+          <h2 class="pf-section-title">Account &amp; community</h2>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="label">Impostazioni</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.9" y1="4.9" x2="19.1" y2="19.1"/></svg></span><span class="label">Utenti bloccati</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span class="label">Chi siamo</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="label">Privacy</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></span><span class="label">Termini di servizio</span><span class="chev">›</span></button>
+        </section>
+
+        <section class="card">
+          <h2 class="pf-section-title">Supporto</h2>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg></span><span class="label">Segnala un bug</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 9a2.5 2.5 0 1 1 3 2.45c-.6.16-1 .72-1 1.34V14"/><line x1="12" y1="17" x2="12.01" y2="17"/><circle cx="12" cy="12" r="10"/></svg></span><span class="label">Dacci un suggerimento</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span><span class="label">Sostieni Vesper ↗</span><span class="chev">›</span></button>
+        </section>
+
+        <section class="card">
+          <h2 class="pf-section-title">Sessione</h2>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2"/></svg></span><span class="label">Tema chiaro</span><span class="chev">›</span></button>
+          <button class="row danger"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><span class="label">Esci</span></button>
+        </section>
+      </div>
+    </div>
+
+    <!-- ═══════════════ VARIANTE C ═══════════════ -->
+    <div class="col">
+      <div class="col-tag">C · Tile separate</div>
+      <div class="col-desc">Ogni voce è una "scheda" a sé con bordo che si accende al passaggio. Niente divisori interni: più respiro, look a "blocchi".</div>
+      <div class="phone">
+        <div class="app-header"><button class="back">‹</button><h1>Altro</h1><span></span></div>
+
+        <section class="card vC">
+          <h2 class="pf-section-title">Account &amp; community</h2>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="label">Impostazioni</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.9" y1="4.9" x2="19.1" y2="19.1"/></svg></span><span class="label">Utenti bloccati</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span class="label">Chi siamo</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="label">Privacy</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="label">Termini di servizio</span><span class="chev">›</span></button>
+        </section>
+
+        <section class="card vC">
+          <h2 class="pf-section-title">Supporto</h2>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg></span><span class="label">Segnala un bug</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 9a2.5 2.5 0 1 1 3 2.45c-.6.16-1 .72-1 1.34V14"/><line x1="12" y1="17" x2="12.01" y2="17"/><circle cx="12" cy="12" r="10"/></svg></span><span class="label">Dacci un suggerimento</span><span class="chev">›</span></button>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span><span class="label">Sostieni Vesper ↗</span><span class="chev">›</span></button>
+        </section>
+
+        <section class="card vC">
+          <h2 class="pf-section-title">Sessione</h2>
+          <button class="row"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg></span><span class="label">Tema chiaro</span><span class="chev">›</span></button>
+          <button class="row danger"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><span class="label">Esci</span></button>
+        </section>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
