@@ -33,6 +33,15 @@ Dominio pubblico: **vespercommunity.com** (registrar + DNS su Vercel). Nome app:
   - [ ] **Email di login (magic link/conferme) = Supabase Auth, non l'helper.** Configurare SMTP Brevo in **Supabase → Authentication → SMTP Settings** + Sender = `no-reply@vespercommunity.com` / `Vesper`
 - [x] `VAPID_SUBJECT` → `mailto:support@vespercommunity.com` ✅ secret Supabase aggiornato (live a runtime, no redeploy) + default allineato in `_shared/push.ts`
 
+### Template email Supabase Auth
+
+L'app usa solo auth email+password (`signUp`, `signInWithPassword`, `resetPasswordForEmail`). Template che partono davvero:
+
+- [x] **Confirm signup** — stilizzato (brand inchiostro & oro, `{{ .ConfirmationURL }}`)
+- [x] **Reset Password** — stilizzato
+- **Magic Link** / **Invite user**: NON usati (niente login passwordless né inviti admin; l'ingresso è via garante/vouch a livello app) → lasciare al default
+- **Change Email**: non usato oggi → vedi backlog post-lancio
+
 > Indirizzi email in uso: **`privacy@`** (temi privacy) e **`support@`** (tutto il resto). Niente `hello@`.
 
 ---
@@ -103,3 +112,7 @@ Dominio pubblico: **vespercommunity.com** (registrar + DNS su Vercel). Nome app:
 2. [ ] Privacy policy + Terms ospitati
 3. [ ] iOS push via APNs (lavoro tecnico più grosso)
 4. [ ] Mac per build iOS
+
+## Backlog post-lancio (non blocca il rilascio)
+
+- [ ] **Cambio email account** — feature account-management. Implementare CON **Secure email change** di Supabase (doppia conferma vecchia+nuova casella, anti-takeover). Serve: UI in Impostazioni (`updateUser({ email })`), attivare Secure email change in Auth settings, stilizzare il template **Change Email**, gestire redirect. Fallback per il lancio: "scrivi a support@ per cambiare email".
