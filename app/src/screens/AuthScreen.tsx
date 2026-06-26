@@ -88,10 +88,10 @@ export function AuthScreen() {
         </header>
         <section className="card box-shadow">
           <p>
-            Vesper è uno spazio dedicato alla community lesbica, bisessuale e queer femminile.
+            Vesper è uno spazio dedicato alla community lesbica e queer, dove ogni orientamento è benvenuto.
           </p>
           <p>
-            Sono benvenute <strong>donne cis, donne trans, uomini trans e persone non-binary AFAB</strong>.
+            Sono benvenute <strong>donne cis, persone trans e non binary</strong>.
           </p>
           <p>
             L'iscrizione <strong>non è aperta a uomini cis</strong>, per preservare la natura di questo spazio.

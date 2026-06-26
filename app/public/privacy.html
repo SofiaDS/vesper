@@ -16,7 +16,7 @@
     h1 { font-size:28px; margin:8px 0 4px; }
     h2 { font-size:19px; margin:36px 0 8px; color:#f3eefc; }
     p, li { color:#d6d0e2; font-size:15px; }
-    a { color:var(--gold); }
+    a { color:var(--gold); word-break:break-word; }
     .meta { color:var(--muted); font-size:13px; margin:4px 0 0; }
     .note { background:var(--card); border:1px solid var(--border); border-radius:12px;
       padding:14px 18px; margin:24px 0; color:var(--muted); font-size:14px; }
@@ -38,53 +38,55 @@
     </div>
 
     <h2>Titolare del trattamento</h2>
-    <p><span class="todo">[TITOLARE — DA COMPLETARE: nome o ragione sociale, indirizzo e, ove applicabile, P.IVA/C.F.]</span></p>
-    <p>Per qualsiasi richiesta relativa ai tuoi dati personali puoi contattare il titolare all'indirizzo
-      <a href="mailto:privacy@vespercommunity.com">privacy@vespercommunity.com</a>.</p>
+    <p>Il titolare del trattamento dei dati personali raccolti tramite Vesper è <span class="todo">[TITOLARE — DA COMPLETARE: nome o ragione sociale, indirizzo e, ove applicabile, P.IVA/C.F.]</span>.</p>
+    <p>Per qualsiasi richiesta relativa ai tuoi dati personali puoi contattare il titolare all'indirizzo <a href="mailto:privacy@vespercommunity.com">privacy@vespercommunity.com</a>.</p>
 
     <h2>Quali dati raccogliamo</h2>
     <ul>
       <li><strong>Dati di account:</strong> indirizzo email e password (conservata in forma cifrata).</li>
       <li><strong>Dati di profilo:</strong> nickname, età, città, bio, interessi e foto che scegli di caricare.</li>
       <li><strong>Dati di categoria particolare (art. 9 GDPR):</strong> identità di genere e orientamento sessuale dichiarati in fase di iscrizione, necessari per garantire che la community sia composta dalle persone a cui Vesper è dedicata.</li>
-      <li><strong>Dato biometrico:</strong> un breve video di verifica ("liveness check") raccolto al momento dell'iscrizione, usato esclusivamente per accertare che l'account sia gestito da una persona reale. Non viene effettuato alcun riconoscimento facciale automatizzato.</li>
+      <li><strong>Dato biometrico:</strong> un breve video di verifica ("liveness check") raccolto al momento dell'iscrizione, usato esclusivamente per accertare che l'account sia gestito da una persona reale e corrispondente al profilo dichiarato. Non viene effettuato alcun riconoscimento facciale automatizzato.</li>
       <li><strong>Documento d'identità:</strong> richiesto solo in casi eccezionali, ad esempio in presenza di una segnalazione per sospetta età falsa, ed esclusivamente per verificare la maggiore età.</li>
       <li><strong>Contenuti generati dall'utente:</strong> messaggi nelle chat di gruppo e nei messaggi privati, reazioni e segnalazioni inviate al team di moderazione.</li>
-      <li><strong>Dati relativi all'uso del servizio:</strong> stato di presenza online, conferme di lettura, relazione con la persona garante (vouch) e punteggio di reputazione.</li>
-      <li><strong>Dati tecnici:</strong> identificativo della sottoscrizione necessario all'invio delle notifiche push, log di accesso e di ricerca per finalità di sicurezza e prevenzione degli abusi.</li>
+      <li><strong>Dati tecnici:</strong> informazioni sul dispositivo necessarie per l'invio delle notifiche push, log di accesso per finalità di sicurezza.</li>
+      <li><strong>Dati relativi all'uso del servizio:</strong> stato di presenza online, conferme di lettura, relazione con la persona garante (vouch) e punteggio di reputazione, utilizzati per il funzionamento delle funzioni sociali dell'app.</li>
     </ul>
 
     <h2>Perché trattiamo i tuoi dati</h2>
     <ul>
-      <li><strong>Per fornire il servizio:</strong> creare e gestire il tuo account, mostrarti il tuo profilo e quello degli altri utenti, farti partecipare alle chat (esecuzione del contratto con te, art. 6.1.b).</li>
-      <li><strong>Per verificare l'appartenenza e l'età:</strong> accertare che tu rientri nella platea a cui Vesper è destinato e che tu abbia almeno 18 anni, sulla base del consenso esplicito prestato in fase di iscrizione (art. 9.2.a per i dati particolari e biometrici).</li>
-      <li><strong>Per la sicurezza della community:</strong> prevenire abusi, gestire segnalazioni e applicare le regole della community (legittimo interesse a mantenere l'app sicura, art. 6.1.f).</li>
-      <li><strong>Per inviarti notifiche push</strong> relative all'attività del tuo account, sulla base del consenso prestato dalle impostazioni del dispositivo.</li>
+      <li><strong>Esecuzione del contratto:</strong> per creare e gestire il tuo account, mostrarti il tuo profilo e quello degli altri utenti, e permetterti di partecipare alle chat.</li>
+      <li><strong>Obbligo di legge:</strong> per verificare che tu abbia almeno 18 anni, in conformità con i requisiti normativi per i servizi digitali.</li>
+      <li><strong>Legittimo interesse:</strong> per la sicurezza della community (prevenire abusi, gestire segnalazioni e applicare le regole della community). I messaggi privati non vengono letti attivamente dal team di moderazione, se non a seguito di una segnalazione inviata da un utente.</li>
+      <li><strong>Consenso:</strong> per inviarti notifiche push relative all'attività del tuo account (gestibile dalle impostazioni del dispositivo).</li>
     </ul>
+
+    <h2>Cookie e tecnologie simili</h2>
+    <p>Vesper utilizza esclusivamente cookie tecnici essenziali per il funzionamento dell'app. Non utilizziamo cookie di profilazione o di terze parti per finalità pubblicitarie.</p>
 
     <h2>Per quanto tempo conserviamo i dati</h2>
     <ul>
-      <li>Il video di verifica liveness viene cancellato automaticamente entro <strong>30 giorni</strong> dalla verifica.</li>
-      <li>Un eventuale documento d'identità caricato per la verifica dell'età viene cancellato entro <strong>24 ore</strong> e non è conservato per altri scopi.</li>
-      <li>I messaggi nelle chat di gruppo sono conservati fino a <strong>24 mesi</strong>; i messaggi privati per la durata di vita dell'account. Alla cancellazione dell'account i contenuti vengono cancellati o resi anonimi.</li>
-      <li>I log di moderazione e le segnalazioni sono conservati per il tempo necessario a gestire il caso ed eventuali appelli (di norma <strong>12 mesi</strong>), poi resi anonimi.</li>
+      <li><strong>Video di verifica (liveness):</strong> cancellato automaticamente entro 30 giorni dal momento della verifica.</li>
+      <li><strong>Documento d'identità:</strong> cancellato entro 24 ore dalla verifica dell'età.</li>
+      <li><strong>Messaggi:</strong> conservati per la durata di vita dell'account; alla cancellazione dell'account vengono cancellati o resi anonimi.</li>
+      <li><strong>Log di moderazione e segnalazioni:</strong> conservati per il tempo necessario a gestire il caso ed eventuali appelli, e in seguito resi anonimi.</li>
     </ul>
 
     <h2>Con chi condividiamo i dati</h2>
     <ul>
-      <li>Database, autenticazione e archiviazione file: <strong>Supabase</strong>, server nell'Unione Europea (Francoforte, Germania).</li>
-      <li>Hosting dell'applicazione e dominio: <strong>Vercel</strong> (USA), sulla base delle Clausole Contrattuali Standard (SCC) previste dal GDPR.</li>
-      <li>Invio email di servizio: <strong>Brevo</strong>, server nell'Unione Europea (Francia).</li>
-      <li>Moderazione automatica dei contenuti: il testo dei messaggi è analizzato dalla <strong>OpenAI Moderation API</strong> (USA) per individuare contenuti vietati. Il trasferimento avviene sulla base delle SCC.</li>
-      <li>Recapito notifiche push: i servizi di push di browser e sistemi operativi (es. <strong>Google, Apple, Mozilla</strong>) ricevono solo un identificativo tecnico necessario alla consegna.</li>
-      <li>Inoltro delle email inviate ai nostri contatti: <strong>ImprovMX</strong> (USA), sulla base delle SCC.</li>
+      <li>Database, autenticazione e archiviazione dei file sono forniti da <strong>Supabase</strong>, con dati ospitati su server nell'Unione Europea (Francoforte, Germania).</li>
+      <li>L'hosting dell'applicazione e la gestione del dominio sono forniti da <strong>Vercel</strong> (società con sede negli Stati Uniti). I trasferimenti verso gli Stati Uniti avvengono sulla base delle Clausole Contrattuali Standard previste dal GDPR.</li>
+      <li>L'invio delle email di servizio (es. conferma indirizzo, reimpostazione password) è gestito da <strong>Brevo</strong>, con server nell'Unione Europea (Francia).</li>
+      <li>Il testo dei messaggi viene analizzato da un servizio automatico di moderazione dei contenuti (<strong>OpenAI Moderation API</strong>) per individuare contenuti vietati. Questo comporta un trasferimento di dati verso gli Stati Uniti, effettuato sulla base delle Clausole Contrattuali Standard previste dal GDPR. Puoi consultare le clausole e le policy di protezione qui: <a href="https://openai.com/policies/privacy-policy">openai.com/policies/privacy-policy</a>.</li>
+      <li>Le notifiche push vengono recapitate tramite i servizi di push dei browser e dei sistemi operativi (es. <strong>Google, Apple, Mozilla</strong>): a tali servizi viene trasmesso solo un identificativo tecnico necessario alla consegna, non il contenuto del tuo profilo.</li>
+      <li>Le email che invii ai nostri indirizzi di contatto sono instradate tramite un servizio di inoltro email (<strong>ImprovMX</strong>, USA), sulla base delle Clausole Contrattuali Standard.</li>
     </ul>
     <p>Non vendiamo né condividiamo i tuoi dati con terzi per finalità pubblicitarie.</p>
 
     <h2>I tuoi diritti</h2>
-    <p>In qualsiasi momento puoi richiedere l'accesso ai tuoi dati, la loro rettifica, la cancellazione, la limitazione del trattamento o la portabilità, e puoi opporti al trattamento.</p>
+    <p>In qualsiasi momento puoi richiedere l'accesso ai tuoi dati, la loro rettifica, la cancellazione, la limitazione del trattamento o la portabilità dei dati, e puoi opporti al trattamento.</p>
     <p>Puoi cancellare autonomamente il tuo account dalla sezione "Impostazioni" dell'app: questa operazione avvia la cancellazione dei tuoi dati personali secondo i tempi descritti in questa informativa.</p>
-    <p>Per qualsiasi richiesta scrivi a <a href="mailto:privacy@vespercommunity.com">privacy@vespercommunity.com</a>. Hai inoltre sempre il diritto di proporre reclamo al Garante per la protezione dei dati personali.</p>
+    <p>Per qualsiasi richiesta relativa ai tuoi dati puoi scrivere a <a href="mailto:privacy@vespercommunity.com">privacy@vespercommunity.com</a>. Hai inoltre sempre il diritto di proporre reclamo al Garante per la protezione dei dati personali.</p>
 
     <h2>Sicurezza dei dati</h2>
     <p>Adottiamo misure tecniche e organizzative per proteggere i tuoi dati da accessi non autorizzati, perdita o divulgazione, tra cui la cifratura delle comunicazioni e l'accesso ai dati limitato al personale e ai volontari di moderazione autorizzati.</p>
