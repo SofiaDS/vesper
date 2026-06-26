@@ -11,7 +11,7 @@ export const supabaseAdmin = createClient(
 )
 
 webpush.setVapidDetails(
-  Deno.env.get('VAPID_SUBJECT') ?? 'mailto:hello@vesper.app',
+  Deno.env.get('VAPID_SUBJECT') ?? 'mailto:support@vespercommunity.com',
   Deno.env.get('VAPID_PUBLIC_KEY')!,
   Deno.env.get('VAPID_PRIVATE_KEY')!,
 )
