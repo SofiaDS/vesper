@@ -22,7 +22,8 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
     {
       heading: 'Titolare del trattamento',
       paragraphs: [
-        'Il titolare del trattamento dei dati personali raccolti tramite Vesper è il gestore dell\'app, contattabile all\'indirizzo privacy@vesperapp.it per qualsiasi richiesta relativa ai tuoi dati personali.',
+        'Il titolare del trattamento dei dati personali raccolti tramite Vesper è [TITOLARE — DA COMPLETARE: nome o ragione sociale, indirizzo e, ove applicabile, P.IVA/C.F.].',
+        'Per qualsiasi richiesta relativa ai tuoi dati personali puoi contattare il titolare all\'indirizzo privacy@vespercommunity.com.',
       ],
     },
     {
@@ -33,8 +34,9 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
         'Dati di categoria particolare (art. 9 GDPR): identità di genere e orientamento sessuale dichiarati in fase di iscrizione, necessari per garantire che la community sia composta dalle persone a cui Vesper è dedicata.',
         'Dato biometrico: un breve video di verifica ("liveness check") raccolto al momento dell\'iscrizione, usato esclusivamente per accertare che l\'account sia gestito da una persona reale e corrispondente al profilo dichiarato. Non viene effettuato alcun riconoscimento facciale automatizzato.',
         'Documento d\'identità: richiesto solo in casi eccezionali, ad esempio in presenza di una segnalazione per sospetta età falsa, ed esclusivamente per verificare la maggiore età.',
-        'Contenuti generati dall\'utente: messaggi nelle chat di gruppo e nei messaggi privati, segnalazioni inviate al team di moderazione.',
-        'Dati tecnici: informazioni sul dispositivo necessarie per l\'invio delle notifiche push, log di accesso per finalità di sicurezza.',
+        'Contenuti generati dall\'utente: messaggi nelle chat di gruppo e nei messaggi privati, reazioni e segnalazioni inviate al team di moderazione.',
+        'Dati relativi all\'uso del servizio: stato di presenza online, conferme di lettura, relazione con la persona garante (vouch) e punteggio di reputazione, utilizzati per il funzionamento delle funzioni sociali dell\'app.',
+        'Dati tecnici: identificativo della sottoscrizione necessario all\'invio delle notifiche push, log di accesso e di ricerca per finalità di sicurezza e prevenzione degli abusi.',
       ],
     },
     {
@@ -58,9 +60,12 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
     {
       heading: 'Con chi condividiamo i dati',
       paragraphs: [
-        'I tuoi dati sono ospitati su server con sede nell\'Unione Europea, forniti dal nostro fornitore di infrastruttura (Supabase).',
-        'Il testo dei messaggi viene analizzato da un servizio automatico di moderazione dei contenuti (OpenAI Moderation API) per individuare contenuti vietati. Questo comporta un trasferimento di dati verso gli Stati Uniti, effettuato sulla base delle clausole contrattuali standard previste dal GDPR.',
-        'Per l\'invio delle notifiche push utilizziamo un fornitore terzo (OneSignal), con server distribuiti a livello internazionale.',
+        'Database, autenticazione e archiviazione dei file sono forniti da Supabase, con dati ospitati su server nell\'Unione Europea (Francoforte, Germania).',
+        'L\'hosting dell\'applicazione e la gestione del dominio sono forniti da Vercel (società con sede negli Stati Uniti). I trasferimenti verso gli Stati Uniti avvengono sulla base delle Clausole Contrattuali Standard previste dal GDPR.',
+        'L\'invio delle email di servizio (es. conferma indirizzo, reimpostazione password) è gestito da Brevo, con server nell\'Unione Europea (Francia).',
+        'Il testo dei messaggi viene analizzato da un servizio automatico di moderazione dei contenuti (OpenAI Moderation API) per individuare contenuti vietati. Questo comporta un trasferimento di dati verso gli Stati Uniti, effettuato sulla base delle Clausole Contrattuali Standard previste dal GDPR.',
+        'Le notifiche push vengono recapitate tramite i servizi di push dei browser e dei sistemi operativi (es. Google, Apple, Mozilla): a tali servizi viene trasmesso solo un identificativo tecnico necessario alla consegna, non il contenuto del tuo profilo.',
+        'Le email che invii ai nostri indirizzi di contatto sono instradate tramite un servizio di inoltro email (ImprovMX, USA), sulla base delle Clausole Contrattuali Standard.',
         'Non vendiamo né condividiamo i tuoi dati con terzi per finalità pubblicitarie.',
       ],
     },
@@ -69,7 +74,7 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
       paragraphs: [
         'In qualsiasi momento puoi richiedere l\'accesso ai tuoi dati, la loro rettifica, la cancellazione, la limitazione del trattamento o la portabilità dei dati, e puoi opporti al trattamento.',
         'Puoi cancellare autonomamente il tuo account dalla sezione "Impostazioni" dell\'app: questa operazione avvia la cancellazione dei tuoi dati personali secondo i tempi descritti in questa informativa.',
-        'Per qualsiasi richiesta relativa ai tuoi dati puoi scrivere a privacy@vesperapp.it. Hai inoltre sempre il diritto di proporre reclamo al Garante per la protezione dei dati personali.',
+        'Per qualsiasi richiesta relativa ai tuoi dati puoi scrivere a privacy@vespercommunity.com. Hai inoltre sempre il diritto di proporre reclamo al Garante per la protezione dei dati personali.',
       ],
     },
     {
@@ -113,7 +118,7 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
       heading: 'Trattamento dei dati e tuoi diritti',
       paragraphs: [
         'Il trattamento dei tuoi dati personali è descritto nella Privacy Policy, disponibile in questa stessa sezione dell\'app. La Privacy Policy indica le finalità del trattamento, i tempi di conservazione e i diritti che puoi esercitare (accesso, rettifica, cancellazione, portabilità, opposizione).',
-        'Per qualsiasi richiesta relativa ai tuoi dati personali puoi scrivere a privacy@vesperapp.it.',
+        'Per qualsiasi richiesta relativa ai tuoi dati personali puoi scrivere a privacy@vespercommunity.com.',
       ],
     },
     {

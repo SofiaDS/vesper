@@ -8,8 +8,8 @@ export type SupportRequestType = 'bug' | 'feedback'
 // Placeholder: andranno sostituiti con le mailbox dedicate quando il dominio
 // sarà attivo (separate da supporto generale, appelli e legale/GDPR).
 const SUPPORT_RECIPIENTS: Record<SupportRequestType, string> = {
-  bug: 'bug@vesperapp.it',
-  feedback: 'feedback@vesperapp.it',
+  bug: 'support@vespercommunity.com',
+  feedback: 'support@vespercommunity.com',
 }
 
 const SUPPORT_SUBJECT_TAG: Record<SupportRequestType, string> = {
