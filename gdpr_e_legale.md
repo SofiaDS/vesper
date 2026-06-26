@@ -125,7 +125,7 @@ Tutti i dati vengono mantenuti su server europei dove possibile. Vedi [`stack_te
 ### Eccezioni note
 
 - **OpenAI Moderation API**: il testo dei messaggi viene trasmesso negli USA per moderazione. **Va dichiarato nell'informativa privacy**. Da valutare nel tempo alternative europee (es. Mistral AI).
-- **OneSignal** (notifiche push): server distribuiti. Accettabile con DPA standard, da dichiarare.
+- **Web Push (VAPID)** (notifiche push): NB — implementazione attuale NON usa OneSignal. Le push sono recapitate dai servizi push di browser/OS (Google FCM, Apple, Mozilla); viene trasmesso solo un identificativo tecnico (endpoint subscription), non il contenuto del profilo. Da dichiarare nell'informativa.
 
 ### Per ogni servizio extra-UE
 

@@ -103,8 +103,13 @@ L'app usa solo auth email+password (`signUp`, `signInWithPassword`, `resetPasswo
 
 ### TODO legale
 
-- [ ] Privacy policy + Terms redatti e ospitati (account, push, Supabase, Brevo, retention, diritti GDPR)
-- [ ] Link a privacy/terms in app e nei listing store
+- [~] **Privacy policy + Terms** — bozza redatta sui trattamenti reali:
+  - in-app: `app/src/screens/LegalScreen.tsx` (viewer già navigabile)
+  - web pubblico: `app/public/privacy.html` + `terms.html` → URL `/privacy` e `/terms` (vercel.json `cleanUrls`)
+  - [ ] **Compilare i placeholder**: `[TITOLARE — DA COMPLETARE]` e date "Ultimo aggiornamento"
+  - [ ] **Validazione legale** prima del lancio (dati art. 9 + biometrico + minori)
+  - [ ] DPA/SCC con i fornitori (Supabase, Vercel, OpenAI, Brevo, ImprovMX)
+- [ ] Link a privacy/terms nei listing store (URL: `https://vespercommunity.com/privacy`)
 
 ## Blocker trasversali
 
