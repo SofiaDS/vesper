@@ -35,26 +35,32 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
         'Dato biometrico: un breve video di verifica ("liveness check") raccolto al momento dell\'iscrizione, usato esclusivamente per accertare che l\'account sia gestito da una persona reale e corrispondente al profilo dichiarato. Non viene effettuato alcun riconoscimento facciale automatizzato.',
         'Documento d\'identità: richiesto solo in casi eccezionali, ad esempio in presenza di una segnalazione per sospetta età falsa, ed esclusivamente per verificare la maggiore età.',
         'Contenuti generati dall\'utente: messaggi nelle chat di gruppo e nei messaggi privati, reazioni e segnalazioni inviate al team di moderazione.',
+        'Dati tecnici: informazioni sul dispositivo necessarie per l\'invio delle notifiche push, log di accesso per finalità di sicurezza.',
         'Dati relativi all\'uso del servizio: stato di presenza online, conferme di lettura, relazione con la persona garante (vouch) e punteggio di reputazione, utilizzati per il funzionamento delle funzioni sociali dell\'app.',
-        'Dati tecnici: identificativo della sottoscrizione necessario all\'invio delle notifiche push, log di accesso e di ricerca per finalità di sicurezza e prevenzione degli abusi.',
       ],
     },
     {
       heading: 'Perché trattiamo i tuoi dati',
       paragraphs: [
-        'Per fornire il servizio: creare e gestire il tuo account, mostrarti il tuo profilo e quello degli altri utenti, farti partecipare alle chat (esecuzione del contratto con te).',
-        'Per verificare che tu rientri nella platea di persone a cui Vesper è destinato e che tu abbia almeno 18 anni, sulla base del consenso esplicito che fornisci in fase di iscrizione.',
-        'Per la sicurezza della community: prevenire abusi, gestire segnalazioni e applicare le regole della community (legittimo interesse a mantenere l\'app sicura per le persone che la usano).',
-        'Per inviarti notifiche push relative all\'attività del tuo account, sulla base del consenso che presti dalle impostazioni del dispositivo.',
+        'Esecuzione del contratto: per creare e gestire il tuo account, mostrarti il tuo profilo e quello degli altri utenti, e permetterti di partecipare alle chat.',
+        'Obbligo di legge: per verificare che tu abbia almeno 18 anni, in conformità con i requisiti normativi per i servizi digitali.',
+        'Legittimo interesse: per la sicurezza della community (prevenire abusi, gestire segnalazioni e applicare le regole della community). I messaggi privati non vengono letti attivamente dal team di moderazione, se non a seguito di una segnalazione inviata da un utente.',
+        'Consenso: per inviarti notifiche push relative all\'attività del tuo account (gestibile dalle impostazioni del dispositivo).',        
       ],
+    },
+    {
+      heading: 'Cookie e tecnologie simili',
+      paragraphs: [
+        'Vesper utilizza esclusivamente cookie tecnici essenziali per il funzionamento dell\'app. Non utilizziamo cookie di profilazione o di terze parti per finalità pubblicitarie.'
+      ]
     },
     {
       heading: 'Per quanto tempo conserviamo i dati',
       paragraphs: [
-        'Il video di verifica liveness viene cancellato automaticamente entro 30 giorni dal momento della verifica.',
-        'Un eventuale documento d\'identità caricato per la verifica dell\'età viene cancellato entro 24 ore dalla verifica e non viene conservato per altri scopi.',
-        'I messaggi nelle chat e nei DM vengono conservati per la durata di vita dell\'account; alla cancellazione dell\'account vengono cancellati o resi anonimi.',
-        'I log di moderazione e le segnalazioni vengono conservati per il tempo necessario a gestire il caso ed eventuali appelli, e in seguito resi anonimi.',
+        'Video di verifica (liveness): cancellato automaticamente entro 30 giorni dal momento della verifica.',
+        'Documento d\'identità: cancellato entro 24 ore dalla verifica dell\'età.',
+        'Messaggi: vengono conservati per la durata di vita dell\'account; alla cancellazione dell\'account vengono cancellati o resi anonimi.',
+        'Log di moderazione e le segnalazioni: conservati per il tempo necessario a gestire il caso ed eventuali appelli, e in seguito resi anonimi.',
       ],
     },
     {
@@ -63,7 +69,7 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
         'Database, autenticazione e archiviazione dei file sono forniti da Supabase, con dati ospitati su server nell\'Unione Europea (Francoforte, Germania).',
         'L\'hosting dell\'applicazione e la gestione del dominio sono forniti da Vercel (società con sede negli Stati Uniti). I trasferimenti verso gli Stati Uniti avvengono sulla base delle Clausole Contrattuali Standard previste dal GDPR.',
         'L\'invio delle email di servizio (es. conferma indirizzo, reimpostazione password) è gestito da Brevo, con server nell\'Unione Europea (Francia).',
-        'Il testo dei messaggi viene analizzato da un servizio automatico di moderazione dei contenuti (OpenAI Moderation API) per individuare contenuti vietati. Questo comporta un trasferimento di dati verso gli Stati Uniti, effettuato sulla base delle Clausole Contrattuali Standard previste dal GDPR.',
+        'Il testo dei messaggi viene analizzato da un servizio automatico di moderazione dei contenuti (OpenAI Moderation API) per individuare contenuti vietati. Questo comporta un trasferimento di dati verso gli Stati Uniti, effettuato sulla base delle Clausole Contrattuali Standard previste dal GDPR. Puoi consultare le clausole e le policy di protezione qui: https://openai.com/policies/privacy-policy.',
         'Le notifiche push vengono recapitate tramite i servizi di push dei browser e dei sistemi operativi (es. Google, Apple, Mozilla): a tali servizi viene trasmesso solo un identificativo tecnico necessario alla consegna, non il contenuto del tuo profilo.',
         'Le email che invii ai nostri indirizzi di contatto sono instradate tramite un servizio di inoltro email (ImprovMX, USA), sulla base delle Clausole Contrattuali Standard.',
         'Non vendiamo né condividiamo i tuoi dati con terzi per finalità pubblicitarie.',
@@ -94,14 +100,14 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
     {
       heading: 'Chi può iscriversi',
       paragraphs: [
-        'Vesper è uno spazio dedicato alla community lesbica, bisessuale e queer femminile. Sono benvenute donne cis, donne trans, uomini trans e persone non-binary AFAB. L\'iscrizione non è aperta a uomini cis, per preservare la natura di questo spazio.',
+        'Vesper è uno spazio dedicato alla community lesbica e queer, dove ogni orientamento è benvenuto, aperta a donne cis, persone trans e non binary. L\'iscrizione non è aperta a uomini cis, per preservare la natura di questo spazio.',
         'Al momento dell\'iscrizione l\'utente dichiara, sotto la propria responsabilità, di rientrare in una delle categorie ammesse. Una dichiarazione mendace costituisce violazione dei presenti Termini e comporta il ban immediato e definitivo dall\'app.',
       ],
     },
     {
       heading: 'Età minima',
       paragraphs: [
-        'L\'iscrizione a Vesper è consentita esclusivamente a persone maggiorenni (18 anni compiuti). In fase di registrazione viene richiesta la data di nascita e una dichiarazione esplicita di maggiore età.',
+        'L\'iscrizione a Vesper è consentita esclusivamente a persone maggiorenni (18 anni compiuti). In fase di registrazione viene richiesta la data di nascita e una dichiarazione esplicita di maggiore età',
         'Dichiarare il falso sull\'età comporta il ban immediato e definitivo dall\'app e può comportare conseguenze legali. L\'utente solleva Vesper da ogni responsabilità derivante da dichiarazioni false rese al momento dell\'iscrizione.',
       ],
     },
@@ -115,6 +121,14 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
       ],
     },
     {
+      heading: 'Proprietà dei contenuti e Limitazione di responsabilità',
+      paragraphs: [
+        'Licenza sui contenuti: L\'utente mantiene la piena proprietà dei contenuti che pubblica su Vesper. Tuttavia, nel momento in cui carichi foto, testi o messaggi, concedi a Vesper una licenza d’uso non esclusiva, gratuita, trasferibile e valida in tutto il mondo, necessaria per consentire all\'App di visualizzare, conservare e condividere tali contenuti con gli altri utenti secondo le funzionalità del servizio.',
+        'Responsabilità dell\'utente: L\'utente è l\'unico ed esclusivo responsabile di qualsiasi contenuto pubblicato o trasmesso tramite l\'App. Garantisci di disporre di tutti i diritti necessari per la pubblicazione dei tuoi contenuti e di non violare diritti di terzi (inclusi diritti d\'autore, marchi o privacy).',
+        'Esclusione di responsabilità: Vesper agisce come intermediario tecnico e non esercita un controllo preventivo su tutti i contenuti pubblicati dagli utenti. Pertanto, Vesper non si assume alcuna responsabilità per le opinioni, le dichiarazioni o i comportamenti di terzi all\'interno della community. L\'utente manleva Vesper da ogni pretesa, danno o richiesta di risarcimento derivante da contenuti o condotte di altri membri, fermo restando l\'impegno di Vesper a intervenire tempestivamente a seguito di segnalazioni documentate.',
+      ]
+    },
+    {
       heading: 'Trattamento dei dati e tuoi diritti',
       paragraphs: [
         'Il trattamento dei tuoi dati personali è descritto nella Privacy Policy, disponibile in questa stessa sezione dell\'app. La Privacy Policy indica le finalità del trattamento, i tempi di conservazione e i diritti che puoi esercitare (accesso, rettifica, cancellazione, portabilità, opposizione).',
@@ -122,16 +136,9 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
       ],
     },
     {
-      heading: 'Comportamento dell\'utente',
-      paragraphs: [
-        'Utilizzando Vesper ti impegni a fornire informazioni veritiere, a rispettare le regole della community e le decisioni del team di moderazione, e a non utilizzare l\'app per finalità illecite o lesive di altri utenti.',
-        'La violazione dei presenti Termini può comportare, a seconda della gravità, avvisi, sospensioni temporanee o la cancellazione definitiva dell\'account, senza diritto a rimborsi ove applicabile.',
-      ],
-    },
-    {
       heading: 'Modifiche ai Termini',
       paragraphs: [
-        'Questi Termini di Servizio potranno essere aggiornati nel tempo, ad esempio in caso di nuove funzionalità o cambi normativi. In caso di modifiche sostanziali ti avviseremo tramite l\'app.',
+        'Questi Termini di Servizio potranno essere aggiornati nel tempo, ad esempio in caso di nuove funzionalità o cambi normativi. In caso di modifiche sostanziali ti avviseremo tramite l\'app. Il rapporto è regolato dalla legge italiana. Per ogni controversia è competente il Foro di Lucca.',
       ],
     },
   ],
@@ -164,11 +171,6 @@ export function LegalScreen({ doc, onBack, backLabel = '‹ Stanze' }: { doc: Le
             ))}
           </div>
         ))}
-        {doc !== 'about' && (
-          <p className="hint">
-            Bozza informativa — verrà validata con un consulente legale prima del lancio pubblico.
-          </p>
-        )}
       </section>
     </main>
   )
