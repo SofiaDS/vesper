@@ -1,11 +1,18 @@
 {
+  "id": "/",
   "name": "Vesper",
   "short_name": "Vesper",
   "description": "Community chatroom-first per donne lesbiche, bi, queer e persone LGBTQ+ femminili.",
   "lang": "it",
+  "dir": "ltr",
+  "categories": ["social", "lifestyle"],
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "background_color": "#171520",
   "theme_color": "#171520",
   "icons": [
@@ -20,6 +27,36 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/phone-1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Foyer della community"
+    },
+    {
+      "src": "/screenshots/phone-2.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Messaggi privati"
+    },
+    {
+      "src": "/screenshots/phone-3.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Spazio inclusivo e sicuro"
+    },
+    {
+      "src": "/screenshots/tablet-1.png",
+      "sizes": "1920x1200",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Foyer della community su tablet"
     }
   ]
 }
