@@ -15,6 +15,9 @@ export default defineConfig({
       filename: 'sw.ts',
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+        // Gli screenshot servono solo alla UI d'installazione: non precacharli,
+        // altrimenti ogni utente scaricherebbe ~2 MB di immagini inutili.
+        globIgnores: ['**/screenshots/**'],
       },
     }),
   ],
