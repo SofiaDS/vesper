@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "app.vercel.vesper_snowy.twa",
       "sha256_cert_fingerprints": [
-        "20:05:31:50:11:0C:DD:53:0B:7C:FA:75:B9:D9:72:65:3A:9B:3D:3A:63:FE:90:39:66:84:2D:0E:15:7D:C2:29"
+        "20:05:31:50:11:0C:DD:53:0B:7C:FA:75:B9:D9:72:65:3A:9B:3D:3A:63:FE:90:39:66:84:2D:0E:15:7D:C2:29",
+        "25:DE:C9:73:0A:6F:62:E0:BF:3A:92:7C:13:3C:95:FC:44:51:01:24:98:13:65:C7:ED:A2:E1:07:D6:43:86:0A"
       ]
     }
   }
