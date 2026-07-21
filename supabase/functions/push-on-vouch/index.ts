@@ -2,9 +2,17 @@
 // Trigger: Database Webhook su INSERT in public.vouch_confirmations.
 // L'invio e la pulizia degli endpoint morti vivono in _shared/push.ts.
 import { sendPushToUser, supabaseAdmin } from '../_shared/push.ts'
+import { isTrustedWebhook, unauthorized } from '../_shared/webhookAuth.ts'
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  const body = await req.json()
+  if (!isTrustedWebhook(req)) return unauthorized()
+
+  let body: { record?: unknown }
+  try {
+    body = await req.json()
+  } catch {
+    return new Response('Bad request', { status: 400 })
+  }
   const row = body.record as { request_id: string; guarantor_id: string }
 
   const { data: vouchReq } = await supabaseAdmin
