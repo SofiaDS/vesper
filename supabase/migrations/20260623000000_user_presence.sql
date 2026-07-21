@@ -8,8 +8,9 @@
 -- proprio last_seen; gli altri vedono "online" se il last_seen è recente E se
 -- l'utente ha show_online = true.
 --
--- PRIVACY: last_seen sta in una tabella separata (NON su profiles, che è
--- leggibile da chiunque via "profiles_select_authenticated USING (true)").
+-- PRIVACY: last_seen sta in una tabella separata (NON su profiles). Nota: dal
+-- 20260721000000 profiles è leggibile solo dalla diretta interessata (o dallo
+-- staff); i profili altrui passano dalla view public_profiles con masking.
 -- La riga è leggibile solo dalla diretta interessata; la presenza altrui passa
 -- ESCLUSIVAMENTE dalla RPC users_online(), che filtra su show_online e non
 -- restituisce mai il timestamp grezzo. Così l'attività di chi nasconde la
