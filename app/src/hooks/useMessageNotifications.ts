@@ -33,12 +33,18 @@ interface Options {
 }
 
 // Verifica se `body` contiene una menzione "@nickname" dell'utente corrente.
-// I nickname sono [a-zA-Z0-9_]{3,24} (vedi MentionText) quindi non servono
-// escape regex; richiediamo che dopo il nick non segua un altro carattere di
-// parola, così "@anna" non matcha dentro "@annamaria".
+// Il nickname ha solo un vincolo di lunghezza (non di set di caratteri), quindi
+// va escapato prima di finire in una regex: un nick con metacaratteri (es.
+// "(bob", "a.b") altrimenti costruirebbe un pattern invalido che lancia.
+// Richiediamo che dopo il nick non segua un altro carattere di parola, così
+// "@anna" non matcha dentro "@annamaria".
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 function mentionsMe(body: string, nickname: string | undefined): boolean {
   if (!nickname) return false
-  return new RegExp(`@${nickname}(?![a-zA-Z0-9_])`, 'i').test(body)
+  return new RegExp(`@${escapeRegex(nickname)}(?![a-zA-Z0-9_])`, 'i').test(body)
 }
 
 // Notifiche in-app cross-screen (toast globale, vedi mockup `.global-toast`):
