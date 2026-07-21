@@ -2,6 +2,7 @@
 // Trigger: Database Webhook su UPDATE in public.reports, eventi: update.
 // L'invio e la pulizia degli endpoint morti vivono in _shared/push.ts.
 import { sendPushToUser } from '../_shared/push.ts'
+import { isTrustedWebhook, unauthorized } from '../_shared/webhookAuth.ts'
 
 const CLOSED_STATUSES = new Set(['actioned', 'dismissed'])
 
@@ -11,7 +12,14 @@ const MESSAGES: Record<string, string> = {
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  const body = await req.json()
+  if (!isTrustedWebhook(req)) return unauthorized()
+
+  let body: { record?: unknown; old_record?: unknown }
+  try {
+    body = await req.json()
+  } catch {
+    return new Response('Bad request', { status: 400 })
+  }
   const record = body.record as { reporter_id: string | null; status: string }
   const oldRecord = body.old_record as { status: string } | undefined
 

@@ -1,9 +1,17 @@
 // Webhook: messages INSERT → notifica le iscritte alla stanza (esclusa la mittente).
 // Per le stanze di tipo 'foyer' non ci sono iscrizioni → nessuna notifica.
 import { sendPushToUser, supabaseAdmin } from '../_shared/push.ts'
+import { isTrustedWebhook, unauthorized } from '../_shared/webhookAuth.ts'
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  const body = await req.json()
+  if (!isTrustedWebhook(req)) return unauthorized()
+
+  let body: { record?: unknown }
+  try {
+    body = await req.json()
+  } catch {
+    return new Response('Bad request', { status: 400 })
+  }
   const msg = body.record as {
     chatroom_id: string
     sender_id: string

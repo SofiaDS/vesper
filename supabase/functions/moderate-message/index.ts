@@ -10,11 +10,19 @@
 import { supabaseAdmin } from '../_shared/push.ts'
 import { containsBlockedTerm } from '../_shared/blocklist.ts'
 import { checkOpenAiModeration } from '../_shared/openaiModeration.ts'
+import { isTrustedWebhook, unauthorized } from '../_shared/webhookAuth.ts'
 
 const MODERATED_TABLES = new Set(['messages', 'dm_messages'])
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  const body = await req.json()
+  if (!isTrustedWebhook(req)) return unauthorized()
+
+  let body: { table?: string; record?: { id: number; body: string } }
+  try {
+    body = await req.json()
+  } catch {
+    return new Response('Bad request', { status: 400 })
+  }
   const table = body.table as string
   const record = body.record as { id: number; body: string }
 

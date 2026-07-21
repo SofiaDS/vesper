@@ -3,6 +3,7 @@
 // wrappano un record sono no-op qui (il routing per-tabella è gestito dalle
 // push-on-*). Invio e pulizia degli endpoint morti vivono in _shared/push.ts.
 import { sendPushToUsers } from '../_shared/push.ts'
+import { isTrustedWebhook, unauthorized } from '../_shared/webhookAuth.ts'
 
 interface RequestPayload {
   user_ids: string[]
@@ -15,6 +16,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 })
   }
+  if (!isTrustedWebhook(req)) return unauthorized()
 
   let payload: RequestPayload
   try {

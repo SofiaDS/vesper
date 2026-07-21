@@ -1,0 +1,38 @@
+-- ============================================================
+-- Vesper — Migration: hardening dei Database Webhook (P-sec media)
+-- Dipende da: 20260610000000_moderate_message_webhooks.sql
+--             20260623000000_push_message_webhooks.sql
+--
+-- CONTESTO / MOTIVO
+-- Le edge function webhook (moderate-message, push-on-*) sono deployate con
+-- verify_jwt:false perche' invocate dai trigger DB, non da utenti. L'endpoint
+-- resta pero' pubblico: senza un controllo interno un chiamante esterno che
+-- conosce l'URL puo' inviare payload arbitrari (spam di push, flag di
+-- moderazione falsi). Le function ora verificano un header condiviso
+--     x-webhook-secret == env WEBHOOK_SECRET
+-- (vedi supabase/functions/_shared/webhookAuth.ts), quindi TUTTI i trigger che
+-- le invocano devono inviare quell'header.
+--
+-- SEGRETO FUORI DA GIT
+-- Il valore di WEBHOOK_SECRET non va committato. E' configurato come Secret
+-- delle Edge Function (Dashboard -> Edge Functions -> Secrets) e inviato dai
+-- trigger DB: gli header dei trigger sono config live-managed (come i webhook
+-- creati da dashboard, che non stanno in nessuna migration). Questo file resta
+-- percio' secret-free e NON ricrea gli header con il secret.
+--
+-- COSA FA QUESTA MIGRATION
+--   Rimuove i due trigger push DUPLICATI e senza auth introdotti da
+--   20260623000000_push_message_webhooks.sql: chiamavano push-on-chatroom /
+--   push-on-dm in aggiunta ai webhook dashboard, causando una DOPPIA notifica,
+--   e non inviano x-webhook-secret (verrebbero rifiutati dal nuovo controllo).
+--   Le notifiche restano garantite dai webhook dashboard push-on-dm /
+--   push-on-chatroom, a cui e' stato aggiunto x-webhook-secret out-of-band.
+--
+-- NOTA rebuild: ricreando il DB dai soli file, i trigger webhook non avranno
+-- l'header x-webhook-secret (e alcuni, creati da dashboard, non esistono nei
+-- file): i webhook faranno 401 finche' non riconfigurati. E' un fail-closed
+-- sicuro (nessuna esposizione), coerente con come i webhook sono gia' gestiti.
+-- ============================================================
+
+drop trigger if exists push_on_messages_insert on public.messages;
+drop trigger if exists push_on_dm_messages_insert on public.dm_messages;
