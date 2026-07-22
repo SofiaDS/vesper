@@ -11,13 +11,16 @@ import { parseDeepLink, type DeepLinkIntent } from '../lib/deepLink'
 // seconda notifica non ri-triggerano una vecchia destinazione.
 export function useDeepLink(): { intent: DeepLinkIntent | null; consume: () => void } {
   const [intent, setIntent] = useState<DeepLinkIntent | null>(() =>
-    typeof window !== 'undefined' ? parseDeepLink(window.location.pathname) : null,
+    typeof window !== 'undefined'
+      ? parseDeepLink(window.location.pathname + window.location.search)
+      : null,
   )
 
   useEffect(() => {
-    // Ripulisci subito l'URL: l'app "vive" su "/", il path era solo l'istruzione
-    // iniziale. Senza questo, un refresh riaprirebbe la stessa destinazione.
-    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+    // Ripulisci subito l'URL: l'app "vive" su "/", il query param era solo
+    // l'istruzione iniziale. Senza questo, un refresh riaprirebbe la stessa
+    // destinazione.
+    if (typeof window !== 'undefined' && window.location.pathname + window.location.search !== '/') {
       window.history.replaceState(null, '', '/')
     }
 
