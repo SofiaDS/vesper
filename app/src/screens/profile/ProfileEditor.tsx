@@ -34,6 +34,7 @@ import { FilterSection } from '../../components/FilterSection'
 import { normalize } from '../../lib/profile/formatters'
 import {
   AVATAR_STYLES,
+  AVATAR_GRID_SIZE,
   GALLERY_SEEDS,
   avatarValue,
   parseAvatar,
@@ -509,18 +510,21 @@ export function ProfileEditor({
 
   // Se l'utente ha già scelto un avatar di questo stile, tienilo in cima e
   // sempre visibile anche dopo uno shuffle, così la sua scelta non "sparisce".
+  // La griglia ha 3 colonne fisse: teniamo SEMPRE esattamente AVATAR_GRID_SIZE
+  // celle (griglia 3×4 piena). Quando l'avatar selezionato va messo in cima,
+  // togliamo l'ultimo del pool, così non spunta una riga con un solo elemento.
   const selectedAvatar = parseAvatar(avatar)
   const poolSeeds = avatarPool[avatarStyle]
   const seeds =
     selectedAvatar &&
     selectedAvatar.style === avatarStyle &&
     !poolSeeds.includes(selectedAvatar.seed)
-      ? [selectedAvatar.seed, ...poolSeeds]
-      : poolSeeds
+      ? [selectedAvatar.seed, ...poolSeeds.slice(0, AVATAR_GRID_SIZE - 1)]
+      : poolSeeds.slice(0, AVATAR_GRID_SIZE)
   const showMoreAvatars = () =>
     setAvatarPool((prev) => ({
       ...prev,
-      [avatarStyle]: Array.from({ length: 20 }, () => randomSeed()),
+      [avatarStyle]: Array.from({ length: AVATAR_GRID_SIZE }, () => randomSeed()),
     }))
 
   const identityOpts = useMemo(() => IDENTITY_OPTIONS, [])
