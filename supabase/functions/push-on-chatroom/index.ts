@@ -94,7 +94,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const nick = (sender as { nickname: string } | null)?.nickname ?? '—'
   const roomName = (room as { name: string }).name
   const preview = msg.body.slice(0, 120)
-  const url = `/room/${msg.chatroom_id}`
+  // Query param sulla root: la "/" risponde sempre 200 (nessuna dipendenza da
+  // rewrite SPA). Il client lo traduce in navigazione via useDeepLink.
+  const url = `/?room=${msg.chatroom_id}`
 
   await Promise.all([
     sendPushToUsers(roomOnly, { title: `${roomName} — @${nick}`, body: preview, url }),

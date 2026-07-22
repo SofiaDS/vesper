@@ -39,7 +39,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
   await sendPushToUser(recipientId, {
     title: `Messaggio da @${(sender as { nickname: string } | null)?.nickname ?? '—'}`,
     body: msg.body.slice(0, 120),
-    url: '/dm',
+    // Query param sulla root: la "/" risponde sempre 200 (niente rewrite SPA).
+    url: '/?dm=1',
   })
 
   return new Response('ok')
