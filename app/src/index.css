@@ -449,6 +449,58 @@ code {
   color: var(--text);
   opacity: 0.45;
 }
+/* Riga a due livelli (nome provider + nota): usata in "Sostieni Vesper". */
+.nav-row-title {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+.nav-row-note {
+  display: block;
+  font-size: 0.78rem;
+  opacity: 0.55;
+  margin-top: 1px;
+}
+
+/* ── Schermata "Sostieni Vesper" ──────────────────────────────
+   Colori tutti via variabili di tema: si adatta a scuro e chiaro. */
+.support-hero {
+  text-align: center;
+}
+/* Cerchio con icona a cuore in cima alla hero card. */
+.support-hero-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: rgba(232, 177, 78, 0.13);
+  color: var(--accent-text);
+  margin-bottom: 0.7rem;
+}
+.support-hero h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.support-hero p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  opacity: 0.82;
+  text-wrap: pretty;
+}
+/* Nota conclusiva sotto la card dei metodi. */
+.support-note {
+  margin: 0.9rem 0.4rem 0.4rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  opacity: 0.5;
+  text-align: center;
+  text-wrap: pretty;
+}
 /* "Esci": azione distruttiva, icona ed etichetta in rosso tenue. */
 .nav-row-danger .nav-row-label {
   color: var(--error-text);

@@ -13,7 +13,6 @@ import {
   Heart,
   SignOut,
   CaretRight,
-  ArrowUpRight,
 } from '@phosphor-icons/react'
 import { AppHeader } from '../components/AppHeader'
 import { useTheme } from '../hooks/useTheme'
@@ -32,7 +31,7 @@ export function AltroScreen({
   onOpenAdmin,
   onReportBug,
   onSuggest,
-  onSupportLink,
+  onOpenSupport,
   onSignOut,
 }: {
   isStaff: boolean
@@ -43,7 +42,7 @@ export function AltroScreen({
   onOpenAdmin: () => void
   onReportBug: () => void
   onSuggest: () => void
-  onSupportLink: () => void
+  onOpenSupport: () => void
   onSignOut: () => void
 }) {
   const { theme, toggle: toggleTheme } = useTheme()
@@ -124,17 +123,12 @@ export function AltroScreen({
           <span className="nav-row-label">Dacci un suggerimento</span>
           <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
-        <button
-          type="button"
-          className="nav-row"
-          onClick={onSupportLink}
-          aria-label="Sostieni Vesper, si apre in una nuova scheda"
-        >
+        <button type="button" className="nav-row" onClick={onOpenSupport}>
           <span className="nav-row-ico" aria-hidden="true">
             <Heart size={20} weight="duotone" />
           </span>
           <span className="nav-row-label">Sostieni Vesper</span>
-          <ArrowUpRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
       </section>
 
