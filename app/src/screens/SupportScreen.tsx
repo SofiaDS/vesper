@@ -58,7 +58,7 @@ export function SupportScreen({ onBack, backLabel = '‹ Altro' }: { onBack: () 
       </section>
 
       <section className="card box-shadow">
-        <h3 className="pf-section-title">Scegli come contribuire</h3>
+        <h3 className="pf-section-title">Scegli come sostenerci</h3>
         {SUPPORT_LINKS.map((link) => {
           const Ico = link.icon
           return (
