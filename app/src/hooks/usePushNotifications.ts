@@ -21,6 +21,8 @@ export interface PushState {
   permission: PushPermission
   /** true quando il permesso è negato: va sbloccato dalle impostazioni di sistema, il toggle non basta. */
   blocked: boolean
+  /** Ultimo errore leggibile dell'operazione subscribe/unsubscribe, o null. */
+  error: string | null
   subscribe: () => Promise<void>
   unsubscribe: () => Promise<void>
 }
@@ -35,6 +37,7 @@ export function usePushNotifications(): PushState {
   const [subscribed, setSubscribed] = useState(false)
   const [busy, setBusy] = useState(false)
   const [permission, setPermission] = useState<PushPermission>(readPermission)
+  const [error, setError] = useState<string | null>(null)
 
   const supported =
     typeof window !== 'undefined' &&
@@ -68,20 +71,32 @@ export function usePushNotifications(): PushState {
       return
     }
     setBusy(true)
+    setError(null)
     try {
       // Richiesta esplicita del permesso: in TWA mappa sul permesso Android
-      // POST_NOTIFICATIONS. Aggiorniamo subito lo stato per riflettere la scelta.
+      // POST_NOTIFICATIONS. ATTENZIONE: in TWA requestPermission() può risolvere
+      // con 'default' mentre il dialog Android è ancora aperto → NON usciamo se
+      // il valore non è 'granted'. Usciamo solo su 'denied' esplicito; per il
+      // resto lasciamo decidere pushManager.subscribe(), che è l'operazione che
+      // conta davvero e che comunque richiede/verifica il permesso.
       const perm = (await Notification.requestPermission()) as PushPermission
       setPermission(perm)
-      if (perm !== 'granted') return
+      if (perm === 'denied') {
+        setError('Permesso notifiche negato.')
+        return
+      }
 
       const reg = await navigator.serviceWorker.ready
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       })
+      // subscribe() è andata a buon fine → il permesso è di fatto concesso,
+      // anche se requestPermission() poco fa aveva riportato ancora 'default'.
+      setPermission(readPermission())
+
       const json = sub.toJSON() as { endpoint: string; keys: { p256dh: string; auth: string } }
-      await supabase.from('push_subscriptions').upsert(
+      const { error: dbError } = await supabase.from('push_subscriptions').upsert(
         {
           user_id:  session.user.id,
           endpoint: json.endpoint,
@@ -90,11 +105,18 @@ export function usePushNotifications(): PushState {
         },
         { onConflict: 'user_id,endpoint' },
       )
+      // Se il salvataggio su DB fallisce (es. RLS), NON accendiamo il toggle:
+      // sarebbe una subscription "orfana" nel browser che il server non conosce.
+      if (dbError) throw dbError
       setSubscribed(true)
-    } catch {
-      // Subscribe fallita (permesso revocato a metà, browser non supportato…):
-      // riallineiamo permission così la UI mostra lo stato reale.
+    } catch (err) {
+      // Subscribe fallita: riallineiamo permission e — soprattutto — rendiamo
+      // l'errore visibile, così si capisce SE e DOVE il comando si è rotto
+      // (permesso non ancora concesso, VAPID errata, DB/RLS, browser…).
       setPermission(readPermission())
+      const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+      setError(message)
+      console.error('[push] subscribe fallita:', err)
     } finally {
       setBusy(false)
     }
@@ -103,6 +125,7 @@ export function usePushNotifications(): PushState {
   const unsubscribe = useCallback(async () => {
     if (!session?.user.id) return
     setBusy(true)
+    setError(null)
     try {
       const reg = await navigator.serviceWorker.ready
       const sub = await reg.pushManager.getSubscription()
@@ -115,8 +138,10 @@ export function usePushNotifications(): PushState {
           .eq('endpoint', sub.endpoint)
       }
       setSubscribed(false)
-    } catch {
-      // silenzioso
+    } catch (err) {
+      const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+      setError(message)
+      console.error('[push] unsubscribe fallita:', err)
     } finally {
       setBusy(false)
     }
@@ -128,6 +153,7 @@ export function usePushNotifications(): PushState {
     busy,
     permission,
     blocked: permission === 'denied',
+    error,
     subscribe,
     unsubscribe,
   }

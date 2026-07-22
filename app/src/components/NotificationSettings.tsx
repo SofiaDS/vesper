@@ -1,7 +1,7 @@
 import { usePushNotifications } from '../hooks/usePushNotifications'
 
 export function NotificationSettings() {
-  const { supported, subscribed, busy, blocked, subscribe, unsubscribe } = usePushNotifications()
+  const { supported, subscribed, busy, blocked, error, subscribe, unsubscribe } = usePushNotifications()
 
   if (!supported) return null
 
@@ -29,6 +29,12 @@ export function NotificationSettings() {
           Le notifiche sono bloccate dal sistema. Per attivarle vai in{' '}
           <strong>Impostazioni di Android › App › Vesper › Notifiche</strong> e
           consenti le notifiche, poi torna qui.
+        </p>
+      )}
+      {!blocked && error && (
+        <p className="hint" role="alert" style={{ marginTop: '0.5rem' }}>
+          Non è stato possibile attivare le notifiche. Riprova; se il problema
+          resta, segnala questo dettaglio: <code>{error}</code>
         </p>
       )}
     </>
