@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { House, ChatCircleDots, MagnifyingGlass, User, DotsThreeOutline } from '@phosphor-icons/react'
 import type { Chatroom } from '../types'
+import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
+import { useDeepLink } from '../hooks/useDeepLink'
 import { usePendingDmCount } from '../hooks/usePendingDmCount'
 import { useAdminPendingCounts } from '../hooks/useAdminPendingCounts'
 import { useBackNavigation } from '../hooks/useBackNavigation'
@@ -35,6 +37,9 @@ export function Home() {
 
   // Heartbeat di presenza online (per il pallino nei DM, Step 5).
   useHeartbeat(myId)
+
+  // Deep-link al click di una notifica push (/dm, /room/<id>).
+  const { intent: deepLink, consume: consumeDeepLink } = useDeepLink()
 
   const [room, setRoom] = useState<Chatroom | null>(null)
   const [showProfile, setShowProfile] = useState(false)
@@ -135,6 +140,33 @@ export function Home() {
     : 'Stanze'
 
   const canDm = (profile?.strato ?? 0) >= 2
+
+  // Applica il deep-link della notifica: apre i DM o carica e apre la stanza
+  // indicata. L'intento arriva sia da avvio a freddo sia da service worker
+  // (app già aperta) — vedi useDeepLink. Consumato dopo la navigazione.
+  useEffect(() => {
+    if (!deepLink) return
+    if (deepLink.type === 'dm') {
+      if (canDm) openScreen(() => setShowDm(true))
+      consumeDeepLink()
+      return
+    }
+    let alive = true
+    supabase
+      .from('chatrooms')
+      .select('id, slug, name, description, kind')
+      .eq('id', deepLink.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!alive) return
+        if (data) openScreen(() => setRoom(data as Chatroom))
+        consumeDeepLink()
+      })
+    return () => { alive = false }
+    // openScreen/consumeDeepLink stabili nella pratica: dipendiamo dall'intento.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepLink, canDm])
+
   const altroBadge = isStaff
     ? adminCounts.verifiche + adminCounts.foto + adminCounts.segnalazioni + adminCounts.ai
     : undefined

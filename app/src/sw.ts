@@ -31,6 +31,24 @@ self.addEventListener('push', (event: PushEvent) => {
 
 self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close()
-  const url = (event.notification.data as { url: string }).url
-  event.waitUntil(self.clients.openWindow(url))
+  const url = (event.notification.data as { url?: string }).url ?? '/'
+  event.waitUntil(
+    (async () => {
+      const clients = await self.clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true,
+      })
+      // App già aperta: portala in primo piano e dille dove navigare. L'app è
+      // una SPA a stato (non rilegge l'URL da sola), quindi passiamo il path
+      // via postMessage → lo raccoglie useDeepLink.
+      for (const client of clients) {
+        await client.focus()
+        client.postMessage({ type: 'deep-link', path: url })
+        return
+      }
+      // Nessuna finestra aperta: aprine una sul path. Il rewrite SPA di Vercel
+      // serve index.html e useDeepLink legge il path all'avvio.
+      await self.clients.openWindow(url)
+    })(),
+  )
 })
