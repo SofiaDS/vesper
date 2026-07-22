@@ -76,18 +76,21 @@ export function avatarDataUri(value: string | null): string | null {
   return uri
 }
 
+// Numero di avatar mostrati nel selettore: griglia 3 colonne × 4 righe = 12.
+// La griglia CSS (.avatar-grid) usa 3 colonne fisse, quindi tenere il totale a
+// un multiplo di 3 evita righe "orfane" con un solo elemento.
+export const AVATAR_GRID_SIZE = 12
+
 // Seed della galleria curata mostrata di default nel selettore. Le parole non
 // contano di per sé: servono solo a produrre avatar distinti e stabili.
 export const GALLERY_SEEDS: Record<AvatarStyle, string[]> = {
   adventurer: [
-    'Aurora', 'Milo', 'Nina', 'Leo', 'Sole', 'Vera', 'Enzo', 'Gaia',
-    'Bruno', 'Iris', 'Teo', 'Lia', 'Marco', 'Ada', 'Nico', 'Elsa',
-    'Piero', 'Zoe', 'Dario', 'Mira',
+    'Aurora', 'Milo', 'Nina', 'Leo', 'Sole', 'Vera',
+    'Enzo', 'Gaia', 'Bruno', 'Iris', 'Teo', 'Lia',
   ],
   bottts: [
-    'Atlas', 'Orbit', 'Nova', 'Pixel', 'Volt', 'Turbo', 'Chip', 'Echo',
-    'Radar', 'Bolt', 'Circuit', 'Gizmo', 'Rocket', 'Byte', 'Cosmo', 'Zap',
-    'Titan', 'Neon', 'Quark', 'Astro',
+    'Atlas', 'Orbit', 'Nova', 'Pixel', 'Volt', 'Turbo',
+    'Chip', 'Echo', 'Radar', 'Bolt', 'Circuit', 'Gizmo',
   ],
 }
 
