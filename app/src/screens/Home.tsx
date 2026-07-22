@@ -22,10 +22,8 @@ import { SettingsScreen } from './SettingsScreen'
 import { AdminScreen, ADMIN_TAB_LABELS, type AdminTab } from './admin/AdminScreen'
 import { DmScreen } from './DmScreen'
 import { LegalScreen, LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
+import { SupportScreen } from './SupportScreen'
 import { openSupportEmail } from '../lib/support'
-
-// TODO(P30): sostituire con il link definitivo (Ko-fi / Liberapay / PayPal) quando disponibile.
-const SUPPORT_URL = 'https://www.example.com'
 
 // Shell post-login: gestisce la navigazione fra lobby, chat, profilo e moderazione.
 // Nessun router esterno: basta uno stato locale, guidato dalla TabBar fissa.
@@ -50,6 +48,7 @@ export function Home() {
   const [showDm, setShowDm] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showAltro, setShowAltro] = useState(false)
+  const [showSupport, setShowSupport] = useState(false)
   const [viewUserId, setViewUserId] = useState<string | null>(null)
   const [legalDoc, setLegalDoc] = useState<LegalDoc | null>(null)
 
@@ -66,6 +65,7 @@ export function Home() {
     setShowDm(false)
     setShowSettings(false)
     setShowAltro(false)
+    setShowSupport(false)
     setViewUserId(null)
     setLegalDoc(null)
     open?.()
@@ -109,6 +109,7 @@ export function Home() {
     !showDm &&
     !showSettings &&
     !showAltro &&
+    !showSupport &&
     !viewUserId &&
     !legalDoc
 
@@ -125,6 +126,8 @@ export function Home() {
     ? 'Utenti bloccati'
     : showSettings
     ? 'Impostazioni'
+    : showSupport
+    ? 'Sostieni Vesper'
     : showAltro
     ? 'Altro'
     : viewUserId
@@ -184,7 +187,7 @@ export function Home() {
   // Ricerca → Profilo pubblico = 2): serve a sapere se il prossimo `goBack`
   // riporta alla lobby, per decidere se ri-armare la guardia sulla history
   // (vedi useBackNavigation).
-  const stackDepth = [room, showProfile, showAdmin, showBlocked, showSearch, showDm, showSettings, showAltro, viewUserId, legalDoc]
+  const stackDepth = [room, showProfile, showAdmin, showBlocked, showSearch, showDm, showSettings, showAltro, showSupport, viewUserId, legalDoc]
     .filter(Boolean).length
 
   let screen: React.ReactNode
@@ -213,6 +216,9 @@ export function Home() {
   } else if (showProfile) {
     goBack = () => setShowProfile(false)
     screen = <ProfileScreen onBack={goBack} />
+  } else if (showSupport) {
+    goBack = () => setShowSupport(false)
+    screen = <SupportScreen onBack={goBack} />
   } else if (showAltro) {
     goBack = goToRooms
     screen = (
@@ -228,7 +234,7 @@ export function Home() {
         }}
         onReportBug={() => openSupportEmail({ type: 'bug', screen: currentScreenLabel, userId: myId })}
         onSuggest={() => openSupportEmail({ type: 'feedback', screen: currentScreenLabel, userId: myId })}
-        onSupportLink={() => window.open(SUPPORT_URL, '_blank', 'noopener,noreferrer')}
+        onOpenSupport={() => setShowSupport(true)}
         onSignOut={signOut}
       />
     )
