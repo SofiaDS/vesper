@@ -50,7 +50,8 @@ export function SupportScreen({ onBack, backLabel = '‹ Altro' }: { onBack: () 
         <p>
           Vesper nasce dal lavoro di due founder ed è un progetto indipendente: niente
           pubblicità, niente vendita di dati, moderazione attenta e attenzione reale alla
-          privacy. Un ambiente dove ogni incontro parte da una base di complicità e serenità.
+          privacy. 
+          Un ambiente dove ogni incontro parte da una base di complicità e serenità.
           Mandarlo avanti ha un costo reale — server, verifica, sviluppo. Se ti va di
           sostenerci, ogni contributo, anche piccolo, fa una differenza concreta.
         </p>
