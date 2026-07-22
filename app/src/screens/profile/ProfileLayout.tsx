@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { AppHeader } from '../../components/AppHeader'
-import { glyphFor } from '../../lib/profile/formatters'
+import { Avatar } from '../../components/Avatar'
 import { ProfileGallery } from './ProfileGallery'
 
 // Layout condiviso della schermata profilo (mio o altrui): header con avatar
@@ -37,7 +37,6 @@ export function ProfileLayout({
   // Card finale opzionale: zona pericolosa (proprio) o azioni di contatto (altrui).
   bottomCard?: ReactNode
 }) {
-  const glyph = glyphFor(avatarPreset, nickname)
   const background = accentColor ?? 'var(--accent)'
   const facts = keyFacts.filter((f): f is string => Boolean(f))
 
@@ -47,7 +46,7 @@ export function ProfileLayout({
         onBack={onBack}
         title={
           <span className="pf-header-title">
-            <span className="avatar-bubble avatar-bubble-sm" style={{ background }}>{glyph}</span>
+            <span className="avatar-bubble avatar-bubble-sm" style={{ background }}><Avatar preset={avatarPreset} nickname={nickname} /></span>
             <span>@{nickname}</span>
           </span>
         }
@@ -56,7 +55,7 @@ export function ProfileLayout({
       {topActions && <div className="pf-icon-actions">{topActions}</div>}
 
       <header className="pf-hero">
-        <span className="avatar-bubble avatar-bubble-lg" style={{ background }}>{glyph}</span>
+        <span className="avatar-bubble avatar-bubble-lg" style={{ background }}><Avatar preset={avatarPreset} nickname={nickname} /></span>
         <h2 className="pf-nick">@{nickname}</h2>
         {facts.length > 0 && <p className="pf-key-facts">{facts.join(' · ')}</p>}
       </header>
