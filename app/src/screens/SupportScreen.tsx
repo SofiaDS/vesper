@@ -52,7 +52,7 @@ export function SupportScreen({ onBack, backLabel = '‹ Altro' }: { onBack: () 
           pubblicità, niente vendita di dati, moderazione attenta e attenzione reale alla
           privacy. 
           Un ambiente dove ogni incontro parte da una base di complicità e serenità.
-          Mandarlo avanti ha un costo reale — server, verifica, sviluppo. Se ti va di
+          Mandarlo avanti ha un costo reale — server, moderazione, sviluppo. Se ti va di
           sostenerci, ogni contributo, anche piccolo, fa una differenza concreta.
         </p>
       </section>
