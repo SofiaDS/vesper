@@ -6,7 +6,7 @@ import { MessageComposer } from '../components/MessageComposer'
 import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
 import { useMessageReactions } from '../hooks/useMessageReactions'
-import { glyphFor } from '../lib/profile/formatters'
+import { Avatar } from '../components/Avatar'
 import {
   listDmConversations,
   acceptDmRequest,
@@ -371,8 +371,8 @@ function ListView({
               {incoming.map((c) => (
                 <div key={c.id} className="dm-conv">
                   <div className="dm-row">
-                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
-                      {glyphFor(null, c.other_nickname)}
+                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: c.other_accent ?? 'var(--accent)' }}>
+                      <Avatar preset={c.other_avatar} nickname={c.other_nickname} />
                     </span>
                     <div className="dm-info">
                       <div className="dm-info-top">
@@ -422,8 +422,8 @@ function ListView({
                     onClick={() => onOpen(c)}
                   >
                     <div className="dm-row">
-                      <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
-                        {glyphFor(null, c.other_nickname)}
+                      <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: c.other_accent ?? 'var(--accent)' }}>
+                        <Avatar preset={c.other_avatar} nickname={c.other_nickname} />
                         {isOnline && (
                           <>
                             <span className="presence-dot" aria-hidden="true" />
@@ -461,8 +461,8 @@ function ListView({
               {outgoing.map((c) => (
                 <div key={c.id} className="dm-conv">
                   <div className="dm-row">
-                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: 'var(--accent)' }}>
-                      {glyphFor(null, c.other_nickname)}
+                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: c.other_accent ?? 'var(--accent)' }}>
+                      <Avatar preset={c.other_avatar} nickname={c.other_nickname} />
                     </span>
                     <div className="dm-info">
                       <div className="dm-info-top">

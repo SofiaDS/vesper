@@ -15,7 +15,7 @@ import { QuotePreview } from '../components/QuotePreview'
 import { useMessageReactions } from '../hooks/useMessageReactions'
 import { promoteLayer } from '../lib/layers'
 import { markRead } from '../lib/reads'
-import { glyphFor } from '../lib/profile/formatters'
+import { Avatar } from '../components/Avatar'
 import type { Chatroom } from '../types'
 import type { ChatMessage } from '../hooks/useChatMessages'
 
@@ -174,7 +174,7 @@ export function ChatScreen({
                   className="msg-avatar"
                   style={{ background: avatarCache.current.get(m.sender_id)?.color ?? 'var(--accent)' }}
                 >
-                  {glyphFor(avatarCache.current.get(m.sender_id)?.preset ?? null, m.nickname)}
+                  <Avatar preset={avatarCache.current.get(m.sender_id)?.preset ?? null} nickname={m.nickname} />
                 </span>
               </button>
             )}

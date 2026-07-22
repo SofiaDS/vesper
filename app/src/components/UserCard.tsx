@@ -1,4 +1,4 @@
-import { glyphFor } from '../lib/profile/formatters'
+import { Avatar } from './Avatar'
 import type { SearchResult } from '../lib/search'
 
 export function UserCard({
@@ -17,7 +17,7 @@ export function UserCard({
         className="search-ava"
         style={result.accent_color ? { background: result.accent_color } : undefined}
       >
-        {glyphFor(result.avatar_preset, result.nickname)}
+        <Avatar preset={result.avatar_preset} nickname={result.nickname} />
       </span>
       <span className="search-meta">
         <span className="search-nick">

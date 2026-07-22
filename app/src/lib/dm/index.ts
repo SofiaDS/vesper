@@ -12,6 +12,8 @@ export interface DmConversation {
   created_at: string
   updated_at: string
   other_nickname: string
+  other_avatar: string | null
+  other_accent: string | null
 }
 
 export interface DmMessage {
@@ -46,7 +48,12 @@ export async function sendDmRequest(
     if (error.code === '23505') throw new Error('Hai già una conversazione con questa utente.')
     throw error
   }
-  return { ...(data as Omit<DmConversation, 'other_nickname'>), other_nickname: '' }
+  return {
+    ...(data as Omit<DmConversation, 'other_nickname' | 'other_avatar' | 'other_accent'>),
+    other_nickname: '',
+    other_avatar: null,
+    other_accent: null,
+  }
 }
 
 export async function acceptDmRequest(conversationId: string): Promise<void> {
@@ -74,7 +81,10 @@ export async function listDmConversations(userId: string): Promise<DmConversatio
     .order('updated_at', { ascending: false })
   if (error) throw error
 
-  const rows = (data ?? []) as Omit<DmConversation, 'other_nickname'>[]
+  const rows = (data ?? []) as Omit<
+    DmConversation,
+    'other_nickname' | 'other_avatar' | 'other_accent'
+  >[]
   const otherIds = rows.map((r) =>
     r.from_user_id === userId ? r.to_user_id : r.from_user_id,
   )
@@ -83,19 +93,35 @@ export async function listDmConversations(userId: string): Promise<DmConversatio
 
   const { data: profs } = await supabase
     .from('public_profiles')
-    .select('id, nickname')
+    .select('id, nickname, avatar_preset, accent_color')
     .in('id', uniq)
 
-  const nickMap: Record<string, string> = {}
-  for (const p of (profs ?? []) as { id: string; nickname: string }[]) {
-    nickMap[p.id] = p.nickname
+  const profMap: Record<
+    string,
+    { nickname: string; avatar_preset: string | null; accent_color: string | null }
+  > = {}
+  for (const p of (profs ?? []) as {
+    id: string
+    nickname: string
+    avatar_preset: string | null
+    accent_color: string | null
+  }[]) {
+    profMap[p.id] = {
+      nickname: p.nickname,
+      avatar_preset: p.avatar_preset,
+      accent_color: p.accent_color,
+    }
   }
 
-  return rows.map((r) => ({
-    ...r,
-    other_nickname:
-      nickMap[r.from_user_id === userId ? r.to_user_id : r.from_user_id] ?? '—',
-  }))
+  return rows.map((r) => {
+    const other = profMap[r.from_user_id === userId ? r.to_user_id : r.from_user_id]
+    return {
+      ...r,
+      other_nickname: other?.nickname ?? '—',
+      other_avatar: other?.avatar_preset ?? null,
+      other_accent: other?.accent_color ?? null,
+    }
+  })
 }
 
 export async function getDmMessages(

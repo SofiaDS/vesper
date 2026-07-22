@@ -31,7 +31,16 @@ import {
 import { ZODIAC_LABELS } from '../../constants/labels'
 import { SingleChoiceField, MultiChoiceField, ShowInProfileToggle } from './ChoiceField'
 import { FilterSection } from '../../components/FilterSection'
-import { glyphFor, normalize, AVATAR_PRESETS } from '../../lib/profile/formatters'
+import { normalize } from '../../lib/profile/formatters'
+import {
+  AVATAR_STYLES,
+  GALLERY_SEEDS,
+  avatarValue,
+  parseAvatar,
+  randomSeed,
+  type AvatarStyle,
+} from '../../lib/profile/avatars'
+import { Avatar } from '../../components/Avatar'
 import { checkLayerEligibility, type LayerEligibility } from '../../lib/layers'
 import {
   listMyPhotos,
@@ -240,6 +249,13 @@ export function ProfileEditor({
   const [smoking, setSmoking] = useState<Smoking | null>(profile.smoking ?? null)
   const [sport, setSport] = useState<Sport | null>(profile.sport ?? null)
   const [avatar, setAvatar] = useState<string | null>(profile.avatar_preset ?? null)
+  const [avatarStyle, setAvatarStyle] = useState<AvatarStyle>('adventurer')
+  // Set di avatar mostrati per stile. "Mostra altri" lo SOSTITUISCE (non
+  // accumula), così la griglia resta di ~20 avatar invece di crescere all'infinito.
+  const [avatarPool, setAvatarPool] = useState<Record<AvatarStyle, string[]>>({
+    adventurer: GALLERY_SEEDS.adventurer,
+    bottts: GALLERY_SEEDS.bottts,
+  })
   const [accent, setAccent] = useState<string | null>(profile.accent_color ?? null)
   const [dmFilter, setDmFilter] = useState(profile.dm_filter)
 
@@ -491,7 +507,21 @@ export function ProfileEditor({
     }
   }
 
-  const avatarGlyph = glyphFor(avatar, nickname)
+  // Se l'utente ha già scelto un avatar di questo stile, tienilo in cima e
+  // sempre visibile anche dopo uno shuffle, così la sua scelta non "sparisce".
+  const selectedAvatar = parseAvatar(avatar)
+  const poolSeeds = avatarPool[avatarStyle]
+  const seeds =
+    selectedAvatar &&
+    selectedAvatar.style === avatarStyle &&
+    !poolSeeds.includes(selectedAvatar.seed)
+      ? [selectedAvatar.seed, ...poolSeeds]
+      : poolSeeds
+  const showMoreAvatars = () =>
+    setAvatarPool((prev) => ({
+      ...prev,
+      [avatarStyle]: Array.from({ length: 20 }, () => randomSeed()),
+    }))
 
   const identityOpts = useMemo(() => IDENTITY_OPTIONS, [])
   const orientationOpts = useMemo(() => ORIENTATION_OPTIONS, [])
@@ -521,7 +551,7 @@ export function ProfileEditor({
       <form className="form profile-form" onSubmit={handleSave}>
         <div className="avatar-preview">
           <span className="avatar-bubble" style={{ background: accent ?? 'var(--accent)' }}>
-            {avatarGlyph}
+            <Avatar preset={avatar} nickname={nickname} />
           </span>
           <span className="muted small-inline">@{nickname || '—'}</span>
         </div>
@@ -530,22 +560,40 @@ export function ProfileEditor({
 
         <fieldset className="field">
           <legend>Avatar</legend>
-          <div className="options">
-            {AVATAR_PRESETS.map((a) => (
+          <div className="avatar-tabs" role="tablist">
+            {AVATAR_STYLES.map((s) => (
               <button
                 type="button"
-                key={a.key}
-                className={avatar === a.key ? 'avatar-opt sel' : 'avatar-opt'}
-                onClick={() => setAvatar(a.key)}
-                aria-label={a.key}
+                key={s.key}
+                role="tab"
+                aria-selected={avatarStyle === s.key}
+                className={avatarStyle === s.key ? 'avatar-tab sel' : 'avatar-tab'}
+                onClick={() => setAvatarStyle(s.key)}
               >
-                {a.glyph}
+                {s.label}
               </button>
             ))}
           </div>
-          <span className="hint">
-            Avatar provvisori: l'illustrazione definitiva arriverà col branding.
-          </span>
+          <div className="avatar-grid">
+            {seeds.map((seed) => {
+              const value = avatarValue(avatarStyle, seed)
+              return (
+                <button
+                  type="button"
+                  key={value}
+                  className={avatar === value ? 'avatar-cell sel' : 'avatar-cell'}
+                  onClick={() => setAvatar(value)}
+                  aria-label={`Avatar ${seed}`}
+                  aria-pressed={avatar === value}
+                >
+                  <Avatar preset={value} nickname={nickname} />
+                </button>
+              )
+            })}
+          </div>
+          <button type="button" className="avatar-more" onClick={showMoreAvatars}>
+            🎲 Mostra altri
+          </button>
         </fieldset>
 
         <fieldset className="field">
