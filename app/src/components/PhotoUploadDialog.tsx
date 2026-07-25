@@ -1,15 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
+import { CaretLeft } from '@phosphor-icons/react'
 import { useModalA11y } from '../hooks/useModalA11y'
 
-// Dialog per aggiungere una foto profilo: scelta sorgente (selfie in-app o
-// galleria) + ritaglio quadrato (zoom + trascinamento). Produce un JPEG Blob
-// gia' quadrato e senza metadati EXIF, che il chiamante carica con uploadPhotoFromBlob.
+// Dialog per aggiungere una foto profilo: scelta sorgente (selfie o galleria)
+// + ritaglio quadrato (zoom + trascinamento). Produce un JPEG Blob gia'
+// quadrato e senza metadati EXIF, che il chiamante carica con uploadPhotoFromBlob.
+//
+// Il selfie NON usa più getUserMedia con anteprima in-app: l'anteprima restava
+// nera e lo scatto non produceva nulla (videoWidth 0, quindi capture() usciva
+// subito). Invece di inseguire il motivo dentro la WebView, si delega alla
+// fotocamera di sistema con `capture="user"` sull'input file: nessuno stream da
+// gestire e l'utente ha i controlli nativi (fronte/retro, flash, messa a fuoco).
+// Su desktop l'attributo viene ignorato e si apre il normale selettore file.
 
 const OUTPUT_SIZE = 1024 // lato del JPEG quadrato finale
 const BOX = 300 // lato dell'area di ritaglio a schermo (px logici)
 const JPEG_QUALITY = 0.85
 
-type Stage = 'choose' | 'camera' | 'crop'
+type Stage = 'choose' | 'crop'
 
 export function PhotoUploadDialog({
   onClose,
@@ -26,21 +34,12 @@ export function PhotoUploadDialog({
   const [err, setErr] = useState<string | null>(null)
 
   const fileRef = useRef<HTMLInputElement | null>(null)
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const streamRef = useRef<MediaStream | null>(null)
+  const camRef = useRef<HTMLInputElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const drag = useRef<{ px: number; py: number; ox: number; oy: number } | null>(
     null,
   )
   const modalRef = useRef<HTMLDivElement | null>(null)
-
-  // Ferma lo stream della fotocamera (pulizia).
-  function stopStream() {
-    streamRef.current?.getTracks().forEach((t) => t.stop())
-    streamRef.current = null
-  }
-
-  useEffect(() => stopStream, [])
 
   // Geometria del ritaglio "cover": l'immagine copre sempre tutta l'area.
   function geom(image: HTMLImageElement, z: number) {
@@ -103,47 +102,6 @@ export function PhotoUploadDialog({
     loadFromUrl(url, () => URL.revokeObjectURL(url))
   }
 
-  async function startCamera() {
-    setErr(null)
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user' },
-        audio: false,
-      })
-      streamRef.current = stream
-      setStage('camera')
-      // il <video> viene montato al cambio di stage; assegna lo stream dopo.
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-          videoRef.current.play().catch(() => {})
-        }
-      }, 0)
-    } catch {
-      setErr('Fotocamera non disponibile. Prova con la galleria.')
-    }
-  }
-
-  function capture() {
-    const v = videoRef.current
-    if (!v) return
-    const vw = v.videoWidth
-    const vh = v.videoHeight
-    if (!vw || !vh) return
-    const tmp = document.createElement('canvas')
-    tmp.width = vw
-    tmp.height = vh
-    const ctx = tmp.getContext('2d')
-    if (!ctx) return
-    // specchia in orizzontale: il selfie deve combaciare con l'anteprima.
-    ctx.translate(vw, 0)
-    ctx.scale(-1, 1)
-    ctx.drawImage(v, 0, 0, vw, vh)
-    const url = tmp.toDataURL('image/jpeg', 0.92)
-    stopStream()
-    loadFromUrl(url)
-  }
-
   function onPointerDown(e: React.PointerEvent) {
     if (!img) return
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
@@ -201,7 +159,6 @@ export function PhotoUploadDialog({
   }
 
   function close() {
-    stopStream()
     onClose()
   }
 
@@ -226,7 +183,11 @@ export function PhotoUploadDialog({
             {/* Tutte e tre le azioni nello stesso contenitore: sono alternative
                 alla pari e devono avere la stessa forma. */}
             <div className="upload-choices">
-              <button type="button" className="btn-primary" onClick={startCamera}>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => camRef.current?.click()}
+              >
                 Scatta un selfie
               </button>
               <button
@@ -247,38 +208,16 @@ export function PhotoUploadDialog({
               hidden
               onChange={onPickFile}
             />
-          </>
-        )}
-
-        {stage === 'camera' && (
-          <>
-            <h3 className="modal-title">Scatta un selfie</h3>
-            <div className="camera-wrap">
-              <video
-                ref={videoRef}
-                className="camera-video"
-                playsInline
-                muted
-              />
-            </div>
-            {err && <p className="err" role="alert">{err}</p>}
-            <div className="modal-actions">
-              <button
-                type="button"
-                className="btn-ghost"
-                aria-label="Indietro"
-                title="Indietro"
-                onClick={() => {
-                  stopStream()
-                  setStage('choose')
-                }}
-              >
-                ‹
-              </button>
-              <button type="button" className="btn-primary" onClick={capture}>
-                Scatta
-              </button>
-            </div>
+            {/* Stesso handler, ma `capture="user"` fa aprire direttamente la
+                fotocamera frontale di sistema invece del selettore file. */}
+            <input
+              ref={camRef}
+              type="file"
+              accept="image/*"
+              capture="user"
+              hidden
+              onChange={onPickFile}
+            />
           </>
         )}
 
@@ -310,7 +249,7 @@ export function PhotoUploadDialog({
             <div className="modal-actions">
               <button
                 type="button"
-                className="btn-ghost"
+                className="btn-ghost btn-icon"
                 aria-label="Indietro"
                 title="Indietro"
                 onClick={() => {
@@ -319,7 +258,7 @@ export function PhotoUploadDialog({
                 }}
                 disabled={busy}
               >
-                ‹
+                <CaretLeft size={20} weight="bold" aria-hidden="true" />
               </button>
               <button
                 type="button"

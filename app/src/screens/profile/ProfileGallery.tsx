@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { listApprovedPhotos, signedUrls } from '../../lib/photos'
 import { useModalA11y } from '../../hooks/useModalA11y'
 
@@ -103,7 +104,7 @@ export function ProfileGallery({
                   onClick={() => setOpenIdx((openIdx - 1 + items.length) % items.length)}
                   aria-label="Foto precedente"
                 >
-                  ‹
+                  <CaretLeft size={22} weight="bold" aria-hidden="true" />
                 </button>
                 <button
                   type="button"
@@ -111,7 +112,7 @@ export function ProfileGallery({
                   onClick={() => setOpenIdx((openIdx + 1) % items.length)}
                   aria-label="Foto successiva"
                 >
-                  ›
+                  <CaretRight size={22} weight="bold" aria-hidden="true" />
                 </button>
               </>
             )}
