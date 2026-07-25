@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { verifyPin } from '../lib/pin'
 import { BrandMark } from '../components/BrandMark'
+import { PasswordInput } from '../components/PasswordInput'
 
 interface Props {
   onUnlock: () => void
@@ -31,8 +32,8 @@ export function PinLockScreen({ onUnlock }: Props) {
         <form onSubmit={handleSubmit} className="form">
           <label className="field">
             <span>Inserisci il PIN</span>
-            <input
-              type="password"
+            <PasswordInput
+              secretName="PIN"
               inputMode="numeric"
               pattern="[0-9]*"
               maxLength={8}

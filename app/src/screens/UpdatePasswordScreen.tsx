@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { mapSupabaseAuthError, validatePassword } from '../lib/authErrors'
 import { BrandMark } from '../components/BrandMark'
+import { PasswordInput } from '../components/PasswordInput'
 
 // Mostrata quando si arriva dal link "reimposta password" (evento recovery).
 // Qui la sessione e' gia' valida: basta impostare la nuova password.
@@ -51,8 +52,7 @@ export function UpdatePasswordScreen() {
         <form onSubmit={handleSubmit} className="form">
           <label className="field">
             <span>Nuova password</span>
-            <input
-              type="password"
+            <PasswordInput
               autoComplete="new-password"
               required
               minLength={8}
@@ -67,8 +67,7 @@ export function UpdatePasswordScreen() {
 
           <label className="field">
             <span>Conferma password</span>
-            <input
-              type="password"
+            <PasswordInput
               autoComplete="new-password"
               required
               value={confirm}

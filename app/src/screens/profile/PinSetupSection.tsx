@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { hasPin, setPin, verifyPin, removePin, lock } from '../../lib/pin'
+import { PasswordInput } from '../../components/PasswordInput'
 
 type Mode = 'idle' | 'set' | 'change' | 'remove'
 
@@ -11,8 +12,8 @@ function PinField({ label, value, onChange }: {
   return (
     <label className="field">
       <span>{label}</span>
-      <input
-        type="password"
+      <PasswordInput
+        secretName="PIN"
         inputMode="numeric"
         pattern="[0-9]*"
         maxLength={8}
