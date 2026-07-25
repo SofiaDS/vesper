@@ -27,7 +27,8 @@
       "Bash(awk '/^\\\\.btn-ghost/,/^}/' index.css)",
       "Bash(awk '/^\\\\.inline-add/,/^}/' index.css)",
       "Bash(awk '/^\\\\.composer \\\\{/,/^}/' index.css)",
-      "Bash(awk '/^\\\\.btn-primary/,/^}/' index.css)"
+      "Bash(awk '/^\\\\.btn-primary/,/^}/' index.css)",
+      "Bash(awk '/^\\\\.composer-wrap/,/^}/' index.css)"
     ],
     "additionalDirectories": [
       "C:\\Users\\sofia.dellaspora\\.claude\\agents"

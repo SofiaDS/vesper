@@ -13,6 +13,7 @@ import { MentionText } from '../components/MentionText'
 import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
 import { useMessageReactions } from '../hooks/useMessageReactions'
+import { useTypingIndicator } from '../hooks/useTypingIndicator'
 import { promoteLayer } from '../lib/layers'
 import { markRead } from '../lib/reads'
 import { Avatar } from '../components/Avatar'
@@ -73,6 +74,18 @@ export function ChatScreen({
     blockedIds,
     resolveNickname,
     onMessage: appendMessage,
+  })
+
+  // Nelle stanze l'indicatore resta anonimo ("qualcunə sta scrivendo"), quindi
+  // il nickname non viene mostrato — lo passiamo comunque perché il hook è lo
+  // stesso dei DM. Chi ha disattivato "mostra quando sono online" non annuncia.
+  const typing = useTypingIndicator({
+    scope: 'room',
+    scopeId: room.id,
+    myId,
+    myNickname: profile?.nickname,
+    broadcast: profile?.show_online ?? true,
+    blockedIds,
   })
 
   useEffect(() => {
@@ -251,6 +264,9 @@ export function ChatScreen({
         replyTo={replyTo ? { nickname: replyTo.nickname, body: replyTo.body } : null}
         onCancelReply={() => setReplyTo(null)}
         members={members}
+        typingLabel={typing.label}
+        onTyping={typing.notifyTyping}
+        onStopTyping={typing.stopTyping}
       />
 
       {reportMsg && (

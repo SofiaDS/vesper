@@ -2078,6 +2078,25 @@ body:has(.install-banner) .rooms-hint {
   display: flex;
   flex-direction: column;
 }
+
+/* "… sta scrivendo": riga effimera sopra il campo di scrittura. Corsivo e
+   attenuata perché è un'informazione di contorno, non un messaggio; non deve
+   competere con la conversazione vera. L'elemento resta nel DOM anche vuoto e
+   min-height ne fissa l'altezza, così il composer non sobbalza quando la frase
+   compare o sparisce. */
+.typing-indicator {
+  margin: 0 0 0.15rem;
+  padding: 0 0.2rem;
+  min-height: 1.1rem;
+  font-size: 0.78rem;
+  font-style: italic;
+  line-height: 1.1rem;
+  color: var(--text);
+  opacity: 0.55;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .reply-bar {
   display: flex;
   align-items: center;
