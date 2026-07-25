@@ -23,7 +23,11 @@
       "PowerShell(node --version)",
       "PowerShell(python -c \"import docx; print\\('ok'\\)\" 2>&1)",
       "Bash(git rev-list *)",
-      "Bash(curl -s -o /dev/null -w \"wordmark.png live: %{http_code} %{content_type} %{size_download}B\\\\n\" \"https://vespercommunity.com/wordmark.png\")"
+      "Bash(curl -s -o /dev/null -w \"wordmark.png live: %{http_code} %{content_type} %{size_download}B\\\\n\" \"https://vespercommunity.com/wordmark.png\")",
+      "Bash(awk '/^\\\\.btn-ghost/,/^}/' index.css)",
+      "Bash(awk '/^\\\\.inline-add/,/^}/' index.css)",
+      "Bash(awk '/^\\\\.composer \\\\{/,/^}/' index.css)",
+      "Bash(awk '/^\\\\.btn-primary/,/^}/' index.css)"
     ],
     "additionalDirectories": [
       "C:\\Users\\sofia.dellaspora\\.claude\\agents"
