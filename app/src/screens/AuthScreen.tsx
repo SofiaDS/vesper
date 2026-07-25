@@ -83,7 +83,9 @@ export function AuthScreen() {
     return (
       <main className="app">
         <header className="brand">
-          <h1>Vesper</h1>
+          <h1>
+            <img className="brand-logo" src="/wordmark.png" alt="Vesper" width={344} height={105} />
+          </h1>
           <p className="tagline">{tagline}</p>
         </header>
         <section className="card box-shadow">
@@ -139,7 +141,9 @@ export function AuthScreen() {
   return (
     <main className="app">
       <header className="brand">
-        <h1>Vesper</h1>
+        <h1>
+          <img className="brand-logo" src="/wordmark.png" alt="Vesper" width={344} height={105} />
+        </h1>
         <p className="tagline">{tagline}</p>
       </header>
 
