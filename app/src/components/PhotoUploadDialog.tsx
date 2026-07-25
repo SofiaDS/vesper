@@ -220,6 +220,11 @@ export function PhotoUploadDialog({
         {stage === 'choose' && (
           <>
             <h3 className="modal-title">Aggiungi una foto</h3>
+            {/* L'errore sta sopra ai bottoni perché di solito parla proprio di
+                loro ("Fotocamera non disponibile. Prova con la galleria."). */}
+            {err && <p className="err" role="alert">{err}</p>}
+            {/* Tutte e tre le azioni nello stesso contenitore: sono alternative
+                alla pari e devono avere la stessa forma. */}
             <div className="upload-choices">
               <button type="button" className="btn-primary" onClick={startCamera}>
                 Scatta un selfie
@@ -231,6 +236,9 @@ export function PhotoUploadDialog({
               >
                 Scegli dalla galleria
               </button>
+              <button type="button" className="btn-ghost" onClick={close}>
+                Indietro
+              </button>
             </div>
             <input
               ref={fileRef}
@@ -239,12 +247,6 @@ export function PhotoUploadDialog({
               hidden
               onChange={onPickFile}
             />
-            {err && <p className="err" role="alert">{err}</p>}
-            <div className="modal-actions">
-              <button type="button" className="btn-ghost" onClick={close}>
-                Annulla
-              </button>
-            </div>
           </>
         )}
 

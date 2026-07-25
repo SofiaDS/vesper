@@ -24,6 +24,7 @@ import { LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
 // una tab dedicata (Impostazioni, moderazione staff, supporto, sessione).
 export function AltroScreen({
   isStaff,
+  adminBadge,
   onBack,
   onOpenSettings,
   onOpenBlocked,
@@ -35,6 +36,10 @@ export function AltroScreen({
   onSignOut,
 }: {
   isStaff: boolean
+  // Totale degli elementi in attesa di moderazione: è lo stesso numero del
+  // badge sulla tab "Altro", ripetuto qui sulla riga che lo origina — dalla
+  // sola tab non si capisce da dove arrivi la notifica.
+  adminBadge?: number
   onBack: () => void
   onOpenSettings: () => void
   onOpenBlocked: () => void
@@ -97,11 +102,25 @@ export function AltroScreen({
       {isStaff && (
         <section className="card box-shadow" style={{ marginTop: '1rem' }}>
           <h2 className="pf-section-title">Moderazione (staff)</h2>
-          <button type="button" className="nav-row" onClick={onOpenAdmin}>
+          <button
+            type="button"
+            className="nav-row"
+            onClick={onOpenAdmin}
+            aria-label={
+              adminBadge
+                ? `Apri pannello Admin, ${adminBadge} elementi in attesa di moderazione`
+                : undefined
+            }
+          >
             <span className="nav-row-ico" aria-hidden="true">
               <ShieldStar size={20} weight="duotone" />
             </span>
             <span className="nav-row-label">Apri pannello Admin</span>
+            {!!adminBadge && (
+              <span className="nav-row-badge" aria-hidden="true">
+                {adminBadge}
+              </span>
+            )}
             <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
           </button>
         </section>

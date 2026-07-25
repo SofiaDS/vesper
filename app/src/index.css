@@ -467,6 +467,24 @@ code {
   color: var(--text);
   opacity: 0.45;
 }
+/* Contatore su una riga di navigazione (es. "Apri pannello Admin"): ripete il
+   badge della tab "Altro" sulla voce che lo genera. Stesso oro del badge in
+   stile "mention", perché è lo stesso numero visto due volte. Il testo resta
+   scuro in entrambi i temi: il fondo è oro anche in tema chiaro. */
+.nav-row-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #171520;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
 /* Riga a due livelli (nome provider + nota): usata in "Sostieni Vesper". */
 .nav-row-title {
   display: block;
@@ -2629,6 +2647,14 @@ body:has(.install-banner) .rooms-hint {
 .upload-choices .btn-ghost {
   width: 100%;
 }
+/* Selfie / galleria / indietro sono tre alternative alla pari, quindi stessa
+   altezza e stesso corpo del testo. .btn-ghost è tarato per le righe compatte
+   e va riallineato al primary; il calc() sul padding verticale compensa il
+   bordo da 1px che il ghost ha e il primary no. */
+.upload-choices .btn-ghost {
+  padding: calc(0.7rem - 1px) 1rem;
+  font-size: 1rem;
+}
 .camera-wrap {
   display: flex;
   justify-content: center;
@@ -3304,6 +3330,15 @@ button.dm-conv:hover {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+/* "Rifai" è un .btn-ghost, tarato per le righe compatte (padding e font più
+   piccoli). Qui sta sotto a "Invia per revisione" come alternativa alla pari,
+   quindi ne ricalca altezza e corpo del testo. Il calc() sul padding verticale
+   compensa il bordo da 1px che il ghost ha e il primary no. */
+.verif-actions .btn-ghost {
+  padding: calc(0.7rem - 1px) 1rem;
+  font-size: 1rem;
 }
 
 /* Player video nella dashboard verifiche */
