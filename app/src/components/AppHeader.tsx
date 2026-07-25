@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { CaretLeft } from '@phosphor-icons/react'
 
 // Header comune a tutte le schermate post-login: back a sinistra (se non siamo
 // in homeScreen), titolo al centro. La navigazione vive nella tab bar + hub
@@ -21,7 +22,7 @@ export function AppHeader({
     <header className="app-header">
       {onBack ? (
         <button type="button" className="link back" onClick={onBack} aria-label={backName} title={backName}>
-          ‹
+          <CaretLeft size={24} weight="bold" aria-hidden="true" />
         </button>
       ) : (
         <span className="link-placeholder" />

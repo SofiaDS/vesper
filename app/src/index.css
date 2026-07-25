@@ -1666,16 +1666,21 @@ body:has(.install-banner) .rooms-hint {
   display: block;
 }
 
+/* Frecce prev/next sopra la foto a schermo intero. Il flex serve a centrare
+   l'icona (un SVG inline, non un glifo di testo); i 36px danno un bersaglio
+   toccabile decente senza coprire troppo la foto. */
 .carousel-nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 26px;
-  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 0;
   cursor: pointer;
-  font-size: 1.1rem;
   line-height: 1;
   color: var(--text);
   background: rgba(23, 21, 32, 0.6);
@@ -2655,19 +2660,17 @@ body:has(.install-banner) .rooms-hint {
   padding: calc(0.7rem - 1px) 1rem;
   font-size: 1rem;
 }
-.camera-wrap {
-  display: flex;
+/* Bottone di sola icona in una riga di azioni (es. "Indietro" accanto a "Usa
+   foto" nel ritaglio): quadrato, così non sembra un bottone di testo mutilato,
+   e con un bersaglio da 44px. */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  margin: 0.4rem 0;
-}
-.camera-video {
-  width: 300px;
-  max-width: 100%;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
-  border-radius: 14px;
-  background: #000;
-  transform: scaleX(-1); /* specchio: anteprima selfie naturale */
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
 }
 .crop-box {
   position: relative;
