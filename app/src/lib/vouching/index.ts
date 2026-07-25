@@ -3,6 +3,9 @@
 
 import { supabase } from '../supabase'
 
+// Valori di riferimento per la UI. Le regole vere sono applicate dal database
+// (default di vouch_requests.expires_at, RPC request_vouch e respond_to_vouch):
+// se cambiano lì, vanno riallineati qui.
 export const VOUCH_CONFIRMATION_HOURS = 48
 export const MAX_FAILED_VOUCHES = 3
 export const REQUIRED_GUARANTORS = 2
@@ -20,40 +23,23 @@ export interface PendingVouchRequest extends VouchRequest {
 }
 
 // La nuova utente nomina i garanti per nickname; crea la richiesta e le conferme.
-// Lancia eccezione se un nickname non esiste, non è Strato 3, o ha già perso il privilegio.
+//
+// Tutto server-side, in un'unica RPC: la validazione ha bisogno di `strato` e
+// `vouch_failed_count`, che public_profiles non espone di proposito, e
+// vouch_confirmations non è scrivibile dal client (nessuna policy INSERT).
+// La versione precedente provava a fare entrambe le cose dal browser e
+// falliva sempre, riportando "utente non trovata" per qualsiasi nickname.
+//
+// I messaggi d'errore arrivano già in italiano dalle `raise exception` della
+// RPC (nickname inesistente, garante sotto lo Strato 3, privilegio esaurito,
+// garanti uguali, richiesta già in corso).
 export async function requestVouch(
-  newUserId: string,
   guarantorNicknames: [string, string],
 ): Promise<void> {
-  const guarantorIds: string[] = []
-  for (const nick of guarantorNicknames) {
-    const { data } = await supabase
-      .from('public_profiles')
-      .select('id, strato, vouch_failed_count')
-      .eq('nickname', nick)
-      .single()
-    if (!data) throw new Error(`Utente "@${nick}" non trovata.`)
-    const p = data as { id: string; strato: number; vouch_failed_count: number }
-    if (p.strato < 3) throw new Error(`@${nick} non ha ancora raggiunto il Strato 3.`)
-    if (p.vouch_failed_count >= MAX_FAILED_VOUCHES)
-      throw new Error(`@${nick} ha esaurito il privilegio di garanzia.`)
-    if (p.id === newUserId) throw new Error('Non puoi nominare te stessa come garante.')
-    guarantorIds.push(p.id)
-  }
-  if (guarantorIds[0] === guarantorIds[1])
-    throw new Error('I due garanti devono essere persone diverse.')
-
-  const { data: req, error: reqErr } = await supabase
-    .from('vouch_requests')
-    .insert({ new_user_id: newUserId })
-    .select('id')
-    .single()
-  if (reqErr) throw reqErr
-
-  const { error: confErr } = await supabase.from('vouch_confirmations').insert(
-    guarantorIds.map((gid) => ({ request_id: req.id, guarantor_id: gid })),
-  )
-  if (confErr) throw confErr
+  const { error } = await supabase.rpc('request_vouch', {
+    p_nicknames: guarantorNicknames,
+  })
+  if (error) throw new Error(error.message)
 }
 
 // Il garante accetta la richiesta.

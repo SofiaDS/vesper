@@ -86,7 +86,7 @@ export function OnboardingScreen() {
     setVouchErr(null)
     setVouching(true)
     try {
-      await requestVouch(userId, [g1.trim(), g2.trim()])
+      await requestVouch([g1.trim(), g2.trim()])
       await refreshProfile()
     } catch (err) {
       setVouchErr(err instanceof Error ? err.message : 'Errore. Riprova o salta.')
@@ -118,13 +118,19 @@ export function OnboardingScreen() {
           </p>
 
           <form onSubmit={handleVouch} className="form">
+            {/* Il placeholder era "@nickname" e induceva a scrivere la chiocciola,
+                che finiva nel nickname cercato. Ora il campo la scarta mentre si
+                digita, così quello che si vede è quello che viene cercato. */}
             <label className="field">
               <span>Nickname prima garante</span>
               <input
                 type="text"
                 value={g1}
-                onChange={(e) => setG1(e.target.value)}
-                placeholder="@nickname"
+                onChange={(e) => setG1(e.target.value.replace(/^@+/, ''))}
+                placeholder="nickname, senza @"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 maxLength={24}
               />
             </label>
@@ -133,8 +139,11 @@ export function OnboardingScreen() {
               <input
                 type="text"
                 value={g2}
-                onChange={(e) => setG2(e.target.value)}
-                placeholder="@nickname"
+                onChange={(e) => setG2(e.target.value.replace(/^@+/, ''))}
+                placeholder="nickname, senza @"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 maxLength={24}
               />
             </label>
