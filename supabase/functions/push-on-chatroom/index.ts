@@ -97,13 +97,18 @@ Deno.serve(async (req: Request): Promise<Response> => {
   // Query param sulla root: la "/" risponde sempre 200 (nessuna dipendenza da
   // rewrite SPA). Il client lo traduce in navigazione via useDeepLink.
   const url = `/?room=${msg.chatroom_id}`
+  // Il service worker scarta la notifica se il destinatario ha già questa
+  // stanza aperta e in primo piano. Vale anche per le menzioni: se stai
+  // leggendo la stanza in cui ti hanno citata, la vedi da sola.
+  const source = { kind: 'room' as const, id: msg.chatroom_id }
 
   await Promise.all([
-    sendPushToUsers(roomOnly, { title: `${roomName} — @${nick}`, body: preview, url }),
+    sendPushToUsers(roomOnly, { title: `${roomName} — @${nick}`, body: preview, url, source }),
     sendPushToUsers(mentionedIds, {
       title: `@${nick} ti ha menzionato in ${roomName}`,
       body: preview,
       url,
+      source,
     }),
   ])
 
