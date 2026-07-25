@@ -139,6 +139,19 @@ body {
   color: var(--accent-text);
 }
 
+/* Wordmark al posto del testo "Vesper" (schermate di auth). L'<img> resta
+   dentro l'<h1> così l'heading di livello 1 sopravvive per screen reader e
+   assistive tech, con alt="Vesper" come testo. Il PNG è trasparente e usa
+   l'oro profondo (#B8841F, = --accent del tema chiaro): funziona sia
+   sull'inchiostro scuro sia sulla crema, quindi basta un solo file. */
+.brand-logo {
+  display: block;
+  width: 60%;
+  max-width: 220px;
+  height: auto;
+  margin: 0 auto 0.15rem;
+}
+
 .tagline {
   margin: 0.25rem 0 1.75rem;
   color: var(--accent-text);
