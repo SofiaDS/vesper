@@ -2439,10 +2439,15 @@ body:has(.install-banner) .rooms-hint {
 }
 
 /* --- Segnala foto sul carosello --- */
+/* Angolo in alto a SINISTRA: a destra c'è .lightbox-close, con cui prima
+   condivideva `top:8px; right:8px` — stesse coordinate esatte. Comparendo
+   dopo nel DOM, la "✕" copriva la bandierina e la segnalazione era
+   irraggiungibile. La chiusura resta a destra, dove ci si aspetta di
+   trovarla; le due azioni ora stanno su angoli opposti. */
 .carousel-report {
   position: absolute;
   top: 8px;
-  right: 8px;
+  left: 8px;
   width: 30px;
   height: 30px;
   display: flex;
