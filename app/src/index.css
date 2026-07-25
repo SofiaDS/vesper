@@ -3290,6 +3290,11 @@ button.dm-conv:hover {
 
 
 /* ── Install banner (PWA) ─────────────────────────────── */
+/* index.html imposta viewport-fit=cover, quindi la pagina si estende SOTTO
+   l'indicatore Home degli iPhone Face ID: un elemento a bottom:0 finisce
+   parzialmente in quella striscia e sembra tagliato. env(safe-area-inset-bottom)
+   restituisce l'altezza da recuperare (0px dove la tacca non c'è, quindi la
+   stessa regola vale per tutti i dispositivi). */
 .install-banner {
   position: fixed;
   bottom: 0;
@@ -3299,6 +3304,7 @@ button.dm-conv:hover {
   background: var(--bg);
   border-top: 1px solid rgba(232, 177, 78, 0.3);
   padding: 0.85rem 1.25rem;
+  padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -3306,6 +3312,7 @@ button.dm-conv:hover {
 }
 .install-banner-body {
   flex: 1;
+  min-width: 0;
 }
 .install-banner-text {
   margin: 0;
@@ -3315,8 +3322,11 @@ button.dm-conv:hover {
   line-height: 1.4;
 }
 .install-share-icon {
-  font-style: normal;
-  font-size: 1rem;
+  width: 1.05em;
+  height: 1.05em;
+  vertical-align: -0.2em;
+  margin: 0 0.1em;
+  color: var(--accent-text);
 }
 .install-banner-actions {
   display: flex;
@@ -3328,6 +3338,31 @@ button.dm-conv:hover {
   font-size: 0.8rem;
   opacity: 0.6;
   white-space: nowrap;
+}
+
+/* Variante iOS: nessun bottone "Installa" (beforeinstallprompt non esiste),
+   quindi le istruzioni sono il contenuto e vanno in colonna a tutta larghezza,
+   con "Non ora" spostato sotto e defilato. Nella versione precedente il testo
+   stava di fianco a "Non ora": su schermo stretto si comprimeva e l'unica cosa
+   nitida che restava era il bottone per rifiutare. */
+.install-banner-ios {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+.install-banner-title {
+  margin: 0 0 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent-text);
+}
+/* Le istruzioni sono l'unico contenuto utile del banner su iOS: niente
+   opacità ridotta, devono restare pienamente leggibili. */
+.install-banner-ios .install-banner-text {
+  opacity: 1;
+}
+.install-banner-ios .install-banner-actions {
+  justify-content: flex-end;
 }
 
 /* ── Light theme ──────────────────────────────────────── */
