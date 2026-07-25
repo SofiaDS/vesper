@@ -1113,17 +1113,40 @@ body:has(.install-banner) .rooms-hint {
 /* Bottone secondario "fantasma" (es. Lascia stanza).
    Stessa forma a pillola di .btn-primary/.btn-secondary, per coerenza
    quando compaiono affiancati (es. azioni su una room-card). */
+/* Bottone secondario delineato. .btn-ghost e .btn-danger condividono la forma
+   ma NON il colore: prima erano la stessa identica regola, quindi ogni azione
+   neutra ("Annulla", "Chiudi", "Cambia PIN") si presentava col rosso
+   dell'azione distruttiva e la distinzione non comunicava più niente.
+   .btn-ghost = neutro, oro come il resto dell'interfaccia.
+   .btn-danger = distruttivo, resta corallo. */
 .btn-ghost,
 .btn-danger {
   margin-top: 0;
   padding: 0.45rem 0.85rem;
   font-size: 0.85rem;
-  border: 1px solid rgba(236, 106, 85, 0.5);
+  border: 1px solid;
   border-radius: 8px;
   background: none;
-  color: var(--error-text);
   font-weight: 600;
   cursor: pointer;
+}
+.btn-ghost {
+  border-color: rgba(232, 177, 78, 0.45);
+  color: var(--accent-text);
+}
+.btn-danger {
+  border-color: rgba(236, 106, 85, 0.5);
+  color: var(--error-text);
+}
+
+/* Riga azioni del blocco PIN. .composer usa space-around, che con tre bottoni
+   di larghezza diversa distribuisce spazi disuguali: qui servono un gap fisso
+   e l'allineamento a sinistra. flex-wrap evita che il terzo bottone esca dalla
+   card sugli schermi stretti. */
+.pin-actions {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.5rem;
 }
 
 .btn-ghost:disabled,
@@ -3424,9 +3447,11 @@ button.dm-conv:hover {
   border-color: rgba(130, 90, 0, 0.2);
 }
 
-[data-theme="light"] .btn-ghost,
+[data-theme="light"] .btn-ghost {
+  border-color: rgba(130, 90, 0, 0.45);
+}
 [data-theme="light"] .btn-danger {
-  border-color: rgba(130, 90, 0, 0.35);
+  border-color: rgba(185, 28, 60, 0.45);
 }
 
 [data-theme="light"] .options .chip,

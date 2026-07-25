@@ -109,14 +109,16 @@ export function PinSetupSection() {
           Imposta PIN di blocco
         </button>
       ) : (
-        <div className="composer inline-add">
+        <div className="composer inline-add pin-actions">
+          {/* Tre azioni dello stesso peso: stesso stile delineato per tutte,
+              invece di un bottone più due link sottolineati. */}
           <button type="button" className="btn-ghost" onClick={() => { setOk(null); setMode('change') }}>
             Cambia PIN
           </button>
-          <button type="button" className="link" onClick={() => { setOk(null); setMode('remove') }}>
+          <button type="button" className="btn-ghost" onClick={() => { setOk(null); setMode('remove') }}>
             Rimuovi
           </button>
-          <button type="button" className="link" onClick={() => { lock(); window.location.reload() }}>
+          <button type="button" className="btn-ghost" onClick={() => { lock(); window.location.reload() }}>
             Blocca ora
           </button>
         </div>
