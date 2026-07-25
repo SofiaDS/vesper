@@ -16,10 +16,22 @@ webpush.setVapidDetails(
   Deno.env.get('VAPID_PRIVATE_KEY')!,
 )
 
+// Origine del messaggio che ha generato la notifica. Il server non sa quale
+// schermata l'utente stia guardando in quel momento, quindi non può decidere da
+// solo se la notifica è ridondante: manda l'informazione e lascia che sia il
+// service worker a confrontarla con la vista aperta (vedi app/src/sw.ts).
+export interface PushSource {
+  kind: 'room' | 'dm'
+  // Id della stanza (solo per kind 'room'): per i DM basta sapere che la
+  // sezione "Messaggi" è aperta, come già fa il toast in-app.
+  id?: string
+}
+
 export interface PushPayload {
   title: string
   body: string
   url?: string
+  source?: PushSource
 }
 
 export interface PushResult {

@@ -8,6 +8,7 @@ import { usePendingDmCount } from '../hooks/usePendingDmCount'
 import { useAdminPendingCounts } from '../hooks/useAdminPendingCounts'
 import { useBackNavigation } from '../hooks/useBackNavigation'
 import { useMessageNotifications } from '../hooks/useMessageNotifications'
+import { useActiveViewReporter } from '../hooks/useActiveViewReporter'
 import { useHeartbeat } from '../hooks/useHeartbeat'
 import { TabBar, type TabBarItem } from '../components/TabBar'
 import { GlobalToast } from '../components/GlobalToast'
@@ -84,6 +85,10 @@ export function Home() {
     activeRoomId: room?.id ?? null,
     dmOpen: showDm,
   })
+
+  // Stessa regola, applicata alle notifiche push di sistema: comunica al
+  // service worker cosa c'è a schermo così può scartare quelle ridondanti.
+  useActiveViewReporter(room?.id ?? null, showDm)
 
   function openFromToast() {
     const t = notif.toast

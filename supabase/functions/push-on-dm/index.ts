@@ -41,6 +41,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
     body: msg.body.slice(0, 120),
     // Query param sulla root: la "/" risponde sempre 200 (niente rewrite SPA).
     url: '/?dm=1',
+    // Il service worker la scarta se la sezione "Messaggi" è già aperta e in
+    // primo piano: la stai leggendo, la notifica sarebbe rumore.
+    source: { kind: 'dm' },
   })
 
   return new Response('ok')
