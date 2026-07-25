@@ -71,8 +71,6 @@ import type {
   Sport,
 } from '../../types'
 
-const ACCENT_COLORS = ['#E8B14E', '#EC6A55', '#7FB7A3', '#9B8CE0', '#E08CB5']
-
 type Comune = { nome: string; sigla: string; provincia: string; regione: string }
 
 const PHOTO_STATUS_LABEL: Record<PhotoStatus, string> = {
@@ -257,7 +255,9 @@ export function ProfileEditor({
     adventurer: GALLERY_SEEDS.adventurer,
     bottts: GALLERY_SEEDS.bottts,
   })
-  const [accent, setAccent] = useState<string | null>(profile.accent_color ?? null)
+  // Lo sfondo colorato serve solo come fallback per gli avatar emoji legacy:
+  // gli avatar DiceBear coprono l'intera bolla, quindi non è più scegliibile.
+  const [accent] = useState<string | null>(profile.accent_color ?? null)
   const [dmFilter, setDmFilter] = useState(profile.dm_filter)
 
   const [cityName, setCityName] = useState(profile.city ?? '')
@@ -598,22 +598,10 @@ export function ProfileEditor({
           <button type="button" className="avatar-more" onClick={showMoreAvatars}>
             🎲 Mostra altri
           </button>
-        </fieldset>
-
-        <fieldset className="field">
-          <legend>Colore accento</legend>
-          <div className="options">
-            {ACCENT_COLORS.map((c) => (
-              <button
-                type="button"
-                key={c}
-                className={accent === c ? 'color-opt sel' : 'color-opt'}
-                style={{ background: c }}
-                onClick={() => setAccent(c)}
-                aria-label={c}
-              />
-            ))}
-          </div>
+          <span className="hint">
+            L'avatar che scegli resta selezionato: premendo «Mostra altri» non
+            lo perdi, rimane in cima alla griglia.
+          </span>
         </fieldset>
 
         <label className="field">
