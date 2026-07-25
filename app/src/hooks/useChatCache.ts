@@ -4,7 +4,6 @@ import { listBlockedIds } from '../lib/blocks'
 
 export interface AvatarData {
   preset: string | null
-  color: string | null
 }
 
 export function useChatCache() {
@@ -25,16 +24,15 @@ export function useChatCache() {
     if (missing.length === 0) return
     const { data: profs } = await supabase
       .from('public_profiles')
-      .select('id, nickname, avatar_preset, accent_color')
+      .select('id, nickname, avatar_preset')
       .in('id', missing)
     for (const p of (profs ?? []) as {
       id: string
       nickname: string
       avatar_preset: string | null
-      accent_color: string | null
     }[]) {
       nicknameCache.current.set(p.id, p.nickname)
-      avatarCache.current.set(p.id, { preset: p.avatar_preset, color: p.accent_color })
+      avatarCache.current.set(p.id, { preset: p.avatar_preset })
     }
   }
 
@@ -43,14 +41,13 @@ export function useChatCache() {
     if (cached) return cached
     const { data } = await supabase
       .from('public_profiles')
-      .select('nickname, avatar_preset, accent_color')
+      .select('nickname, avatar_preset')
       .eq('id', senderId)
       .maybeSingle()
     const nick = (data as { nickname: string } | null)?.nickname ?? '—'
     nicknameCache.current.set(senderId, nick)
     avatarCache.current.set(senderId, {
       preset: (data as { avatar_preset: string | null } | null)?.avatar_preset ?? null,
-      color:  (data as { accent_color: string | null } | null)?.accent_color ?? null,
     })
     return nick
   }

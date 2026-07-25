@@ -13,7 +13,6 @@ export interface DmConversation {
   updated_at: string
   other_nickname: string
   other_avatar: string | null
-  other_accent: string | null
 }
 
 export interface DmMessage {
@@ -49,10 +48,9 @@ export async function sendDmRequest(
     throw error
   }
   return {
-    ...(data as Omit<DmConversation, 'other_nickname' | 'other_avatar' | 'other_accent'>),
+    ...(data as Omit<DmConversation, 'other_nickname' | 'other_avatar'>),
     other_nickname: '',
     other_avatar: null,
-    other_accent: null,
   }
 }
 
@@ -83,7 +81,7 @@ export async function listDmConversations(userId: string): Promise<DmConversatio
 
   const rows = (data ?? []) as Omit<
     DmConversation,
-    'other_nickname' | 'other_avatar' | 'other_accent'
+    'other_nickname' | 'other_avatar'
   >[]
   const otherIds = rows.map((r) =>
     r.from_user_id === userId ? r.to_user_id : r.from_user_id,
@@ -93,23 +91,21 @@ export async function listDmConversations(userId: string): Promise<DmConversatio
 
   const { data: profs } = await supabase
     .from('public_profiles')
-    .select('id, nickname, avatar_preset, accent_color')
+    .select('id, nickname, avatar_preset')
     .in('id', uniq)
 
   const profMap: Record<
     string,
-    { nickname: string; avatar_preset: string | null; accent_color: string | null }
+    { nickname: string; avatar_preset: string | null }
   > = {}
   for (const p of (profs ?? []) as {
     id: string
     nickname: string
     avatar_preset: string | null
-    accent_color: string | null
   }[]) {
     profMap[p.id] = {
       nickname: p.nickname,
       avatar_preset: p.avatar_preset,
-      accent_color: p.accent_color,
     }
   }
 
@@ -119,7 +115,6 @@ export async function listDmConversations(userId: string): Promise<DmConversatio
       ...r,
       other_nickname: other?.nickname ?? '—',
       other_avatar: other?.avatar_preset ?? null,
-      other_accent: other?.accent_color ?? null,
     }
   })
 }

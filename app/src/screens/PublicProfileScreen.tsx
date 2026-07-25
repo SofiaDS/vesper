@@ -28,7 +28,6 @@ type PublicProfile = {
   id: string
   nickname: string
   avatar_preset: string | null
-  accent_color: string | null
   bio: string | null
   interests: string[] | null
   birth_date: string | null
@@ -57,7 +56,7 @@ type PublicProfile = {
   is_self: boolean
 }
 
-const COLS = `id, nickname, avatar_preset, accent_color, bio, interests, birth_date, age,
+const COLS = `id, nickname, avatar_preset, bio, interests, birth_date, age,
   identity_category, orientations, city, city_province, city_region, pronouns, intents,
   relationship_status, relationship_type, languages, children_status, has_pets, pets_detail,
   diet, religion, politics, education_level, education_institute, smoking, sport, zodiac, is_self`
@@ -180,7 +179,6 @@ export function PublicProfileScreen({
         userId={p.id}
         nickname={p.nickname}
         avatarPreset={p.avatar_preset}
-        accentColor={p.accent_color}
         bio={p.bio}
         keyFacts={keyFacts}
         rows={rows}
