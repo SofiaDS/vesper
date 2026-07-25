@@ -1,6 +1,7 @@
 import { useAuth } from './auth/AuthProvider'
 import { usePinLock } from './hooks/usePinLock'
 import { isSupabaseConfigured } from './lib/supabase'
+import { BrandMark } from './components/BrandMark'
 import { InstallBanner } from './components/InstallBanner'
 import { ThemeToggle } from './components/ThemeToggle'
 import { AuthScreen } from './screens/AuthScreen'
@@ -19,7 +20,7 @@ function App() {
     return (
       <main className="app">
         <header className="brand">
-          <h1>Vesper</h1>
+          <BrandMark />
         </header>
         <section className="card">
           <p className="warn" role="alert">
@@ -35,7 +36,7 @@ function App() {
     return (
       <main className="app">
         <header className="brand">
-          <h1>Vesper</h1>
+          <BrandMark />
         </header>
         <p className="muted">Caricamento&hellip;</p>
       </main>

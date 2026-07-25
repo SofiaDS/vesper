@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
+import { BrandMark } from '../components/BrandMark'
 
 export function VerificationPendingScreen() {
   const { session, refreshProfile } = useAuth()
@@ -27,7 +28,7 @@ export function VerificationPendingScreen() {
   return (
     <main className="app">
       <header className="brand">
-        <h1>Vesper</h1>
+        <BrandMark />
       </header>
       <section className="card">
         <h2>Verifica in corso</h2>

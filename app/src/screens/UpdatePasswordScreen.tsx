@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { mapSupabaseAuthError, validatePassword } from '../lib/authErrors'
+import { BrandMark } from '../components/BrandMark'
 
 // Mostrata quando si arriva dal link "reimposta password" (evento recovery).
 // Qui la sessione e' gia' valida: basta impostare la nuova password.
@@ -42,7 +43,7 @@ export function UpdatePasswordScreen() {
   return (
     <main className="app">
       <header className="brand">
-        <h1>Vesper</h1>
+        <BrandMark />
         <p className="tagline">Nuova password</p>
       </header>
 

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { verifyPin } from '../lib/pin'
+import { BrandMark } from '../components/BrandMark'
 
 interface Props {
   onUnlock: () => void
@@ -22,7 +23,7 @@ export function PinLockScreen({ onUnlock }: Props) {
   return (
     <main className="app">
       <header className="brand">
-        <h1>Vesper</h1>
+        <BrandMark />
         <p className="tagline">App bloccata</p>
       </header>
 
