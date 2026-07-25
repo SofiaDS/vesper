@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
+import { BrandMark } from '../components/BrandMark'
 
 const BUCKET = 'identity-verifications'
 const REC_SECONDS = 5
@@ -161,7 +162,7 @@ export function VerificationScreen() {
   return (
     <main className="app verif">
       <header className="brand">
-        <h1>Vesper</h1>
+        <BrandMark />
       </header>
 
       <section className="card">

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { requestVouch } from '../lib/vouching'
+import { BrandMark } from '../components/BrandMark'
 import {
   IDENTITY_OPTIONS,
   ORIENTATION_OPTIONS,
@@ -101,7 +102,7 @@ export function OnboardingScreen() {
     return (
       <main className="app">
         <header className="brand">
-          <h1>Vesper</h1>
+          <BrandMark />
           <p className="tagline">Hai delle garanti?</p>
         </header>
 
@@ -162,7 +163,7 @@ export function OnboardingScreen() {
   return (
     <main className="app">
       <header className="brand">
-        <h1>Vesper</h1>
+        <BrandMark />
         <p className="tagline">Crea il tuo profilo</p>
       </header>
 

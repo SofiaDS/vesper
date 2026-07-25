@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { mapSupabaseAuthError, validatePassword } from '../lib/authErrors'
+import { BrandMark } from '../components/BrandMark'
 
 type Mode = 'login' | 'signup' | 'reset' | 'declare'
 
@@ -83,9 +84,7 @@ export function AuthScreen() {
     return (
       <main className="app">
         <header className="brand">
-          <h1>
-            <img className="brand-logo" src="/wordmark.png" alt="Vesper" width={344} height={105} />
-          </h1>
+          <BrandMark />
           <p className="tagline">{tagline}</p>
         </header>
         <section className="card box-shadow">
@@ -141,9 +140,7 @@ export function AuthScreen() {
   return (
     <main className="app">
       <header className="brand">
-        <h1>
-          <img className="brand-logo" src="/wordmark.png" alt="Vesper" width={344} height={105} />
-        </h1>
+        <BrandMark />
         <p className="tagline">{tagline}</p>
       </header>
 
