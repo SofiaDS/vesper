@@ -28,7 +28,8 @@
       "Bash(awk '/^\\\\.inline-add/,/^}/' index.css)",
       "Bash(awk '/^\\\\.composer \\\\{/,/^}/' index.css)",
       "Bash(awk '/^\\\\.btn-primary/,/^}/' index.css)",
-      "Bash(awk '/^\\\\.composer-wrap/,/^}/' index.css)"
+      "Bash(awk '/^\\\\.composer-wrap/,/^}/' index.css)",
+      "Bash(echo \"TYPECHECK OK \\(exit $?\\)\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\sofia.dellaspora\\.claude\\agents"

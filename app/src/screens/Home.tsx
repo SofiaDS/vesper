@@ -229,6 +229,7 @@ export function Home() {
     screen = (
       <AltroScreen
         isStaff={isStaff}
+        adminBadge={altroBadge}
         onBack={goToRooms}
         onOpenSettings={() => setShowSettings(true)}
         onOpenBlocked={() => setShowBlocked(true)}
