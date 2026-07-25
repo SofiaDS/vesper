@@ -16,7 +16,12 @@ precacheAndRoute(self.__WB_MANIFEST)
 self.skipWaiting()
 clientsClaim()
 
-interface PushSource { kind: 'room' | 'dm'; id?: string }
+interface PushSource { kind: 'room' | 'dm'; id?: string; label?: string; group?: string }
+
+// Quante righe di anteprima tenere nella notifica raggruppata. Android mostra
+// una riga sola da chiusa ed espande il resto al tocco; oltre una manciata di
+// righe il testo viene comunque troncato dal sistema.
+const MAX_LINES = 5
 // Risposta di una finestra aperta alla domanda "cosa stai mostrando?".
 interface ActiveView { roomId: string | null; dmOpen: boolean }
 
@@ -56,20 +61,91 @@ async function isAlreadyOnScreen(source: PushSource): Promise<boolean> {
   return views.some((v) => viewCovers(v, source))
 }
 
+interface PushPayload {
+  title?: string
+  body?: string
+  url?: string
+  source?: PushSource
+  line?: string
+}
+
+// Stato accumulato che una notifica si porta dietro, per poterlo rileggere
+// quando arriva il messaggio successivo della stessa conversazione.
+interface NotifData { url: string; count: number; lines: string[] }
+
+// `renotify` fa parte della specifica Web Notifications (ed è supportata dai
+// browser che ci interessano) ma non è ancora nei tipi DOM di TypeScript.
+// Dichiararla qui è più onesto di un cast a `any`, che spegnerebbe i controlli
+// anche sul resto delle opzioni.
+interface NotificationOptionsWithRenotify extends NotificationOptions {
+  renotify?: boolean
+}
+
+// Chiave di raggruppamento: notifiche con lo stesso `tag` si sostituiscono a
+// vicenda invece di impilarsi. È il meccanismo che la specifica Web Push mette
+// a disposizione per questo, e l'unico: non esiste un'API per una notifica
+// "riassunto" separata dalle singole.
+function groupTag(source: PushSource): string {
+  return source.group ?? `${source.kind}:${source.id ?? 'all'}`
+}
+
+// Titolo della notifica raggruppata. Senza etichetta si ripiega su una frase
+// generica, che è sempre meglio di "undefined".
+function groupTitle(source: PushSource, count: number): string {
+  const label = source.label
+  if (!label) return `${count} nuovi messaggi`
+  return source.kind === 'dm'
+    ? `${count} messaggi da ${label}`
+    : `${count} messaggi in ${label}`
+}
+
 self.addEventListener('push', (event: PushEvent) => {
-  interface PushPayload { title?: string; body?: string; url?: string; source?: PushSource }
   const data: PushPayload = event.data?.json() ?? {}
   event.waitUntil(
     (async () => {
       // Notifica ridondante: stai già leggendo quella stanza / i DM. Uscendo
       // senza showNotification non compare nulla.
       if (data.source && (await isAlreadyOnScreen(data.source))) return
-      await self.registration.showNotification(data.title ?? 'Vesper', {
-        body: data.body ?? '',
+
+      const url = data.url ?? '/'
+      if (!data.source) {
+        await self.registration.showNotification(data.title ?? 'Vesper', {
+          body: data.body ?? '',
+          icon: '/icon-192.png',
+          badge: '/icon-192.png',
+          data: { url, count: 1, lines: [] } satisfies NotifData,
+        })
+        return
+      }
+
+      const tag = groupTag(data.source)
+      // Notifica ancora a schermo per questa conversazione: ne recuperiamo il
+      // conteggio e le anteprime già mostrate. Se l'utente l'ha scartata, si
+      // riparte da capo — ed è giusto: ha già visto quelle precedenti.
+      const [existing] = await self.registration.getNotifications({ tag })
+      const prev = existing?.data as NotifData | undefined
+      const count = (prev?.count ?? 0) + 1
+      const lines = [...(prev?.lines ?? []), data.line ?? data.body ?? ''].slice(-MAX_LINES)
+
+      const grouped = count > 1
+      // Assegnato a una variabile tipata, non passato come letterale: così
+      // `renotify` non incappa nel controllo sulle proprietà in eccesso, che
+      // TypeScript applica solo agli oggetti scritti in linea.
+      const options: NotificationOptionsWithRenotify = {
+        // Da chiusa Android mostra la prima riga, al tocco espande l'elenco.
+        body: grouped ? lines.join('\n') : (data.body ?? ''),
         icon: '/icon-192.png',
         badge: '/icon-192.png',
-        data: { url: data.url ?? '/' },
-      })
+        tag,
+        // Senza questo la sostituzione è silenziosa: la notifica si
+        // aggiornerebbe senza avvisare che è arrivato un altro messaggio.
+        renotify: true,
+        data: { url, count, lines } satisfies NotifData,
+      }
+      await self.registration.showNotification(
+        grouped ? groupTitle(data.source, count) : (data.title ?? 'Vesper'),
+        options,
+      )
     })(),
   )
 })

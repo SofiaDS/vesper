@@ -22,9 +22,17 @@ webpush.setVapidDetails(
 // service worker a confrontarla con la vista aperta (vedi app/src/sw.ts).
 export interface PushSource {
   kind: 'room' | 'dm'
-  // Id della stanza (solo per kind 'room'): per i DM basta sapere che la
-  // sezione "Messaggi" è aperta, come già fa il toast in-app.
+  // Id della stanza, confrontato con la vista aperta per decidere se la
+  // notifica è ridondante. Per i DM basta sapere che la sezione "Messaggi" è
+  // aperta, come già fa il toast in-app, quindi lì l'id serve solo a raggruppare.
   id?: string
+  // Etichetta leggibile per il titolo raggruppato: nome della stanza, oppure
+  // "@nickname" per i DM. ("10 messaggi in Foyer", "5 messaggi da @anna")
+  label?: string
+  // Chiave di raggruppamento delle notifiche: i messaggi che la condividono si
+  // fondono in un'unica notifica invece di accumularsi. Default `kind:id`.
+  // Le menzioni la sovrascrivono per restare distinte dal mucchio.
+  group?: string
 }
 
 export interface PushPayload {
@@ -32,6 +40,9 @@ export interface PushPayload {
   body: string
   url?: string
   source?: PushSource
+  // Riga da accumulare nell'elenco quando più messaggi si raggruppano. Nelle
+  // stanze include il mittente ("@anna: ciao"), nei DM basta il testo.
+  line?: string
 }
 
 export interface PushResult {

@@ -36,14 +36,22 @@ Deno.serve(async (req: Request): Promise<Response> => {
     .eq('id', msg.sender_id)
     .maybeSingle()
 
+  const nick = (sender as { nickname: string } | null)?.nickname ?? '—'
+  const preview = msg.body.slice(0, 120)
+
   await sendPushToUser(recipientId, {
-    title: `Messaggio da @${(sender as { nickname: string } | null)?.nickname ?? '—'}`,
-    body: msg.body.slice(0, 120),
+    title: `Messaggio da @${nick}`,
+    body: preview,
     // Query param sulla root: la "/" risponde sempre 200 (niente rewrite SPA).
     url: '/?dm=1',
     // Il service worker la scarta se la sezione "Messaggi" è già aperta e in
-    // primo piano: la stai leggendo, la notifica sarebbe rumore.
-    source: { kind: 'dm' },
+    // primo piano: la stai leggendo, la notifica sarebbe rumore. L'id serve a
+    // raggruppare per conversazione: messaggi da persone diverse restano
+    // notifiche separate.
+    source: { kind: 'dm', id: msg.conversation_id, label: `@${nick}` },
+    // In un 1 a 1 il mittente è sempre lo stesso: ripeterlo a ogni riga
+    // sarebbe rumore, basta il testo.
+    line: preview,
   })
 
   return new Response('ok')

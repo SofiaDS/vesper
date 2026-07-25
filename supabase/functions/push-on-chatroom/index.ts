@@ -100,15 +100,21 @@ Deno.serve(async (req: Request): Promise<Response> => {
   // Il service worker scarta la notifica se il destinatario ha già questa
   // stanza aperta e in primo piano. Vale anche per le menzioni: se stai
   // leggendo la stanza in cui ti hanno citata, la vedi da sola.
-  const source = { kind: 'room' as const, id: msg.chatroom_id }
+  const source = { kind: 'room' as const, id: msg.chatroom_id, label: roomName }
+  // Riga dell'elenco quando più messaggi della stessa stanza si raggruppano:
+  // qui il mittente serve, perché in una stanza scrivono in tante.
+  const line = `@${nick}: ${preview}`
 
   await Promise.all([
-    sendPushToUsers(roomOnly, { title: `${roomName} — @${nick}`, body: preview, url, source }),
+    sendPushToUsers(roomOnly, { title: `${roomName} — @${nick}`, body: preview, url, source, line }),
     sendPushToUsers(mentionedIds, {
       title: `@${nick} ti ha menzionato in ${roomName}`,
       body: preview,
       url,
-      source,
+      // Gruppo separato: una menzione è esplicita e non deve finire sepolta
+      // dentro "12 messaggi in Foyer", dove passerebbe inosservata.
+      source: { ...source, group: `mention:${msg.chatroom_id}` },
+      line,
     }),
   ])
 
