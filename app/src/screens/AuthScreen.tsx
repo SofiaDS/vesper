@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { mapSupabaseAuthError, validatePassword } from '../lib/authErrors'
 import { BrandMark } from '../components/BrandMark'
+import { PasswordInput } from '../components/PasswordInput'
 
 type Mode = 'login' | 'signup' | 'reset' | 'declare'
 
@@ -163,8 +164,7 @@ export function AuthScreen() {
           {mode !== 'reset' && (
             <label className="field">
               <span>Password</span>
-              <input
-                type="password"
+              <PasswordInput
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 required
                 minLength={mode === 'signup' ? 8 : undefined}
@@ -187,8 +187,7 @@ export function AuthScreen() {
           {mode === 'signup' && (
             <label className="field">
               <span>Conferma password</span>
-              <input
-                type="password"
+              <PasswordInput
                 autoComplete="new-password"
                 required
                 value={confirmPassword}
