@@ -13,7 +13,6 @@ export function ProfileLayout({
   userId,
   nickname,
   avatarPreset,
-  accentColor,
   bio,
   keyFacts,
   rows,
@@ -25,7 +24,6 @@ export function ProfileLayout({
   userId: string
   nickname: string
   avatarPreset: string | null
-  accentColor: string | null
   bio: string | null
   // Identità, orientamento, cosa cerca, età — già formattati; gli assenti (per
   // privacy o perché non impostati) vengono filtrati prima di mostrarli.
@@ -37,7 +35,6 @@ export function ProfileLayout({
   // Card finale opzionale: zona pericolosa (proprio) o azioni di contatto (altrui).
   bottomCard?: ReactNode
 }) {
-  const background = accentColor ?? 'var(--accent)'
   const facts = keyFacts.filter((f): f is string => Boolean(f))
 
   return (
@@ -46,7 +43,7 @@ export function ProfileLayout({
         onBack={onBack}
         title={
           <span className="pf-header-title">
-            <span className="avatar-bubble avatar-bubble-sm" style={{ background }}><Avatar preset={avatarPreset} nickname={nickname} /></span>
+            <span className="avatar-bubble avatar-bubble-sm"><Avatar preset={avatarPreset} nickname={nickname} /></span>
             <span>@{nickname}</span>
           </span>
         }
@@ -55,7 +52,7 @@ export function ProfileLayout({
       {topActions && <div className="pf-icon-actions">{topActions}</div>}
 
       <header className="pf-hero">
-        <span className="avatar-bubble avatar-bubble-lg" style={{ background }}><Avatar preset={avatarPreset} nickname={nickname} /></span>
+        <span className="avatar-bubble avatar-bubble-lg"><Avatar preset={avatarPreset} nickname={nickname} /></span>
         <h2 className="pf-nick">@{nickname}</h2>
         {facts.length > 0 && <p className="pf-key-facts">{facts.join(' · ')}</p>}
       </header>

@@ -255,9 +255,6 @@ export function ProfileEditor({
     adventurer: GALLERY_SEEDS.adventurer,
     bottts: GALLERY_SEEDS.bottts,
   })
-  // Lo sfondo colorato serve solo come fallback per gli avatar emoji legacy:
-  // gli avatar DiceBear coprono l'intera bolla, quindi non è più scegliibile.
-  const [accent] = useState<string | null>(profile.accent_color ?? null)
   const [dmFilter, setDmFilter] = useState(profile.dm_filter)
 
   const [cityName, setCityName] = useState(profile.city ?? '')
@@ -487,7 +484,6 @@ export function ProfileEditor({
           smoking,
           sport,
           avatar_preset: avatar,
-          accent_color: accent,
           dm_filter: dmFilter,
           ...vis,
           is_searchable: searchable,
@@ -554,7 +550,7 @@ export function ProfileEditor({
 
       <form className="form profile-form" onSubmit={handleSave}>
         <div className="avatar-preview">
-          <span className="avatar-bubble" style={{ background: accent ?? 'var(--accent)' }}>
+          <span className="avatar-bubble">
             <Avatar preset={avatar} nickname={nickname} />
           </span>
           <span className="muted small-inline">@{nickname || '—'}</span>

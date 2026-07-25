@@ -54,7 +54,6 @@ export function ProfilePreview({
       userId={profile.id}
       nickname={profile.nickname}
       avatarPreset={profile.avatar_preset}
-      accentColor={profile.accent_color}
       bio={profile.bio}
       keyFacts={keyFacts}
       rows={rows}

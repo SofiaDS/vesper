@@ -13,10 +13,7 @@ export function UserCard({
   const place = result.city || result.city_region
   return (
     <button type="button" className="search-card" onClick={onOpen}>
-      <span
-        className="search-ava"
-        style={result.accent_color ? { background: result.accent_color } : undefined}
-      >
+      <span className="search-ava">
         <Avatar preset={result.avatar_preset} nickname={result.nickname} />
       </span>
       <span className="search-meta">

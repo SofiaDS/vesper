@@ -1179,6 +1179,7 @@ body:has(.install-banner) .rooms-hint {
   border-radius: 50%;
   font-size: 1.7rem;
   color: var(--bg);
+  background: var(--accent);
   flex-shrink: 0;
 }
 
@@ -1278,21 +1279,6 @@ body:has(.install-banner) .rooms-hint {
 }
 .avatar-more:hover {
   border-color: var(--accent);
-}
-
-/* Pastiglie colore accento */
-.color-opt {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-  padding: 0;
-}
-
-.color-opt.sel {
-  border-color: var(--text);
-  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
 }
 
 /* Textarea bio */
@@ -1943,6 +1929,7 @@ body:has(.install-banner) .rooms-hint {
   border-radius: 50%;
   font-size: 1.1rem;
   color: var(--bg);
+  background: var(--accent);
   flex-shrink: 0;
   line-height: 1;
 }

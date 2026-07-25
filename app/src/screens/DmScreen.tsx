@@ -371,7 +371,7 @@ function ListView({
               {incoming.map((c) => (
                 <div key={c.id} className="dm-conv">
                   <div className="dm-row">
-                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: c.other_accent ?? 'var(--accent)' }}>
+                    <span className="avatar-bubble avatar-bubble-sm dm-avatar">
                       <Avatar preset={c.other_avatar} nickname={c.other_nickname} />
                     </span>
                     <div className="dm-info">
@@ -422,7 +422,7 @@ function ListView({
                     onClick={() => onOpen(c)}
                   >
                     <div className="dm-row">
-                      <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: c.other_accent ?? 'var(--accent)' }}>
+                      <span className="avatar-bubble avatar-bubble-sm dm-avatar">
                         <Avatar preset={c.other_avatar} nickname={c.other_nickname} />
                         {isOnline && (
                           <>
@@ -461,7 +461,7 @@ function ListView({
               {outgoing.map((c) => (
                 <div key={c.id} className="dm-conv">
                   <div className="dm-row">
-                    <span className="avatar-bubble avatar-bubble-sm dm-avatar" style={{ background: c.other_accent ?? 'var(--accent)' }}>
+                    <span className="avatar-bubble avatar-bubble-sm dm-avatar">
                       <Avatar preset={c.other_avatar} nickname={c.other_nickname} />
                     </span>
                     <div className="dm-info">

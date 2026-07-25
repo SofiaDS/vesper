@@ -170,10 +170,7 @@ export function ChatScreen({
                 onClick={() => onOpenProfile(m.sender_id)}
                 aria-label={`Apri profilo di ${m.nickname}`}
               >
-                <span
-                  className="msg-avatar"
-                  style={{ background: avatarCache.current.get(m.sender_id)?.color ?? 'var(--accent)' }}
-                >
+                <span className="msg-avatar">
                   <Avatar preset={avatarCache.current.get(m.sender_id)?.preset ?? null} nickname={m.nickname} />
                 </span>
               </button>

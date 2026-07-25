@@ -23,7 +23,6 @@ export interface Profile {
   orientations: Orientation[]
   birth_date: string | null
   avatar_preset: string | null
-  accent_color: string | null
   bio: string | null
   city: string | null
   city_province: string | null

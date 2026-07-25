@@ -9,7 +9,6 @@ export interface SearchResult {
   id: string
   nickname: string
   avatar_preset: string | null
-  accent_color: string | null
   age: number | null
   city: string | null
   city_region: string | null
