@@ -6,6 +6,7 @@ import { MessageComposer } from '../components/MessageComposer'
 import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
 import { useMessageReactions } from '../hooks/useMessageReactions'
+import { useTypingIndicator } from '../hooks/useTypingIndicator'
 import { Avatar } from '../components/Avatar'
 import {
   listDmConversations,
@@ -61,6 +62,26 @@ function ConversationView({
 
   const reactions = useMessageReactions({ scope: 'dm', scopeId: conversation.id, myId })
   const isOnline = useOnlinePresence([otherId]).has(otherId)
+
+  // DM 1 a 1: l'indicatore dice chi sta scrivendo, perché la conversazione ha
+  // una sola controparte e non rivela nulla che non si sappia già.
+  //
+  // broadcast sempre attivo, di proposito: a differenza delle stanze qui NON è
+  // legato a show_online. Stai scrivendo a quella persona e fra un istante
+  // riceverà il messaggio, quindi l'indicatore anticipa di due secondi una
+  // presenza che sta comunque per dichiararsi. Lo stato "online" invece è un
+  // segnale passivo e continuo, che espone le proprie abitudini nel tempo: è
+  // quello che show_online protegge. Nelle stanze il vincolo resta perché lì
+  // un indicatore anonimo tradirebbe la presenza di chi ha scelto di non
+  // comparire nell'elenco (vedi ChatScreen).
+  const { profile } = useAuth()
+  const typing = useTypingIndicator({
+    scope: 'dm',
+    scopeId: conversation.id,
+    myId,
+    myNickname: profile?.nickname,
+    broadcast: true,
+  })
 
   useEffect(() => {
     let alive = true
@@ -254,6 +275,9 @@ function ConversationView({
             : null
         }
         onCancelReply={() => setReplyTo(null)}
+        typingLabel={typing.label}
+        onTyping={typing.notifyTyping}
+        onStopTyping={typing.stopTyping}
       />
     </main>
   )

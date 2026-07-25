@@ -16,6 +16,9 @@ export function MessageComposer({
   replyTo,
   onCancelReply,
   members,
+  typingLabel,
+  onTyping,
+  onStopTyping,
 }: {
   value: string
   onChange: (value: string) => void
@@ -25,6 +28,10 @@ export function MessageComposer({
   replyTo?: { nickname: string; body: string } | null
   onCancelReply?: () => void
   members?: RoomMember[]
+  // Frase "… sta scrivendo" già composta da useTypingIndicator, o null.
+  typingLabel?: string | null
+  onTyping?: () => void
+  onStopTyping?: () => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [trigger, setTrigger] = useState<MentionTrigger | null>(null)
@@ -42,7 +49,16 @@ export function MessageComposer({
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const el = e.target
     onChange(el.value)
+    // Il campo svuotato non è più "sto scrivendo": ritira subito l'annuncio
+    // invece di lasciarlo scadere da solo.
+    if (el.value.trim()) onTyping?.()
+    else onStopTyping?.()
     setTrigger(members ? matchMentionTrigger(el.value, el.selectionStart ?? el.value.length) : null)
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    onStopTyping?.()
+    onSubmit(e)
   }
 
   function pickMention(nickname: string) {
@@ -73,7 +89,14 @@ export function MessageComposer({
           </button>
         </div>
       )}
-      <form className="composer" onSubmit={onSubmit}>
+      {/* Sempre nel DOM, anche vuota: riserva lo spazio così il composer non
+          sobbalza quando qualcunə inizia a scrivere, e permette ad aria-live di
+          annunciare il cambiamento (una regione aggiunta al DOM già piena non
+          verrebbe letta). */}
+      <p className="typing-indicator" aria-live="polite">
+        {typingLabel ?? ''}
+      </p>
+      <form className="composer" onSubmit={handleSubmit}>
         <div className="autocomplete autocomplete-up">
           <input
             ref={inputRef}
