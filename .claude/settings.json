@@ -67,7 +67,8 @@
       "Bash(tail -c 300 sdk-install.log)",
       "Bash(mkdir -p /c/vesper-twa/output)",
       "Bash(cp app-release-bundle.aab output/Vesper-v3-targetSdk36.aab)",
-      "Bash(cp app-release-signed.apk output/Vesper-v3-targetSdk36.apk)"
+      "Bash(cp app-release-signed.apk output/Vesper-v3-targetSdk36.apk)",
+      "WebFetch(domain:play.google.com)"
     ],
     "additionalDirectories": [
       "C:\\Users\\sofia.dellaspora\\.claude\\agents",
