@@ -93,7 +93,7 @@ export function AuthScreen() {
             Vesper è uno spazio dedicato alla community lesbica e queer, dove ogni orientamento è benvenuto.
           </p>
           <p>
-            Sono benvenute <strong>donne cis, persone trans e non binary</strong>.
+            Sono benvenute <strong>donne cis, persone trans, non binary e intersex</strong>.
           </p>
           <p>
             L'iscrizione <strong>non è aperta a uomini cis</strong>, per preservare la natura di questo spazio.

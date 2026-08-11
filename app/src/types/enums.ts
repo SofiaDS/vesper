@@ -6,6 +6,10 @@ export type IdentityCategory =
   | 'genderqueer'
   | 'agender'
   | 'bigender'
+  // Intersex è una caratteristica sessuale, non un'identità di genere: sta qui
+  // perché il campo è a scelta singola (11 ago 2026). Se un giorno diventasse
+  // un campo di profilo a sé, va spostata lì.
+  | 'intersex'
   | 'altro'
   | 'preferisco_non_specificare'
 

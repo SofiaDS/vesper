@@ -106,7 +106,7 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
     {
       heading: 'Chi può iscriversi',
       paragraphs: [
-        'Vesper è uno spazio dedicato alla community lesbica e queer, dove ogni orientamento è benvenuto, aperta a donne cis, persone trans e non binary. L\'iscrizione non è aperta a uomini cis, per preservare la natura di questo spazio.',
+        'Vesper è uno spazio dedicato alla community lesbica e queer, dove ogni orientamento è benvenuto, aperta a donne cis, persone trans, non binary e intersex. L\'iscrizione non è aperta a uomini cis, per preservare la natura di questo spazio.',
         'Al momento dell\'iscrizione l\'utente dichiara, sotto la propria responsabilità, di rientrare in una delle categorie ammesse. Una dichiarazione mendace costituisce violazione dei presenti Termini e comporta il ban immediato e definitivo dall\'app.',
       ],
     },
@@ -153,7 +153,7 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
       heading: 'Chi siamo',
       paragraphs: [
         'Abbiamo creato Vesper perché crediamo che le connessioni più belle nascano quando ci si sente davvero liberi di essere se stessi. Sappiamo che certe conversazioni fluiscono con una naturalezza speciale quando si condivide un vissuto o una sensibilità comune.',
-        'Per questo, Vesper è uno spazio pensato per donne, persone trans, non-binary e tutte le soggettività che non si identificano come uomini cisgender. Non è una chiusura verso l\'esterno — crediamo fermamente che il confronto con la diversità sia un arricchimento fondamentale — ma una scelta di design: vogliamo offrire un ambiente dove ogni incontro parta da una base di complicità immediata e serenità.',
+        'Per questo, Vesper è uno spazio pensato per donne, persone trans, non-binary e intersex, e tutte le soggettività che non si identificano come uomini cisgender. Non è una chiusura verso l\'esterno — crediamo fermamente che il confronto con la diversità sia un arricchimento fondamentale — ma una scelta di design: vogliamo offrire un ambiente dove ogni incontro parta da una base di complicità immediata e serenità.',
         'Qui la gentilezza è il requisito fondamentale. La nostra moderazione è attiva per mantenere alta la qualità del clima e proteggere la tua tranquillità.',
         'Siamo qui per chi cerca legami basati sull\'ascolto e sull\'autenticità. Perché in un ambiente in cui ti senti a casa, le connessioni migliori accadono da sole.',
       ],
