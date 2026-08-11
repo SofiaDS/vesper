@@ -10,6 +10,7 @@
 export type DeepLinkIntent =
   | { type: 'dm' }
   | { type: 'room'; id: string }
+  | { type: 'vouch' }
 
 export function parseDeepLink(input: string): DeepLinkIntent | null {
   // `input` può essere un path assoluto ("/?room=x", "/room/x") o un URL intero:
@@ -25,6 +26,7 @@ export function parseDeepLink(input: string): DeepLinkIntent | null {
   const roomId = url.searchParams.get('room')
   if (roomId) return { type: 'room', id: roomId }
   if (url.searchParams.get('dm') !== null) return { type: 'dm' }
+  if (url.searchParams.get('vouch') !== null) return { type: 'vouch' }
 
   // Formato legacy: path (/dm, /room/<id>).
   const clean = url.pathname.replace(/\/+$/, '')

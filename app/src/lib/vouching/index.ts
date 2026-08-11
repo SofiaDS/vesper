@@ -10,16 +10,24 @@ export const VOUCH_CONFIRMATION_HOURS = 48
 export const MAX_FAILED_VOUCHES = 3
 export const REQUIRED_GUARANTORS = 2
 
-export interface VouchRequest {
-  id: string
-  new_user_id: string
-  status: 'pending' | 'approved' | 'denied' | 'expired'
-  created_at: string
-  expires_at: string
+// Quanto manca alla scadenza, in parole. Le richieste durano 48 ore: sotto
+// l'ora si scende ai minuti, altrimenti "meno di un'ora" resterebbe l'unica
+// cosa mostrata per tutto l'ultimo tratto — proprio quando serve decidere.
+export function vouchTimeLeft(expiresAt: string): string {
+  const ms = new Date(expiresAt).getTime() - Date.now()
+  if (ms <= 0) return 'scaduta'
+  const hours = Math.floor(ms / 3_600_000)
+  if (hours >= 1) return `${hours} ${hours === 1 ? 'ora' : 'ore'}`
+  const mins = Math.max(1, Math.floor(ms / 60_000))
+  return `${mins} ${mins === 1 ? 'minuto' : 'minuti'}`
 }
 
-export interface PendingVouchRequest extends VouchRequest {
+// Una richiesta ancora aperta, vista dal garante che deve rispondere.
+export interface PendingVouchRequest {
+  id: string
   new_user_nickname: string
+  created_at: string
+  expires_at: string
 }
 
 // La nuova utente nomina i garanti per nickname; crea la richiesta e le conferme.
@@ -62,34 +70,48 @@ export async function denyVouch(requestId: string): Promise<void> {
   if (error) throw error
 }
 
-// Lista le richieste in attesa per un garante (tab "Richieste di garanzia" — futuro).
-export async function getPendingVouchRequests(
-  guarantorId: string,
-): Promise<PendingVouchRequest[]> {
-  const now = new Date().toISOString()
-  const { data, error } = await supabase
-    .from('vouch_confirmations')
-    .select('request_id, vouch_requests!inner(id, new_user_id, status, created_at, expires_at, profiles!inner(nickname))')
-    .eq('guarantor_id', guarantorId)
-    .eq('status', 'pending')
-    .eq('vouch_requests.status', 'pending')
-    .gt('vouch_requests.expires_at', now)
+// Lista le richieste ancora aperte in cui chi chiama è garante.
+//
+// Passa dalla RPC `pending_vouch_requests` e non da una query con join, per lo
+// stesso motivo di `requestVouch`: al garante la RLS nasconde sia
+// `vouch_requests` (policy solo per la richiedente e lo staff) sia il `profiles`
+// della richiedente. La versione precedente faceva il join dal browser e
+// tornava sempre una lista vuota — la notifica partiva, ma non c'era modo di
+// vedere la richiesta a cui si riferiva.
+//
+// Il garante è implicito (`auth.uid()` dentro la funzione): non si passa un id.
+export async function getPendingVouchRequests(): Promise<PendingVouchRequest[]> {
+  const { data, error } = await supabase.rpc('pending_vouch_requests')
   if (error) throw error
 
-  return ((data ?? []) as unknown as {
-    vouch_requests: {
-      id: string; new_user_id: string; status: string
-      created_at: string; expires_at: string
-      profiles: { nickname: string }
-    }
-  }[]).map(({ vouch_requests: r }) => ({
-    id: r.id,
-    new_user_id: r.new_user_id,
-    status: r.status as VouchRequest['status'],
+  return ((data ?? []) as {
+    request_id: string
+    new_user_nickname: string
+    created_at: string
+    expires_at: string
+  }[]).map((r) => ({
+    id: r.request_id,
+    new_user_nickname: r.new_user_nickname,
     created_at: r.created_at,
     expires_at: r.expires_at,
-    new_user_nickname: r.profiles.nickname,
   }))
+}
+
+// La richiesta di garanzia ancora aperta di chi sta guardando, se esiste.
+//
+// Serve alla schermata di verifica: senza, chi ha appena nominato le garanti si
+// trova subito davanti al video e lo registra comunque, rendendo inutile la
+// scorciatoia. Qui non serve una RPC — la policy `vouch_req_select_self` lascia
+// già leggere alla richiedente la propria riga, ed è l'unica che tornerebbe.
+export async function getMyPendingVouch(): Promise<{ expires_at: string } | null> {
+  const { data, error } = await supabase
+    .from('vouch_requests')
+    .select('expires_at')
+    .eq('status', 'pending')
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle()
+  if (error) return null
+  return (data as { expires_at: string } | null) ?? null
 }
 
 // Registra manualmente una garanzia fallita (solo staff, per revisioni post-hoc).

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { BrandMark } from '../components/BrandMark'
+import { getMyPendingVouch, vouchTimeLeft } from '../lib/vouching'
 
 const BUCKET = 'identity-verifications'
 const REC_SECONDS = 5
@@ -34,6 +35,36 @@ export function VerificationScreen() {
 
   // Mostra il motivo del rifiuto precedente se disponibile
   const rejectionReason = profile?.verification_rejection_reason
+
+  // Garanzia in corso: con due conferme la verifica è assolta e il video non
+  // serve (vedi permessi_e_strati.md §2). Senza dirlo qui, chi ha appena
+  // nominato le garanti registra comunque il video mentre aspetta.
+  const [pendingVouch, setPendingVouch] = useState<{ expires_at: string } | null>(null)
+  const [checkingVouch, setCheckingVouch] = useState(false)
+
+  useEffect(() => {
+    let alive = true
+    getMyPendingVouch().then((v) => {
+      if (alive) setPendingVouch(v)
+    })
+    return () => {
+      alive = false
+    }
+  }, [])
+
+  // Le conferme dei garanti non arrivano in push a chi le ha chieste: senza un
+  // modo di ricontrollare, l'unica via sarebbe chiudere e riaprire l'app.
+  // refreshProfile basta: se la verifica è passata ad 'approved', App.tsx
+  // smette di mostrare questa schermata da sé.
+  async function recheck() {
+    setCheckingVouch(true)
+    try {
+      await refreshProfile()
+      setPendingVouch(await getMyPendingVouch())
+    } finally {
+      setCheckingVouch(false)
+    }
+  }
 
   // Avvia la fotocamera
   async function startCamera() {
@@ -181,6 +212,28 @@ export function VerificationScreen() {
                 ⚠ La tua verifica precedente è stata rifiutata. Riprova seguendo
                 le indicazioni qui sotto.
               </p>
+            )}
+
+            {pendingVouch && (
+              <div className="card" style={{ marginBottom: '1rem' }}>
+                <p>
+                  <strong>Hai una garanzia in corso.</strong> Se entrambe le garanti
+                  confermano entro {vouchTimeLeft(pendingVouch.expires_at)}, questo video
+                  non ti verrà chiesto e entrerai subito.
+                </p>
+                <p className="hint">
+                  Puoi aspettare, oppure registrarlo comunque adesso: se la garanzia
+                  arriva prima, la verifica è già fatta.
+                </p>
+                <button
+                  type="button"
+                  className="btn-ghost btn-sm"
+                  onClick={recheck}
+                  disabled={checkingVouch}
+                >
+                  {checkingVouch ? 'Controllo…' : 'Ho ricevuto la garanzia, controlla'}
+                </button>
+              </div>
             )}
 
             <p className="muted">

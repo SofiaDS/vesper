@@ -13,6 +13,7 @@ import {
   Heart,
   SignOut,
   CaretRight,
+  Handshake,
 } from '@phosphor-icons/react'
 import { AppHeader } from '../components/AppHeader'
 import { useTheme } from '../hooks/useTheme'
@@ -25,11 +26,14 @@ import { LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
 export function AltroScreen({
   isStaff,
   adminBadge,
+  showVouch,
+  vouchBadge,
   onBack,
   onOpenSettings,
   onOpenBlocked,
   onOpenLegal,
   onOpenAdmin,
+  onOpenVouch,
   onReportBug,
   onSuggest,
   onOpenSupport,
@@ -40,11 +44,17 @@ export function AltroScreen({
   // badge sulla tab "Altro", ripetuto qui sulla riga che lo origina — dalla
   // sola tab non si capisce da dove arrivi la notifica.
   adminBadge?: number
+  // La voce compare solo a chi può davvero fare da garante (Strato 3), o a chi
+  // ha comunque richieste in sospeso: per tutte le altre sarebbe una riga che
+  // non può mai contenere niente.
+  showVouch: boolean
+  vouchBadge?: number
   onBack: () => void
   onOpenSettings: () => void
   onOpenBlocked: () => void
   onOpenLegal: (doc: LegalDoc) => void
   onOpenAdmin: () => void
+  onOpenVouch: () => void
   onReportBug: () => void
   onSuggest: () => void
   onOpenSupport: () => void
@@ -76,6 +86,29 @@ export function AltroScreen({
           <span className="nav-row-label">Utenti bloccati</span>
           <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
+        {showVouch && (
+          <button
+            type="button"
+            className="nav-row"
+            onClick={onOpenVouch}
+            aria-label={
+              vouchBadge
+                ? `Richieste di garanzia, ${vouchBadge} in attesa di risposta`
+                : undefined
+            }
+          >
+            <span className="nav-row-ico" aria-hidden="true">
+              <Handshake size={20} weight="duotone" />
+            </span>
+            <span className="nav-row-label">Richieste di garanzia</span>
+            {!!vouchBadge && (
+              <span className="nav-row-badge" aria-hidden="true">
+                {vouchBadge}
+              </span>
+            )}
+            <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
+          </button>
+        )}
         <button type="button" className="nav-row" onClick={() => onOpenLegal('about')}>
           <span className="nav-row-ico" aria-hidden="true">
             <Info size={20} weight="duotone" />

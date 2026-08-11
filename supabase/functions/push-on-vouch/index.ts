@@ -33,6 +33,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
   await sendPushToUser(row.guarantor_id, {
     title: 'Richiesta di garanzia',
     body: `${nick} ti ha indicata come garante. Apri l'app per rispondere entro 48 ore.`,
+    // Senza `url` la notifica apriva la root: chi la toccava si ritrovava nella
+    // lobby senza capire dove rispondere. Query param sulla root come gli altri
+    // deep-link (vedi app/src/lib/deepLink.ts).
+    url: '/?vouch=1',
   })
 
   return new Response('ok')
