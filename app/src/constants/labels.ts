@@ -15,6 +15,7 @@ export const IDENTITY_LABELS: Record<IdentityCategory, string> = {
   genderqueer: 'Genderqueer',
   agender: 'Agender',
   bigender: 'Bigender',
+  intersex: 'Intersex',
   altro: 'Altro',
   preferisco_non_specificare: 'Preferisco non specificare',
 }

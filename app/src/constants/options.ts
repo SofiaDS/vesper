@@ -23,6 +23,7 @@ export const IDENTITY_OPTIONS: { value: IdentityCategory; label: string }[] = [
   { value: 'genderqueer', label: 'Genderqueer' },
   { value: 'agender', label: 'Agender' },
   { value: 'bigender', label: 'Bigender' },
+  { value: 'intersex', label: 'Intersex' },
   { value: 'altro', label: 'Altro' },
   { value: 'preferisco_non_specificare', label: 'Preferisco non specificare' },
 ]
