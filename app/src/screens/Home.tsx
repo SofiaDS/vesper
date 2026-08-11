@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { useDeepLink } from '../hooks/useDeepLink'
 import { usePendingDmCount } from '../hooks/usePendingDmCount'
+import { usePendingVouchCount } from '../hooks/usePendingVouchCount'
 import { useAdminPendingCounts } from '../hooks/useAdminPendingCounts'
 import { useBackNavigation } from '../hooks/useBackNavigation'
 import { useMessageNotifications } from '../hooks/useMessageNotifications'
@@ -24,6 +25,7 @@ import { AdminScreen, ADMIN_TAB_LABELS, type AdminTab } from './admin/AdminScree
 import { DmScreen } from './DmScreen'
 import { LegalScreen, LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
 import { SupportScreen } from './SupportScreen'
+import { VouchRequestsScreen } from './VouchRequestsScreen'
 import { openSupportEmail } from '../lib/support'
 
 // Shell post-login: gestisce la navigazione fra lobby, chat, profilo e moderazione.
@@ -33,6 +35,11 @@ export function Home() {
   const myId = session?.user.id
   const pendingDmCount = usePendingDmCount((profile?.strato ?? 0) >= 2 ? myId : undefined)
   const adminCounts = useAdminPendingCounts(isStaff)
+  // Garante si può essere solo dallo Strato 3 (permessi_e_strati.md §2), quindi
+  // per tutte le altre non ha senso nemmeno interrogare il server.
+  const canBeGuarantor = (profile?.strato ?? 0) >= 3
+  const { count: vouchCount, refresh: refreshVouchCount } =
+    usePendingVouchCount(canBeGuarantor ? myId : undefined)
 
   // Heartbeat di presenza online (per il pallino nei DM, Step 5).
   useHeartbeat(myId)
@@ -50,6 +57,7 @@ export function Home() {
   const [showSettings, setShowSettings] = useState(false)
   const [showAltro, setShowAltro] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
+  const [showVouch, setShowVouch] = useState(false)
   const [viewUserId, setViewUserId] = useState<string | null>(null)
   const [legalDoc, setLegalDoc] = useState<LegalDoc | null>(null)
 
@@ -67,6 +75,7 @@ export function Home() {
     setShowSettings(false)
     setShowAltro(false)
     setShowSupport(false)
+    setShowVouch(false)
     setViewUserId(null)
     setLegalDoc(null)
     open?.()
@@ -115,6 +124,7 @@ export function Home() {
     !showSettings &&
     !showAltro &&
     !showSupport &&
+    !showVouch &&
     !viewUserId &&
     !legalDoc
 
@@ -133,6 +143,8 @@ export function Home() {
     ? 'Impostazioni'
     : showSupport
     ? 'Sostieni Vesper'
+    : showVouch
+    ? 'Richieste di garanzia'
     : showAltro
     ? 'Altro'
     : viewUserId
@@ -159,6 +171,14 @@ export function Home() {
       consumeDeepLink()
       return
     }
+    // Non filtriamo per Strato: chi ha ricevuto la notifica era garante quando è
+    // partita. Se nel frattempo qualcosa è cambiato, la schermata mostra il suo
+    // stato vuoto — meglio che ignorare il tocco sulla notifica.
+    if (deepLink.type === 'vouch') {
+      openScreen(() => setShowVouch(true))
+      consumeDeepLink()
+      return
+    }
     let alive = true
     supabase
       .from('chatrooms')
@@ -175,9 +195,13 @@ export function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deepLink, canDm])
 
-  const altroBadge = isStaff
+  const adminBadge = isStaff
     ? adminCounts.verifiche + adminCounts.foto + adminCounts.segnalazioni + adminCounts.ai
-    : undefined
+    : 0
+  // Il badge della tab somma tutto ciò che dentro "Altro" aspetta una risposta:
+  // moderazione (solo staff) e richieste di garanzia. `undefined` a zero, così
+  // TabBar non disegna un pallino vuoto.
+  const altroBadge = adminBadge + vouchCount || undefined
   const tabItems: TabBarItem[] = [
     { key: 'stanze', label: 'Stanze', icon: <House size={22} weight="duotone" />, onClick: goToRooms, active: inStanze },
     ...(canDm
@@ -192,7 +216,7 @@ export function Home() {
   // Ricerca → Profilo pubblico = 2): serve a sapere se il prossimo `goBack`
   // riporta alla lobby, per decidere se ri-armare la guardia sulla history
   // (vedi useBackNavigation).
-  const stackDepth = [room, showProfile, showAdmin, showBlocked, showSearch, showDm, showSettings, showAltro, showSupport, viewUserId, legalDoc]
+  const stackDepth = [room, showProfile, showAdmin, showBlocked, showSearch, showDm, showSettings, showAltro, showSupport, showVouch, viewUserId, legalDoc]
     .filter(Boolean).length
 
   let screen: React.ReactNode
@@ -224,12 +248,23 @@ export function Home() {
   } else if (showSupport) {
     goBack = () => setShowSupport(false)
     screen = <SupportScreen onBack={goBack} />
+  } else if (showVouch) {
+    goBack = () => setShowVouch(false)
+    screen = (
+      <VouchRequestsScreen
+        onBack={goBack}
+        backLabel={showAltro ? '‹ Altro' : '‹ Stanze'}
+        onChange={refreshVouchCount}
+      />
+    )
   } else if (showAltro) {
     goBack = goToRooms
     screen = (
       <AltroScreen
         isStaff={isStaff}
-        adminBadge={altroBadge}
+        adminBadge={adminBadge || undefined}
+        showVouch={canBeGuarantor || vouchCount > 0}
+        vouchBadge={vouchCount || undefined}
         onBack={goToRooms}
         onOpenSettings={() => setShowSettings(true)}
         onOpenBlocked={() => setShowBlocked(true)}
@@ -238,6 +273,7 @@ export function Home() {
           setAdminTab('stats')
           setShowAdmin(true)
         }}
+        onOpenVouch={() => setShowVouch(true)}
         onReportBug={() => openSupportEmail({ type: 'bug', screen: currentScreenLabel, userId: myId })}
         onSuggest={() => openSupportEmail({ type: 'feedback', screen: currentScreenLabel, userId: myId })}
         onOpenSupport={() => setShowSupport(true)}

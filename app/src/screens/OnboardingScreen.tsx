@@ -109,12 +109,14 @@ export function OnboardingScreen() {
         <section className="card">
           <p>
             Se conosci già qualcuna su Vesper che è al <strong>Strato 3</strong> e ti conosce,
-            puoi nominarla come garante. Con entrambe le conferme salti l'attesa iniziale e
-            accedi subito allo Strato 2.
+            puoi nominarla come garante. Con entrambe le conferme accedi subito allo
+            Strato 2 e <strong>non devi registrare il video di verifica</strong>.
           </p>
           <p className="hint">
-            È opzionale: puoi entrare normalmente e raggiungere lo Strato 2 dopo 7 giorni e
-            20 messaggi in chatroom.
+            È opzionale: puoi entrare normalmente verificandoti col video, e raggiungere lo
+            Strato 2 dopo 7 giorni e 20 messaggi in chatroom. Le garanti hanno 48 ore per
+            rispondere: nel frattempo puoi già fare la verifica col video, e se la garanzia
+            arriva prima non ti verrà più chiesta.
           </p>
 
           <form onSubmit={handleVouch} className="form">

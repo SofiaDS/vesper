@@ -22,7 +22,7 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
     {
       heading: 'Titolare del trattamento',
       paragraphs: [
-        'Il titolare del trattamento dei dati personali raccolti tramite Vesper è [TITOLARE — DA COMPLETARE: nome o ragione sociale, indirizzo e, ove applicabile, P.IVA/C.F.].',
+        'Il titolare del trattamento dei dati personali raccolti tramite Vesper è il team di Vesper.',
         'Per qualsiasi richiesta relativa ai tuoi dati personali puoi contattare il titolare all\'indirizzo privacy@vespercommunity.com.',
       ],
     },
@@ -97,6 +97,12 @@ const LEGAL_DOC_SECTIONS: Record<LegalDoc, LegalSection[]> = {
     },
   ],
   terms: [
+    {
+      heading: 'Chi gestisce Vesper',
+      paragraphs: [
+        'Vesper è gestita dal team di Vesper. Per comunicazioni relative al servizio o ai presenti Termini puoi scrivere a support@vespercommunity.com; per le richieste sui dati personali l\'indirizzo è privacy@vespercommunity.com.',
+      ],
+    },
     {
       heading: 'Chi può iscriversi',
       paragraphs: [
