@@ -110,22 +110,26 @@ export function VouchRequestsScreen({
                     scade tra {vouchTimeLeft(r.expires_at)}
                   </span>
                 </span>
+                {/* Stessa coppia .btn-approve/.btn-reject delle schermate di
+                    moderazione (Verifiche, Foto), nello stesso ordine: è la
+                    stessa decisione — approvare o rifiutare una persona — e non
+                    ha motivo di presentarsi diversamente. */}
                 <span style={{ display: 'flex', gap: '0.5rem' }}>
                   <button
                     type="button"
-                    className="btn-ghost btn-sm"
-                    onClick={() => setConfirmDeny(r)}
-                    disabled={busy === r.id}
-                  >
-                    Rifiuta
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-sm"
+                    className="btn-approve"
                     onClick={() => respond(r, true)}
                     disabled={busy === r.id}
                   >
                     {busy === r.id ? 'Invio…' : 'Approva'}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-reject"
+                    onClick={() => setConfirmDeny(r)}
+                    disabled={busy === r.id}
+                  >
+                    Rifiuta
                   </button>
                 </span>
               </li>
