@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Capacitor, type PluginListenerHandle } from '@capacitor/core'
+import { PushNotifications } from '@capacitor/push-notifications'
 import { parseDeepLink, type DeepLinkIntent } from '../lib/deepLink'
+
+const native = Capacitor.isNativePlatform()
 
 // Espone l'ultimo intento di deep-link da consumare per navigare. Due sorgenti:
 //   - avvio a freddo: l'app viene aperta su /dm o /room/<id> (il rewrite SPA di
@@ -22,6 +26,20 @@ export function useDeepLink(): { intent: DeepLinkIntent | null; consume: () => v
     // destinazione.
     if (typeof window !== 'undefined' && window.location.pathname + window.location.search !== '/') {
       window.history.replaceState(null, '', '/')
+    }
+
+    // NATIVO: il tap su una notifica FCM arriva su 'pushNotificationActionPerformed'.
+    // Il backend mette la destinazione in data.url ("/?room=x", "/?dm=1"): la
+    // parsiamo come i deep-link web. Copre sia app in background sia avvio a freddo.
+    if (native) {
+      let handle: PluginListenerHandle | null = null
+      PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+        const url = action.notification.data?.url
+        if (typeof url !== 'string') return
+        const next = parseDeepLink(url)
+        if (next) setIntent(next)
+      }).then((h) => { handle = h })
+      return () => { handle?.remove() }
     }
 
     if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return

@@ -3,6 +3,7 @@
 // così la gestione degli status code non va mantenuta in più copie.
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import webpush from 'npm:web-push@3'
+import { sendFcm, type FcmMessage } from './fcm.ts'
 
 export const supabaseAdmin = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -48,6 +49,39 @@ export interface PushPayload {
 export interface PushResult {
   sent: number
   expiredCleaned: number
+  // Notifiche native FCM inviate e token morti ripuliti (0 se FCM non è
+  // configurato o nessun destinatario ha l'app nativa).
+  fcmSent: number
+  fcmCleaned: number
+}
+
+// Traduce il payload push nel messaggio FCM: `data` accetta solo stringhe, e ci
+// mettiamo l'url per il deep-link (lo legge useDeepLink al tap) più la chiave di
+// raggruppamento, così le notifiche native si fondono come su web.
+function toFcmMessage(payload: PushPayload): FcmMessage {
+  const group = payload.source?.group ?? (payload.source
+    ? `${payload.source.kind}:${payload.source.id ?? ''}`
+    : '')
+  const data: Record<string, string> = { url: payload.url ?? '/' }
+  if (group) data.group = group
+  return { title: payload.title, body: payload.body, data }
+}
+
+// Invia le notifiche native FCM a un insieme di utenti e ripulisce i token morti.
+async function deliverFcm(userIds: string[], payload: PushPayload): Promise<{ sent: number; cleaned: number }> {
+  if (userIds.length === 0) return { sent: 0, cleaned: 0 }
+  const { data: rows } = await supabaseAdmin
+    .from('fcm_tokens')
+    .select('token')
+    .in('user_id', userIds)
+  const tokens = (rows ?? []).map((r) => (r as { token: string }).token)
+  if (tokens.length === 0) return { sent: 0, cleaned: 0 }
+
+  const { sent, deadTokens } = await sendFcm(tokens, toFcmMessage(payload))
+  if (deadTokens.length > 0) {
+    await supabaseAdmin.from('fcm_tokens').delete().in('token', deadTokens)
+  }
+  return { sent, cleaned: deadTokens.length }
 }
 
 type SubRow = { id: string; endpoint: string; p256dh: string; auth_key: string }
@@ -62,7 +96,7 @@ const DEAD_ENDPOINT_CODES = new Set([404, 410])
 
 // Invia il payload a un insieme di subscription già caricate, rimuove quelle
 // con endpoint morto e logga gli altri errori per renderli diagnosticabili.
-async function deliver(subs: SubRow[], payload: PushPayload): Promise<PushResult> {
+async function deliver(subs: SubRow[], payload: PushPayload): Promise<{ sent: number; expiredCleaned: number }> {
   if (subs.length === 0) return { sent: 0, expiredCleaned: 0 }
 
   const expiredIds: string[] = []
@@ -94,21 +128,29 @@ async function deliver(subs: SubRow[], payload: PushPayload): Promise<PushResult
   return { sent, expiredCleaned: expiredIds.length }
 }
 
-// Invia a tutte le subscription di un singolo utente.
+// Invia a tutte le subscription di un singolo utente (Web Push + FCM nativo).
 export async function sendPushToUser(userId: string, payload: PushPayload): Promise<PushResult> {
   const { data: subs } = await supabaseAdmin
     .from('push_subscriptions')
     .select('id, endpoint, p256dh, auth_key')
     .eq('user_id', userId)
-  return deliver((subs ?? []) as SubRow[], payload)
+  const [web, fcm] = await Promise.all([
+    deliver((subs ?? []) as SubRow[], payload),
+    deliverFcm([userId], payload),
+  ])
+  return { ...web, fcmSent: fcm.sent, fcmCleaned: fcm.cleaned }
 }
 
-// Invia a tutte le subscription di più utenti con una sola query.
+// Invia a tutte le subscription di più utenti con una sola query (Web Push + FCM).
 export async function sendPushToUsers(userIds: string[], payload: PushPayload): Promise<PushResult> {
-  if (userIds.length === 0) return { sent: 0, expiredCleaned: 0 }
+  if (userIds.length === 0) return { sent: 0, expiredCleaned: 0, fcmSent: 0, fcmCleaned: 0 }
   const { data: subs } = await supabaseAdmin
     .from('push_subscriptions')
     .select('id, endpoint, p256dh, auth_key')
     .in('user_id', userIds)
-  return deliver((subs ?? []) as SubRow[], payload)
+  const [web, fcm] = await Promise.all([
+    deliver((subs ?? []) as SubRow[], payload),
+    deliverFcm(userIds, payload),
+  ])
+  return { ...web, fcmSent: fcm.sent, fcmCleaned: fcm.cleaned }
 }
