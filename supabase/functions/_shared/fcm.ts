@@ -16,13 +16,25 @@ interface ServiceAccount {
 function loadServiceAccount(): ServiceAccount | null {
   const raw = Deno.env.get('FCM_SERVICE_ACCOUNT')
   if (!raw) return null
+  // Il secret può essere il JSON grezzo oppure la sua versione base64 (utile per
+  // evitare problemi con i newline della private_key quando si incolla il valore).
+  const trimmed = raw.trim()
+  const text = trimmed.startsWith('{') ? trimmed : safeAtob(trimmed)
   try {
-    const sa = JSON.parse(raw) as ServiceAccount
+    const sa = JSON.parse(text) as ServiceAccount
     if (!sa.project_id || !sa.client_email || !sa.private_key) return null
     return sa
   } catch {
-    console.error('[fcm] FCM_SERVICE_ACCOUNT non è JSON valido')
+    console.error('[fcm] FCM_SERVICE_ACCOUNT non è JSON valido (né base64 di un JSON)')
     return null
+  }
+}
+
+function safeAtob(b64: string): string {
+  try {
+    return atob(b64)
+  } catch {
+    return ''
   }
 }
 
