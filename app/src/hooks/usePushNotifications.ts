@@ -101,7 +101,7 @@ export function usePushNotifications(): PushState {
       handles.push(
         await PushNotifications.addListener('registrationError', (err) => {
           if (!alive) return
-          setError(`registrationError: ${JSON.stringify(err.error ?? err)}`)
+          setError(`[nativo] registrationError: ${JSON.stringify(err.error ?? err)}`)
           setSubscribed(false)
         }),
       )
@@ -169,7 +169,7 @@ export function usePushNotifications(): PushState {
       await PushNotifications.register()
     } catch (err) {
       const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
-      setError(message)
+      setError(`[nativo] ${message}`)
       console.error('[push] register nativo fallito:', err)
     } finally {
       setBusy(false)
@@ -239,7 +239,10 @@ export function usePushNotifications(): PushState {
     } catch (err) {
       setPermission(readWebPermission())
       const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
-      setError(message)
+      // Marcato [web]: se ricompare in una segnalazione conferma che l'utente NON
+      // era nell'app nativa (che userebbe FCM) ma sul sito/PWA/vecchia TWA, dove
+      // "push service error" dipende quasi sempre dall'ambiente del dispositivo.
+      setError(`[web] ${message}`)
       console.error('[push] subscribe web fallita:', err)
     } finally {
       setBusy(false)

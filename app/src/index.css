@@ -59,6 +59,12 @@
   --header-h: 3.25rem;
   --tabbar-h: 3.4rem;
 
+  /* Inset della status bar. Nell'app nativa Android (targetSdk 36) la WebView
+     disegna edge-to-edge: senza questo padding l'header finisce sotto l'orologio
+     e la batteria. Richiede `viewport-fit=cover` nel meta viewport (già impostato).
+     Nel browser/PWA senza notch il fallback è 0px → nessun effetto collaterale. */
+  --safe-top: env(safe-area-inset-top, 0px);
+
   /* Carattere di base dell'app. Commutato a OpenDyslexic dal toggle
      accessibilità via [data-font="dyslexic"] su <html> (vedi sotto). */
   --font-body: 'Atkinson Hyperlegible', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -120,7 +126,7 @@ body {
 #root {
   height: 100%;
   width:100%;
-  padding-top: calc(var(--header-h) + var(--tabbar-h));
+  padding-top: calc(var(--header-h) + var(--tabbar-h) + var(--safe-top));
 }
 
 .app {
@@ -643,7 +649,7 @@ code {
   max-width: 420px;
   min-width: 0;
   margin: 0 auto;
-  height: calc(100dvh - 3rem - var(--header-h) - var(--tabbar-h));
+  height: calc(100dvh - 3rem - var(--header-h) - var(--tabbar-h) - var(--safe-top));
   padding-top: 0.5rem;
   display: flex;
   flex-direction: column;
@@ -792,7 +798,11 @@ code {
   top: 0;
   right: 0;
   width: 98%;
-  height: var(--header-h);
+  /* L'altezza totale include la fascia della status bar; padding-top la libera
+     così titolo e pulsanti restano centrati nella parte visibile sotto di essa.
+     Lo sfondo --bg riempie anche la fascia, dando una status bar tinta unita. */
+  height: calc(var(--header-h) + var(--safe-top));
+  padding-top: var(--safe-top);
   box-sizing: border-box;
   z-index: 5;
   display: flex;
@@ -843,7 +853,7 @@ code {
 /* --- Tab bar di navigazione principale, fissa sotto l'header --- */
 .tabbar {
   position: fixed;
-  top: var(--header-h);
+  top: calc(var(--header-h) + var(--safe-top));
   right: 0;
   width: 98%;
   height: var(--tabbar-h);
@@ -1454,7 +1464,10 @@ body:has(.install-banner) .rooms-hint {
   overflow-y: auto;
   border-radius: 10px;
   border: 1px solid rgba(232, 177, 78, 0.3);
-  background: #1e1b29;
+  /* Segue il tema: in scuro era #1e1b29 hardcoded, che in tema chiaro lasciava
+     il menù nero con testo scuro (illeggibile). --surface vale #221f2e (scuro)
+     / #e4dfd0 (chiaro): il testo var(--text) resta leggibile in entrambi. */
+  background: var(--surface);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
 }
 
