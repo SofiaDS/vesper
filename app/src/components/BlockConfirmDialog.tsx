@@ -24,10 +24,11 @@ export function BlockConfirmDialog({
         className="modal"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="block-modal-title"
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="modal-title">Bloccare @{nickname}?</h2>
+        <h2 className="modal-title" id="block-modal-title">Bloccare @{nickname}?</h2>
         <p className="muted small-inline">
           Non vedrai più i suoi messaggi. La persona non riceverà una notifica.
         </p>

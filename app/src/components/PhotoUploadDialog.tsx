@@ -171,12 +171,13 @@ export function PhotoUploadDialog({
         className="modal"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="photo-upload-title"
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
         {stage === 'choose' && (
           <>
-            <h3 className="modal-title">Aggiungi una foto</h3>
+            <h3 className="modal-title" id="photo-upload-title">Aggiungi una foto</h3>
             {/* L'errore sta sopra ai bottoni perché di solito parla proprio di
                 loro ("Fotocamera non disponibile. Prova con la galleria."). */}
             {err && <p className="err" role="alert">{err}</p>}
@@ -223,7 +224,7 @@ export function PhotoUploadDialog({
 
         {stage === 'crop' && (
           <>
-            <h3 className="modal-title">Ritaglia</h3>
+            <h3 className="modal-title" id="photo-upload-title">Ritaglia</h3>
             <p className="hint">Trascina per spostare, usa il cursore per lo zoom.</p>
             <div
               className="crop-box"

@@ -560,13 +560,16 @@ export function ProfileEditor({
 
         <fieldset className="field">
           <legend>Avatar</legend>
-          <div className="avatar-tabs" role="tablist">
+          {/* Selezione singola in un fieldset (la legend "Avatar" fa da
+              raggruppamento accessibile). Non è un vero tablist — manca
+              tabpanel/frecce — quindi usiamo bottoni con aria-pressed, come il
+              controllo dimensione testo, invece di role="tab" a metà. */}
+          <div className="avatar-tabs">
             {AVATAR_STYLES.map((s) => (
               <button
                 type="button"
                 key={s.key}
-                role="tab"
-                aria-selected={avatarStyle === s.key}
+                aria-pressed={avatarStyle === s.key}
                 className={avatarStyle === s.key ? 'avatar-tab sel' : 'avatar-tab'}
                 onClick={() => setAvatarStyle(s.key)}
               >

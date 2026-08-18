@@ -216,10 +216,11 @@ export function AltroScreen({
             className="modal"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="logout-modal-title"
             tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="modal-title">Vuoi uscire?</h2>
+            <h2 className="modal-title" id="logout-modal-title">Vuoi uscire?</h2>
             <p className="muted small-inline">
               Verrai disconnessa e tornerai alla schermata di accesso.
             </p>

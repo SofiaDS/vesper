@@ -145,10 +145,11 @@ export function VouchRequestsScreen({
             className="modal"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="deny-vouch-title"
             tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="modal-title">Rifiutare la garanzia?</h2>
+            <h2 className="modal-title" id="deny-vouch-title">Rifiutare la garanzia?</h2>
             {/* Nessun avviso di penalità: dall'11 ago 2026 rifiutare non ha
                 conseguenze per il garante (vedi migration
                 20260811160000_vouch_skips_video_and_no_deny_penalty). */}

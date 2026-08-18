@@ -81,6 +81,7 @@ export function ProfileGallery({
             className="lightbox"
             role="dialog"
             aria-modal="true"
+            aria-label="Foto profilo a schermo intero"
             tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >

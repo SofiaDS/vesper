@@ -61,12 +61,13 @@ export function ReportDialog({
         className="modal"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="report-modal-title"
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
         {done ? (
           <div role="status">
-            <h2 className="modal-title">Segnalazione inviata</h2>
+            <h2 className="modal-title" id="report-modal-title">Segnalazione inviata</h2>
             <p className="muted">
               Grazie. Il team di moderazione la esaminerà al più presto.
             </p>
@@ -78,7 +79,7 @@ export function ReportDialog({
           </div>
         ) : (
           <form onSubmit={submit}>
-            <h2 className="modal-title">Segnala {targetLabel}</h2>
+            <h2 className="modal-title" id="report-modal-title">Segnala {targetLabel}</h2>
             <p className="muted small-inline">
               La segnalazione è anonima per la persona segnalata.
             </p>
