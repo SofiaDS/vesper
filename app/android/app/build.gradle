@@ -46,6 +46,12 @@ android {
             if (keystorePropsFile.exists()) {
                 signingConfig signingConfigs.release
             }
+            // Include i simboli di debug del codice nativo (Firebase/Capacitor)
+            // nell'AAB: toglie il warning di Play e rende leggibili gli eventuali
+            // crash nativi. Vale dal PROSSIMO build.
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
