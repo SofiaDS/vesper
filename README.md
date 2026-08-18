@@ -1,57 +1,46 @@
-# App community lesbica/queer — Documentazione di progetto
+# Vesper
 
-Repository di tutte le decisioni di prodotto e tecniche del progetto. Ogni file tratta un tema specifico, in modo da essere navigabile senza scrollare un singolo documento gigante.
+**Uno spazio digitale sicuro per la comunità lesbica e queer.**
 
-Ultimo aggiornamento: 4 giugno 2026
+Vesper è un'app mobile pensata per far incontrare e connettere donne lesbiche,
+bisessuali, queer e persone della comunità LGBTQ+ femminile, a partire dall'Italia.
 
----
+## Perché nasce
 
-## CONCEPT
+Trovare uno spazio online in cui sentirsi davvero al sicuro e a proprio agio non
+è scontato. Gran parte delle app esistenti ruota attorno alla logica dello swipe
+e del match romantico, mette al centro l'apparenza, e non offre abbastanza tutele
+contro molestie e presenze indesiderate.
 
-**Cosa**: App mobile (iOS + Android) per connettere donne lesbiche, bisessuali, queer e persone della comunità LGBTQ+ femminile, partendo dall'Italia.
+Vesper nasce da un bisogno diverso: un luogo dove **conoscersi con calma**, fare
+comunità, parlare e sentirsi parte di qualcosa — non solo cercare un
+appuntamento. Uno spazio costruito attorno alla sicurezza, all'inclusività e al
+rispetto delle persone che lo abitano.
 
-**Modello**: Chatroom-first community (non swipe/match come Tinder). Le persone si conoscono nella chatroom globale, poi possono passare a messaggi privati. In aggiunta, una funzione di **ricerca utenti opt-in** permette di trovare persone specifiche per nickname o di esplorare per filtri di affinità.
+## Come funziona
 
-**Target**: Donne cis, donne trans (MTF), uomini trans (FTM), persone non-binary AFAB. Orientamenti: lesbiche, bisessuali, queer, pan, in questioning.
+L'esperienza è **community-first**: ci si conosce dentro chat comuni, tematiche e
+aperte, dove nascono conversazioni e legami. Da lì, quando c'è il desiderio, si
+può passare a messaggi privati. In più, chi vuole può rendersi trovabile e
+cercare altre persone per affinità.
 
-**Stato**: Idea — fase di progettazione pre-sviluppo.
+Tutto è pensato per essere accogliente e accessibile: un ambiente curato, in cui
+ogni persona possa esprimersi per come è.
 
----
+## Per chi è
 
-## MAPPA DEI DOCUMENTI
+Vesper è uno spazio per la comunità LGBTQ+ femminile e queer: donne cis e trans,
+uomini trans, persone non-binary. Orientamenti lesbici, bisessuali, queer, pan e
+in questioning trovano qui un posto pensato per loro.
 
-### Decisioni di prodotto
+## Valori
 
-| File | Contenuto |
-|---|---|
-| [`utenti_e_identita.md`](./utenti_e_identita.md) | Verifica identità, dichiarazione di appartenenza, categorie, esclusione uomini cis, principi etici |
-| [`permessi_e_strati.md`](./permessi_e_strati.md) | I 3 strati di permessi progressivi, sistema vouching (garanti) |
-| [`reputazione.md`](./reputazione.md) | Sistema di reputazione invisibile come strumento di moderazione (in fase di definizione) |
-| [`moderazione.md`](./moderazione.md) | Chi modera, segnalazioni, filtro AI, gestione casi speciali, dashboard moderatori |
-| [`appelli.md`](./appelli.md) | Procedure di appello per rifiuto verifica e ban |
-| [`profilo_utente.md`](./profilo_utente.md) | Campi profilo, visibilità, avatar preset, evoluzione v2 con foto |
-| [`ricerca_utenti.md`](./ricerca_utenti.md) | Ricerca per nickname e per filtri di affinità, opt-in, anti-abuso |
-| [`block.md`](./block.md) | Sistema di block tra utenti, perimetro, visibilità, gestione |
-| [`chatroom.md`](./chatroom.md) | Struttura delle chat: 1 globale (Foyer) + 3 tematiche (Wander, Pulse, Cult) |
-| [`minori_e_eta.md`](./minori_e_eta.md) | Età minima 18+, doppia barriera, procedura sospetto minorenne |
-| [`gdpr_e_legale.md`](./gdpr_e_legale.md) | Aspetti GDPR, compliance, TOS, consulenza legale, conservazione dati |
-| [`monetizzazione.md`](./monetizzazione.md) | Modello di business, opzioni ADV/supporter/ibrido, posizionamento strategico |
-| [`branding.md`](./branding.md) | Nome (Vesper), palette "Inchiostro & oro", stato logo, verifiche marchio/dominio |
-| [`punti_aperti.md`](./punti_aperti.md) | Tutte le decisioni ancora da prendere, divise per priorità |
-
-### Decisioni tecniche
-
-| File | Contenuto |
-|---|---|
-| [`stack_tecnico.md`](./stack_tecnico.md) | Stack tecnologico completo, costi, roadmap di sviluppo |
-| [`app/`](./app/) | Frontend PWA (React + Vite + TypeScript). Setup in [`app/SETUP.md`](./app/SETUP.md) |
-| [`supabase/`](./supabase/) | Schema del database (migration SQL Fase 1, seed, RLS). Vedi [`supabase/README.md`](./supabase/README.md) |
+- **Sicurezza** — un ambiente protetto, dove sentirsi a proprio agio.
+- **Inclusività** — spazio per tutte le identità della comunità.
+- **Accessibilità** — un'esperienza pensata per essere usabile da chiunque.
+- **Privacy** — rispetto e cura dei dati delle persone.
 
 ---
 
-## COME USARE QUESTI DOCUMENTI
-
-- **Ogni decisione presa** è registrata con: contesto, opzioni considerate, scelta finale, motivazione, note aperte.
-- **Decisioni scartate** sono mantenute con la motivazione (utile tra mesi per non ripensarci).
-- **Riferimenti incrociati** tra file espliciti quando un tema tocca più documenti (es. "vedi `moderazione.md` punto X").
-- **Aggiornare il file rilevante** ogni volta che una decisione viene presa o modificata, e aggiornare la data in alto.
+*Vesper è un progetto in evoluzione, costruito con attenzione e ascolto della
+comunità a cui si rivolge.*

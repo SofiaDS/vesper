@@ -6,11 +6,13 @@
 # generati, non fanno parte dell'app. Rigenerabili da store-assets/src.
 store-assets/
 
-# Documenti di progetto / planning / spec (tenuti in locale, fuori dal repo).
-# Regola solo sui .md in ROOT: i README/SETUP di sviluppo nelle sottocartelle
-# (app/README.md, app/SETUP.md, supabase/README.md) NON sono toccati.
-# README.md di root resta tracciato.
+# Documenti di progetto / planning / spec / bozze (tenuti in locale, fuori dal
+# repo). Regola solo sui file in ROOT: i README/SETUP di sviluppo nelle
+# sottocartelle (app/README.md, app/SETUP.md, supabase/README.md) NON sono
+# toccati. README.md di root resta tracciato.
 /*.md
+/*.txt
+/*.docx
 !/README.md
 
 # Temporanei / OS / editor
