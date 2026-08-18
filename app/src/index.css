@@ -3750,6 +3750,27 @@ button.dm-conv:hover {
 }
 .burger-btn:hover { background: rgba(232, 177, 78, 0.24); }
 
+/* Hit-area touch da 44px per i bottoni icona piccoli, senza ingrandire il cerchio
+   visibile: pseudo-elemento trasparente centrato (stessa tecnica di .msg-reaction-add).
+   Solo su bottoni isolati — .photo-star/.photo-del sono troppo vicini per due aree
+   da 44px senza sovrapporle (da ridisegnare a parte). Le icone hanno già position
+   fixed/relative/absolute che fa da contesto; .pf-icon-btn no, gliela diamo qui. */
+.pf-icon-btn { position: relative; }
+.theme-btn::before,
+.burger-btn::before,
+.pf-icon-btn::before,
+.carousel-nav::before,
+.carousel-report::before,
+.lightbox-close::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
 .burger-overlay {
   position: fixed;
   inset: 0;
