@@ -91,6 +91,14 @@ html[data-font="dyslexic"] {
   --font-body: 'OpenDyslexic', 'Atkinson Hyperlegible', system-ui, sans-serif;
 }
 
+/* Dimensione testo regolabile (Impostazioni › Accessibilità, WCAG 1.4.4).
+   Il layout è tutto in `rem`, quindi scalare il font-size della radice ingrandisce
+   proporzionalmente testo, header, tab bar e spaziature. Livello "default" = nessun
+   attributo = default del browser (di norma 16px), così rispetta anche eventuali
+   impostazioni di sistema dell'utente. */
+html[data-text-size="large"] { font-size: 112.5%; }
+html[data-text-size="xlarge"] { font-size: 125%; }
+
 * {
   box-sizing: border-box;
 }
@@ -3664,6 +3672,40 @@ button.dm-conv:hover {
   transition: transform 0.2s;
 }
 .toggle-pill.on .toggle-knob { transform: translateX(20px); }
+
+/* ── Controllo a segmenti: dimensione testo (Accessibilità) ────────────
+   Selezione singola su tre livelli. Impilato in verticale perché tre etichette
+   non stanno accanto alla label sulla colonna da 420px. */
+.text-size-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+.seg {
+  display: flex;
+  gap: 0.35rem;
+  width: 100%;
+}
+.seg-btn {
+  flex: 1;
+  min-height: 44px; /* target touch */
+  padding: 0.4rem 0.3rem;
+  border: 1.5px solid rgba(232, 177, 78, 0.4);
+  border-radius: 8px;
+  background: rgba(232, 177, 78, 0.12);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.seg-btn.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #171520; /* testo scuro su oro in entrambi i temi (come .btn-primary) */
+  font-weight: 600;
+}
 
 /* ── Theme icon button (fixed, tutte le schermate) ────── */
 .theme-btn {

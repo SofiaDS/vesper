@@ -1,6 +1,7 @@
 import { AppHeader } from '../components/AppHeader'
 import { NotificationSettings } from '../components/NotificationSettings'
 import { FontToggle } from '../components/FontToggle'
+import { TextSizeControl } from '../components/TextSizeControl'
 import { PinSetupSection } from './profile/PinSetupSection'
 import { LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
 
@@ -25,6 +26,7 @@ export function SettingsScreen({
       <section className="card box-shadow" style={{ marginTop: '1rem' }}>
         <h2 className="pf-section-title">Accessibilità</h2>
         <FontToggle />
+        <TextSizeControl />
       </section>
 
       <section className="card box-shadow" style={{ marginTop: '1rem' }}>

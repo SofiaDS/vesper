@@ -5,10 +5,13 @@ import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './auth/AuthProvider'
 import { initFont } from './hooks/useFont'
+import { initTextSize } from './hooks/useTextSize'
 
-// Applica la preferenza font salvata prima del render, così il carattere ad
-// alta leggibilità vale su tutte le schermate (il toggle vive solo in Impostazioni).
+// Applica le preferenze di accessibilità salvate prima del render (font ad alta
+// leggibilità + dimensione testo), così valgono su tutte le schermate: i
+// controlli vivono solo in Impostazioni.
 initFont()
+initTextSize()
 
 // Marca il guscio nativo Capacitor su <html>. Serve al CSS per garantire un
 // margine minimo sotto la status bar: nella WebView Android `env(safe-area-inset-top)`
