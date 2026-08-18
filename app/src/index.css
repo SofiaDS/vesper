@@ -908,7 +908,7 @@ code {
 
 .tab-label {
   font-weight: 600;
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   letter-spacing: 0.01em;
 }
 
@@ -3898,4 +3898,28 @@ button.dm-conv:hover {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Più contrasto richiesto a livello di sistema: rinforziamo i bordi oro tenui
+   (poco visibili a bassa opacità) e ispessiamo l'anello di focus. Dove l'elemento
+   non ha un bordo, impostare border-color è innocuo. */
+@media (prefers-contrast: more) {
+  :focus-visible { outline-width: 3px; }
+  .card,
+  .app-header,
+  .tabbar,
+  .modal,
+  .seg-btn,
+  .pf-icon-btn { border-color: var(--accent); }
+}
+
+/* Modalità alto contrasto del sistema (Windows, alcuni Android): i colori di
+   sfondo vengono sostituiti da quelli di sistema, quindi gli stati "attivo" che
+   si distinguono SOLO per il riempimento oro diventerebbero identici a quelli
+   spenti. Un contorno con colore di sistema sopravvive alla sostituzione. */
+@media (forced-colors: active) {
+  .toggle-pill.on,
+  .seg-btn.on,
+  .avatar-tab.sel,
+  .tab.active { outline: 2px solid Highlight; outline-offset: -2px; }
 }
