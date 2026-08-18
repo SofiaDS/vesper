@@ -388,7 +388,10 @@ code {
   border: 0;
   border-radius: 8px;
   background: var(--accent);
-  color: var(--bg);
+  /* Inchiostro fisso, non var(--bg): sull'oro il testo dev'essere scuro in
+     ENTRAMBI i temi. Nel dark var(--bg) era già #171520 (invariato); nel chiaro
+     var(--bg) è crema → testo crema su oro = 2.80:1 (FAIL AA). #171520 su oro ≈ 5.3:1. */
+  color: #171520;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -1268,7 +1271,7 @@ body:has(.install-banner) .rooms-hint {
   padding: 0 0.25rem;
   border-radius: 999px;
   background: var(--error);
-  color: var(--text);
+  color: #fff; /* bianco su rosso ≈ 5:1 in entrambi i temi (var(--text) nel light falliva) */
   font-size: 0.65rem;
   font-weight: 700;
   line-height: 1;
@@ -1306,7 +1309,7 @@ body:has(.install-banner) .rooms-hint {
   height: 56px;
   border-radius: 50%;
   font-size: 1.7rem;
-  color: var(--bg);
+  color: #171520; /* iniziale scura su oro in entrambi i temi (vedi .btn-primary) */
   background: var(--accent);
   flex-shrink: 0;
 }
@@ -1635,18 +1638,18 @@ body:has(.install-banner) .rooms-hint {
   border-radius: 999px;
   font-size: 0.66rem;
   font-weight: 600;
-  color: var(--bg);
+  color: #171520; /* badge su crema chiara: testo scuro fisso (nel light var(--bg) era invisibile) */
   background: rgba(247, 239, 221, 0.85);
 }
 
 .photo-badge.approved {
   background: #7fb7a3;
-  color: var(--bg);
+  color: #171520;
 }
 
 .photo-badge.pending {
   background: var(--accent);
-  color: var(--bg);
+  color: #171520;
 }
 
 .photo-badge.rejected {
@@ -1949,12 +1952,12 @@ body:has(.install-banner) .rooms-hint {
 
 .btn-approve {
   background: #7fb7a3;
-  color: var(--bg);
+  color: #171520; /* testo scuro su verde in entrambi i temi (nel light era 1.93:1) */
 }
 
 .btn-reject {
   background: var(--error);
-  color: var(--text);
+  color: #fff; /* bianco su rosso ≈ 5:1; var(--text) nel light dava 3.56:1 */
 }
 
 .btn-approve:disabled,
@@ -2064,7 +2067,7 @@ body:has(.install-banner) .rooms-hint {
   height: 44px;
   border-radius: 50%;
   font-size: 1.1rem;
-  color: var(--bg);
+  color: #171520; /* iniziale scura su oro in entrambi i temi */
   background: var(--accent);
   flex-shrink: 0;
   line-height: 1;
@@ -2983,7 +2986,7 @@ body:has(.install-banner) .rooms-hint {
   flex: 0 0 42px;
   border-radius: 50%;
   background: var(--accent);
-  color: var(--bg);
+  color: #171520; /* iniziale scura su oro in entrambi i temi */
   font-size: 1.2rem;
 }
 .search-meta {
@@ -3571,7 +3574,22 @@ button.dm-conv:hover {
 }
 
 [data-theme="light"] input::placeholder,
-[data-theme="light"] textarea::placeholder { color: rgba(26, 22, 38, 0.45); }
+[data-theme="light"] textarea::placeholder { color: rgba(26, 22, 38, 0.6); }
+
+/* Contrasto testo secondario nel tema CHIARO. Nel dark queste opacità sono già
+   AA (testo chiaro su inchiostro); nel light lo stesso testo scuro su crema
+   scende sotto 4.5:1 quando è molto trasparente. Qui le alziamo SOLO nel light
+   così restano "muted" ma leggibili, senza toccare il dark già conforme.
+   (Valori da rifinire a occhio se risultassero troppo carichi sul chiaro.) */
+[data-theme="light"] .muted,
+[data-theme="light"] .roster-toggle { opacity: 0.75; }
+[data-theme="light"] .hint,
+[data-theme="light"] .nav-row-note { opacity: 0.72; }
+[data-theme="light"] .msg-time,
+[data-theme="light"] .pf-section-title,
+[data-theme="light"] .support-note,
+[data-theme="light"] .rep-expired,
+[data-theme="light"] .rep-badge-expired { opacity: 0.68; }
 
 
 [data-theme="light"] .report-card,
@@ -3743,7 +3761,7 @@ button.dm-conv:hover {
 .burger-item:hover { background: rgba(232, 177, 78, 0.12); }
 .burger-item.active {
   background: var(--accent);
-  color: var(--bg);
+  color: #171520; /* voce attiva: testo scuro su oro in entrambi i temi */
 }
 
 .burger-item-end {
