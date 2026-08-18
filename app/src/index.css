@@ -75,6 +75,15 @@
   color: var(--text);
 }
 
+/* Solo nel guscio nativo (flag messo da main.tsx): garantiamo un margine in alto
+   comodo anche quando la WebView Android non espone `env(safe-area-inset-top)`
+   (torna 0). `max(env, 28px)` cleara la status bar in ogni caso, `+ 0.5rem` dà
+   respiro così titolo/nome profilo non risultano incollati in alto. Sul web
+   l'attributo non c'è, quindi resta il puro `env()` di sopra. */
+:root[data-native="true"] {
+  --safe-top: calc(max(env(safe-area-inset-top, 0px), 28px) + 0.5rem);
+}
+
 /* Toggle "Carattere ad alta leggibilità" (Impostazioni › Accessibilità):
    sostituisce il font di base con OpenDyslexic, mantenendo Atkinson come
    fallback. `html[...]` batte la specificità di :root, qualunque sia l'ordine. */
