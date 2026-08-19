@@ -1208,7 +1208,7 @@ body:has(.install-banner) .rooms-hint {
   opacity: 0.45;
 }
 
-/* Bottone secondario "fantasma" (es. Lascia stanza).
+/* Bottone secondario "fantasma" (es. Esci).
    Stessa forma a pillola di .btn-primary/.btn-secondary, per coerenza
    quando compaiono affiancati (es. azioni su una room-card). */
 /* Bottone secondario delineato. .btn-ghost e .btn-danger condividono la forma

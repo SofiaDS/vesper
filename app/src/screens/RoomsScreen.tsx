@@ -106,7 +106,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
                           onClick={() => handleLeave(room)}
                           disabled={working}
                         >
-                          {working ? 'Lasciando…' : 'Lascia stanza'}
+                          {working ? 'Lasciando…' : 'Esci'}
                         </button>
                       )}
                     </>
