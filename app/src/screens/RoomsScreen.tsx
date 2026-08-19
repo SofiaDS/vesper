@@ -102,11 +102,11 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
                       {isJoined && !isFoyer && (
                         <button
                           type="button"
-                          className="btn-ghost btn-sm"
+                          className="btn-danger btn-sm"
                           onClick={() => handleLeave(room)}
                           disabled={working}
                         >
-                          {working ? 'Lasciando…' : 'Esci'}
+                          {working ? 'Uscendo…' : 'Esci'}
                         </button>
                       )}
                     </>

@@ -16,6 +16,7 @@ import { useMessageReactions } from '../hooks/useMessageReactions'
 import { useTypingIndicator } from '../hooks/useTypingIndicator'
 import { promoteLayer } from '../lib/layers'
 import { markRead } from '../lib/reads'
+import { dayKey, dayLabel } from '../lib/dayLabel'
 import { Avatar } from '../components/Avatar'
 import type { Chatroom } from '../types'
 import type { ChatMessage } from '../hooks/useChatMessages'
@@ -63,6 +64,7 @@ export function ChatScreen({
     reload,
   } = useChatMessages({
     roomId: room.id,
+    myId,
     blockedIds,
     nicknameCache,
     loadBlockedIds,
@@ -171,11 +173,16 @@ export function ChatScreen({
         {!loading && messages.length === 0 && (
           <p className="muted">Ancora nessun messaggio. Scrivi tu il primo. 👋</p>
         )}
-        {messages.map((m) => (
-          <div
-            key={m.id}
-            className={m.sender_id === myId ? 'msg-row msg-row-mine' : 'msg-row'}
-          >
+        {messages.map((m, i) => (
+          <div key={m.id} className="msg-group">
+            {(i === 0 || dayKey(messages[i - 1].created_at) !== dayKey(m.created_at)) && (
+              <div className="day-divider" role="separator">
+                <span>{dayLabel(m.created_at)}</span>
+              </div>
+            )}
+            <div
+              className={m.sender_id === myId ? 'msg-row msg-row-mine' : 'msg-row'}
+            >
             {m.sender_id !== myId && (
               <button
                 type="button"
@@ -241,6 +248,7 @@ export function ChatScreen({
                   )}
                 </span>
               </div>
+            </div>
             </div>
           </div>
         ))}

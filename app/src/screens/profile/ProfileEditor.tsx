@@ -257,6 +257,17 @@ export function ProfileEditor({
   })
   const [dmFilter, setDmFilter] = useState(profile.dm_filter)
 
+  // Data di nascita: facoltativa e inseribile una sola volta (finché il profilo
+  // non ne ha una). Da qui deriva l'età usata nei filtri di ricerca e nel
+  // profilo. Una volta salvata non è più modificabile dall'editor.
+  const [birthDate, setBirthDate] = useState('')
+  // Data massima selezionabile = oggi meno 18 anni (vincolo 18+ lato app).
+  const maxBirthDate = (() => {
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - 18)
+    return d.toISOString().slice(0, 10)
+  })()
+
   const [cityName, setCityName] = useState(profile.city ?? '')
   const [cityProvince, setCityProvince] = useState(profile.city_province ?? '')
   const [cityRegion, setCityRegion] = useState(profile.city_region ?? '')
@@ -454,6 +465,14 @@ export function ProfileEditor({
       setError("Seleziona la città dall'elenco dei suggerimenti.")
       return
     }
+    // Data di nascita: si salva solo la prima volta (finché il profilo non ne ha
+    // già una). Ricontrolliamo il vincolo 18+ oltre al `max` dell'input, che un
+    // utente potrebbe aggirare.
+    const birthDateToSave = !profile.birth_date && birthDate ? birthDate : null
+    if (birthDateToSave && birthDateToSave > maxBirthDate) {
+      setError('Devi avere almeno 18 anni per inserire la data di nascita.')
+      return
+    }
     const relTypeToSave = relStatus === 'in_relazione' ? relType : null
     setSaving(true)
     try {
@@ -485,6 +504,7 @@ export function ProfileEditor({
           sport,
           avatar_preset: avatar,
           dm_filter: dmFilter,
+          ...(birthDateToSave ? { birth_date: birthDateToSave } : {}),
           ...vis,
           is_searchable: searchable,
           updated_at: new Date().toISOString(),
@@ -702,28 +722,47 @@ export function ProfileEditor({
           </label>
         </div>
 
-        {profile.birth_date && (
-          <fieldset className="field">
-            <legend>Età e data di nascita</legend>
+        <fieldset className="field">
+          <legend>Età e data di nascita</legend>
+          {profile.birth_date ? (
             <p className="hint">la data di nascita non è modificabile.</p>
-            <label className="declare mini">
+          ) : (
+            <label className="field">
+              <span>Data di nascita (facoltativa)</span>
               <input
-                type="checkbox"
-                checked={vis.show_age}
-                onChange={(e) => setVisFlag('show_age', e.target.checked)}
+                type="date"
+                value={birthDate}
+                max={maxBirthDate}
+                min="1900-01-01"
+                onChange={(e) => setBirthDate(e.target.value)}
               />
-              <span>Mostra la mia età</span>
+              <p className="hint">
+                Devi avere almeno 18 anni. Una volta salvata non sarà più
+                modificabile. Serve per mostrare la tua età e per i filtri di ricerca.
+              </p>
             </label>
-            <label className="declare mini">
-              <input
-                type="checkbox"
-                checked={vis.show_birth_date}
-                onChange={(e) => setVisFlag('show_birth_date', e.target.checked)}
-              />
-              <span>Mostra la data esatta</span>
-            </label>
-          </fieldset>
-        )}
+          )}
+          {(profile.birth_date || birthDate) && (
+            <>
+              <label className="declare mini">
+                <input
+                  type="checkbox"
+                  checked={vis.show_age}
+                  onChange={(e) => setVisFlag('show_age', e.target.checked)}
+                />
+                <span>Mostra la mia età</span>
+              </label>
+              <label className="declare mini">
+                <input
+                  type="checkbox"
+                  checked={vis.show_birth_date}
+                  onChange={(e) => setVisFlag('show_birth_date', e.target.checked)}
+                />
+                <span>Mostra la data esatta</span>
+              </label>
+            </>
+          )}
+        </fieldset>
 
         <FilterSection
           legend="Identità & orientamento"

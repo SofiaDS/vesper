@@ -1208,6 +1208,37 @@ body:has(.install-banner) .rooms-hint {
   opacity: 0.45;
 }
 
+/* Il wrapper .msg-group tiene insieme un eventuale divisore di giorno e la riga
+   del messaggio: serve solo a raggruppare, non altera il layout della bolla. */
+.msg-group {
+  display: contents;
+}
+
+/* Divisore "Oggi / Ieri / data" tra blocchi di giorni diversi in chat e DM.
+   Etichetta centrata su una linea sottile, discreta rispetto ai messaggi. */
+.day-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.9rem 0 0.5rem;
+}
+.day-divider::before,
+.day-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(232, 177, 78, 0.18);
+}
+.day-divider span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  color: var(--text);
+  opacity: 0.55;
+  white-space: nowrap;
+}
+
 /* Bottone secondario "fantasma" (es. Esci).
    Stessa forma a pillola di .btn-primary/.btn-secondary, per coerenza
    quando compaiono affiancati (es. azioni su una room-card). */

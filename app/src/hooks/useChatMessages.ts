@@ -14,6 +14,7 @@ const PAGE_SIZE = 50
 
 interface Options {
   roomId: string
+  myId: string | undefined
   blockedIds: React.MutableRefObject<Set<string>>
   nicknameCache: React.MutableRefObject<Map<string, string>>
   loadBlockedIds: () => Promise<void>
@@ -22,6 +23,7 @@ interface Options {
 
 export function useChatMessages({
   roomId,
+  myId,
   blockedIds,
   nicknameCache,
   loadBlockedIds,
@@ -35,6 +37,10 @@ export function useChatMessages({
   const [reloadKey, setReloadKey] = useState(0)
   // Evita auto-scroll quando si prependono messaggi vecchi.
   const skipAutoScroll = useRef(false)
+  // Momento in cui l'utente si è iscritto alla stanza: non mostriamo i messaggi
+  // inviati prima, così entrando non si eredita tutto lo storico pregresso.
+  // (Il Foyer è auto-join alla registrazione → joined_at ≈ signup.)
+  const joinedAt = useRef<string | null>(null)
 
   function appendMessage(msg: ChatMessage) {
     setMessages((prev) =>
@@ -50,10 +56,26 @@ export function useChatMessages({
     setHasMore(false)
 
     async function init() {
-      const { data: rows, error: msgErr } = await supabase
+      // Recupera il momento di iscrizione per filtrare via lo storico
+      // precedente. Se manca la riga (es. Foyer non ancora seminato), non
+      // filtriamo: meglio mostrare i messaggi che nasconderli per errore.
+      const { data: mem } = myId
+        ? await supabase
+            .from('chat_membership')
+            .select('joined_at')
+            .eq('chatroom_id', roomId)
+            .eq('user_id', myId)
+            .maybeSingle()
+        : { data: null }
+      if (!active) return
+      joinedAt.current = mem?.joined_at ?? null
+
+      let query = supabase
         .from('messages')
         .select('id, body, created_at, sender_id, reply_to_id')
         .eq('chatroom_id', roomId)
+      if (joinedAt.current) query = query.gte('created_at', joinedAt.current)
+      const { data: rows, error: msgErr } = await query
         .order('created_at', { ascending: false })
         .limit(PAGE_SIZE)
 
@@ -89,7 +111,7 @@ export function useChatMessages({
 
     init()
     return () => { active = false }
-  }, [roomId, reloadKey])
+  }, [roomId, myId, reloadKey])
 
   function reload() {
     setReloadKey((k) => k + 1)
@@ -100,11 +122,13 @@ export function useChatMessages({
     setLoadingOlder(true)
     setError(null)
     try {
-      const { data: rows, error: olderErr } = await supabase
+      let olderQuery = supabase
         .from('messages')
         .select('id, body, created_at, sender_id, reply_to_id')
         .eq('chatroom_id', roomId)
         .lt('created_at', oldestCreatedAt)
+      if (joinedAt.current) olderQuery = olderQuery.gte('created_at', joinedAt.current)
+      const { data: rows, error: olderErr } = await olderQuery
         .order('created_at', { ascending: false })
         .limit(PAGE_SIZE)
       if (olderErr) throw olderErr

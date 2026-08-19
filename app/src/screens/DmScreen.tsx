@@ -19,6 +19,7 @@ import {
 } from '../lib/dm'
 import { isBlocked } from '../lib/blocks'
 import { markRead } from '../lib/reads'
+import { dayKey, dayLabel } from '../lib/dayLabel'
 import { useDmUnread } from '../hooks/useUnreadCounts'
 import { useOnlinePresence } from '../hooks/useOnlinePresence'
 
@@ -219,11 +220,18 @@ function ConversationView({
         {!loading && messages.length === 0 && (
           <p className="muted">Nessun messaggio. Scrivi il primo.</p>
         )}
-        {messages.map((m) => {
+        {messages.map((m, i) => {
           const nicknameOf = (senderId: string) => (senderId === myId ? 'tu' : conversation.other_nickname)
           const quoted = m.reply_to_id != null ? messages.find((q) => q.id === m.reply_to_id) : null
+          const showDivider = i === 0 || dayKey(messages[i - 1].created_at) !== dayKey(m.created_at)
           return (
-            <div key={m.id} className={m.sender_id === myId ? 'msg-row msg-row-mine' : 'msg-row'}>
+            <div key={m.id} className="msg-group">
+            {showDivider && (
+              <div className="day-divider" role="separator">
+                <span>{dayLabel(m.created_at)}</span>
+              </div>
+            )}
+            <div className={m.sender_id === myId ? 'msg-row msg-row-mine' : 'msg-row'}>
               <div className="msg-col">
                 <div className={m.sender_id === myId ? 'msg msg-mine' : 'msg'}>
                   {m.reply_to_id != null && (
@@ -255,6 +263,7 @@ function ConversationView({
                   </span>
                 </div>
               </div>
+            </div>
             </div>
           )
         })}
