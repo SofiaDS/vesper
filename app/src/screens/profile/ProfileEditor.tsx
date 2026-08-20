@@ -14,6 +14,7 @@ import {
   Medal,
   PawPrint,
   PersonSimpleRun,
+  Planet,
   Scales,
   Sparkle,
   Star,
@@ -63,15 +64,8 @@ import { SummaryRows, summarize, type SummaryRow } from './SummaryRows'
 import { DeleteAccountSection } from './DeleteAccountSection'
 import { normalize, labelOf } from '../../lib/profile/formatters'
 import { profileCompletion } from '../../lib/profile/completion'
-import {
-  AVATAR_STYLES,
-  AVATAR_GRID_SIZE,
-  GALLERY_SEEDS,
-  avatarValue,
-  parseAvatar,
-  randomSeed,
-  type AvatarStyle,
-} from '../../lib/profile/avatars'
+import { defaultAvatarValue, parseAvatar } from '../../lib/profile/avatars'
+import { AvatarPicker, avatarSummary } from './AvatarPicker'
 import { Avatar } from '../../components/Avatar'
 import { checkLayerEligibility, type LayerEligibility } from '../../lib/layers'
 import {
@@ -338,14 +332,13 @@ export function ProfileEditor({
   const [newInterest, setNewInterest] = useState('')
   const [smoking, setSmoking] = useState<Smoking | null>(profile.smoking ?? null)
   const [sport, setSport] = useState<Sport | null>(profile.sport ?? null)
-  const [avatar, setAvatar] = useState<string | null>(profile.avatar_preset ?? null)
-  const [avatarStyle, setAvatarStyle] = useState<AvatarStyle>('adventurer')
-  // Set di avatar mostrati per stile. "Mostra altri" lo SOSTITUISCE (non
-  // accumula), così la griglia resta di ~20 avatar invece di crescere all'infinito.
-  const [avatarPool, setAvatarPool] = useState<Record<AvatarStyle, string[]>>({
-    adventurer: GALLERY_SEEDS.adventurer,
-    bottts: GALLERY_SEEDS.bottts,
-  })
+  // Chi non ha ancora un avatar — o ne ha uno nel vecchio formato, con gli
+  // stili di DiceBear v9 che non esistono più — parte da quello di default sul
+  // proprio id: l'avatar non è una casella da riempire, ce l'hanno tutte.
+  // Aprendo l'editor e salvando, il valore vecchio si allinea al nuovo formato.
+  const [avatar, setAvatar] = useState<string>(
+    parseAvatar(profile.avatar_preset) ? profile.avatar_preset! : defaultAvatarValue(profile.id),
+  )
   const [dmFilter, setDmFilter] = useState(profile.dm_filter)
 
   // Data di nascita: facoltativa e inseribile una sola volta (finché il profilo
@@ -627,25 +620,6 @@ export function ProfileEditor({
     }
   }
 
-  // Se l'utente ha già scelto un avatar di questo stile, tienilo in cima e
-  // sempre visibile anche dopo uno shuffle, così la sua scelta non "sparisce".
-  // La griglia ha 3 colonne fisse: teniamo SEMPRE esattamente AVATAR_GRID_SIZE
-  // celle (griglia 3×4 piena). Quando l'avatar selezionato va messo in cima,
-  // togliamo l'ultimo del pool, così non spunta una riga con un solo elemento.
-  const selectedAvatar = parseAvatar(avatar)
-  const poolSeeds = avatarPool[avatarStyle]
-  const seeds =
-    selectedAvatar &&
-    selectedAvatar.style === avatarStyle &&
-    !poolSeeds.includes(selectedAvatar.seed)
-      ? [selectedAvatar.seed, ...poolSeeds.slice(0, AVATAR_GRID_SIZE - 1)]
-      : poolSeeds.slice(0, AVATAR_GRID_SIZE)
-  const showMoreAvatars = () =>
-    setAvatarPool((prev) => ({
-      ...prev,
-      [avatarStyle]: Array.from({ length: AVATAR_GRID_SIZE }, () => randomSeed()),
-    }))
-
   const identityOpts = useMemo(() => IDENTITY_OPTIONS, [])
   const orientationOpts = useMemo(() => ORIENTATION_OPTIONS, [])
   const intentOpts = useMemo(() => INTENT_OPTIONS, [])
@@ -656,7 +630,6 @@ export function ProfileEditor({
   // Barra di completamento: legge lo stato del form (non il profilo salvato),
   // così la percentuale si muove mentre si compila.
   const completion = profileCompletion({
-    avatar_preset: avatar,
     pronouns,
     bio,
     city: citySelected.current ? cityName : null,
@@ -938,6 +911,24 @@ export function ProfileEditor({
             </div>
           )}
         </div>
+      ),
+    },
+  ]
+
+  // ── Scheda «Base»: l'unica riga riassuntiva, per l'avatar ─────────────
+  const avatarFields: SummaryRow[] = [
+    {
+      key: 'avatar',
+      label: 'Avatar',
+      icon: Planet,
+      value: avatarSummary(avatar),
+      body: (
+        <AvatarPicker
+          value={avatar}
+          seed={profile.id}
+          nickname={nickname}
+          onChange={setAvatar}
+        />
       ),
     },
   ]
@@ -1411,7 +1402,7 @@ export function ProfileEditor({
   ]
 
   const sheetField =
-    [...lifeFields, ...identityFields, ...privacyFields].find((f) => f.key === openSheet) ?? null
+    [...avatarFields, ...lifeFields, ...identityFields, ...privacyFields].find((f) => f.key === openSheet) ?? null
 
   return (
     <main className="app profile">
@@ -1471,50 +1462,7 @@ export function ProfileEditor({
               />
             </label>
 
-            <fieldset className="field">
-              <legend>Avatar</legend>
-              {/* Selezione singola in un fieldset (la legend "Avatar" fa da
-                  raggruppamento accessibile). Non è un vero tablist — manca
-                  tabpanel/frecce — quindi usiamo bottoni con aria-pressed, come il
-                  controllo dimensione testo, invece di role="tab" a metà. */}
-              <div className="avatar-tabs">
-                {AVATAR_STYLES.map((s) => (
-                  <button
-                    type="button"
-                    key={s.key}
-                    aria-pressed={avatarStyle === s.key}
-                    className={avatarStyle === s.key ? 'avatar-tab sel' : 'avatar-tab'}
-                    onClick={() => setAvatarStyle(s.key)}
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </div>
-              <div className="avatar-grid">
-                {seeds.map((seed) => {
-                  const value = avatarValue(avatarStyle, seed)
-                  return (
-                    <button
-                      type="button"
-                      key={value}
-                      className={avatar === value ? 'avatar-cell sel' : 'avatar-cell'}
-                      onClick={() => setAvatar(value)}
-                      aria-label={`Avatar ${seed}`}
-                      aria-pressed={avatar === value}
-                    >
-                      <Avatar preset={value} nickname={nickname} />
-                    </button>
-                  )
-                })}
-              </div>
-              <button type="button" className="avatar-more" onClick={showMoreAvatars}>
-                🎲 Mostra altri
-              </button>
-              <span className="hint">
-                L'avatar che scegli resta selezionato: premendo «Mostra altri» non
-                lo perdi, rimane in cima alla griglia.
-              </span>
-            </fieldset>
+            <SummaryRows rows={avatarFields} openKey={openSheet} onOpen={setOpenSheet} />
 
             {/* Un <div>, non un <label>: la pillola occhio è un bottone, e un
                 bottone dentro l'etichetta di un campo ne ruberebbe il click. */}

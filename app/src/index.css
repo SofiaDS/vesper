@@ -1372,27 +1372,6 @@ body:has(.install-banner) .rooms-hint {
   border: 3px solid var(--bg);
 }
 
-/* Griglia di scelta avatar */
-.avatar-opt {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  font-size: 1.35rem;
-  background: rgba(247, 239, 221, 0.05);
-  border: 1px solid rgba(232, 177, 78, 0.22);
-  cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.1s ease;
-}
-
-.avatar-opt.sel {
-  border-color: var(--accent);
-  background: rgba(232, 177, 78, 0.16);
-  transform: scale(1.06);
-}
-
 /* Avatar generati (DiceBear): l'SVG riempie e ritaglia la bolla tonda. */
 .avatar-img {
   width: 100%;
@@ -1402,7 +1381,9 @@ body:has(.install-banner) .rooms-hint {
   display: block;
 }
 
-/* Selettore avatar: schede stile + griglia + "mostra altri". */
+/* Selettore avatar: due schede (Pianeti / Costellazioni) e sotto le varianti
+   di colore. Non c'è più una griglia da cui pescare un avatar a caso: l'avatar
+   è uno solo, generato dall'id del profilo, e qui se ne sceglie l'aspetto. */
 .avatar-tabs {
   display: flex;
   gap: 0.4rem;
@@ -1424,38 +1405,45 @@ body:has(.install-banner) .rooms-hint {
   background: rgba(232, 177, 78, 0.16);
   color: var(--accent-text);
 }
-.avatar-grid {
+/* Le varianti di colore dello stile scelto. Ogni casella mostra il TUO
+   avatar — stesso seed, stesso pianeta — così vedi esattamente cosa ottieni. */
+.avatar-presets {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.6rem;
+  margin-top: 0.2rem;
 }
-.avatar-cell {
-  width: 100%;
-  aspect-ratio: 1;
-  padding: 2px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  background: none;
-  cursor: pointer;
-  transition: transform 0.1s ease, border-color 0.15s ease;
-}
-.avatar-cell.sel {
-  border-color: var(--accent);
-  transform: scale(1.06);
-}
-.avatar-more {
-  margin-top: 0.75rem;
-  padding: 0.5rem 0.95rem;
-  border-radius: 999px;
-  border: 1px solid rgba(232, 177, 78, 0.28);
+.avatar-preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.3rem;
+  border: 1px solid rgba(232, 177, 78, 0.22);
+  border-radius: 12px;
   background: rgba(247, 239, 221, 0.04);
   color: var(--text);
-  font-size: 0.9rem;
+  font: inherit;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
-.avatar-more:hover {
+.avatar-preset.sel {
   border-color: var(--accent);
+  background: rgba(232, 177, 78, 0.14);
+}
+.avatar-preset .avatar-bubble {
+  width: 3.4rem;
+  height: 3.4rem;
+  font-size: 1.4rem;
+}
+/* Il nome della variante non è l'unico segnale della selezione (c'è anche il
+   bordo oro), ma in grassetto si legge a colpo d'occhio quale è attiva. */
+.avatar-preset-label {
+  font-size: 0.78rem;
+}
+.avatar-preset.sel .avatar-preset-label {
+  color: var(--accent-text);
+  font-weight: 700;
 }
 
 /* Textarea bio */
@@ -4016,13 +4004,15 @@ button.dm-conv:hover {
    resta --accent-text (--accent come testo non arriva a 4.5:1 sul chiaro). */
 [data-theme="light"] .pf-icon-btn,
 [data-theme="light"] .pf-etabs button,
-[data-theme="light"] .pf-eye {
+[data-theme="light"] .pf-eye,
+[data-theme="light"] .avatar-preset {
   border-color: rgba(130, 90, 0, 0.22);
   background: rgba(23, 21, 32, 0.07);
   color: var(--text);
 }
 [data-theme="light"] .pf-etabs button[aria-pressed='true'],
-[data-theme="light"] .pf-eye[aria-pressed='true'] {
+[data-theme="light"] .pf-eye[aria-pressed='true'],
+[data-theme="light"] .avatar-preset.sel {
   border-color: var(--accent);
   background: rgba(154, 106, 0, 0.18);
   color: var(--accent-text);

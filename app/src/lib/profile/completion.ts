@@ -6,9 +6,11 @@
 // Il conteggio guarda i campi che l'utente può compilare *dall'editor*: il
 // nickname non entra (è obbligatorio alla registrazione, sarebbe sempre pieno)
 // e nemmeno i flag show_* o il segno zodiacale (derivato dalla data di
-// nascita). Un campo con il valore "preferisco non specificare" conta come
-// NON compilato: è la scelta di default di quelle liste, quindi contarlo
-// gonfierebbe la percentuale di chi non ha toccato nulla.
+// nascita). Fuori anche l'avatar: da quando è generato dall'id del profilo ce
+// l'hanno tutte fin dall'inizio, quindi contarlo darebbe a chiunque una
+// percentuale di partenza gratis. Un campo con il valore "preferisco non
+// specificare" conta come NON compilato: è la scelta di default di quelle
+// liste, quindi contarlo gonfierebbe la percentuale di chi non ha toccato nulla.
 
 import type {
   IdentityCategory,
@@ -25,7 +27,6 @@ import type {
 } from '../../types'
 
 export interface CompletionInput {
-  avatar_preset: string | null
   pronouns: string | null
   bio: string | null
   city: string | null
@@ -63,7 +64,6 @@ function hasItems(v: readonly unknown[] | null): boolean {
 
 export function profileCompletion(p: CompletionInput): ProfileCompletion {
   const checks: boolean[] = [
-    hasText(p.avatar_preset),
     hasText(p.pronouns),
     hasText(p.bio),
     hasText(p.city),
