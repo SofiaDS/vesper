@@ -720,6 +720,18 @@ export function ProfileEditor({
               </ul>
             )}
           </div>
+          {/* La regione non è un campo a sé: si ricava dal comune scelto e finisce
+              in city_region, che alimenta il filtro "Regione" della ricerca. Senza
+              questo avviso l'utente non ha modo di sapere che scegliendo la città
+              diventa trovabile anche per regione. Stesso pattern del segno
+              zodiacale, che è pure derivato (dalla data di nascita). */}
+          {cityRegion && (
+            <p className="hint">
+              Regione: <strong>{cityRegion}</strong> · derivata dalla città. Se
+              mostri la città nel profilo, le altre persone possono trovarti anche
+              filtrando per regione.
+            </p>
+          )}
           <label className="declare mini">
             <input
               type="checkbox"
