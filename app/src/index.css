@@ -1331,6 +1331,9 @@ body:has(.install-banner) .rooms-hint {
 
 .profile-form {
   gap: 1.4rem;
+  /* .app centra tutto: in un form le etichette e gli hint vanno a sinistra,
+     dove inizia il campo a cui si riferiscono. */
+  text-align: left;
 }
 
 /* Anteprima avatar + nickname */
@@ -1359,10 +1362,14 @@ body:has(.install-banner) .rooms-hint {
   font-size: 1.1rem;
 }
 
-.avatar-bubble-lg {
-  width: 88px;
-  height: 88px;
-  font-size: 2.4rem;
+/* Avatar dell'hero del profilo (redesign 2B): risale a cavallo del mosaico
+   foto, quindi ha un bordo del colore dello sfondo che lo stacca dalla foto
+   sottostante. In rem, non px, così segue la dimensione testo scelta. */
+.avatar-bubble-hero {
+  width: 4.5rem;
+  height: 4.5rem;
+  font-size: 2rem;
+  border: 3px solid var(--bg);
 }
 
 /* Griglia di scelta avatar */
@@ -1588,20 +1595,17 @@ body:has(.install-banner) .rooms-hint {
   background: rgba(247, 239, 221, 0.04);
 }
 
+/* Etichetta piccola sopra un blocco. L'opacità era 0.45: sull'inchiostro dà
+   ~3.8:1, sotto il 4.5:1 richiesto per il testo normale (e a 0.75rem non è
+   "testo grande"). A 0.55 resta chiaramente secondaria ma passa AA (~5:1),
+   sia qui sia nel tema chiaro (dove l'override più sotto la porta a 0.68). */
 .pf-section-title {
   margin: 0 0 0.5rem;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text);
-  opacity: 0.45;
-}
-
-.pf-nick {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
+  opacity: 0.55;
 }
 
 .pf-bio {
@@ -1611,31 +1615,9 @@ body:has(.install-banner) .rooms-hint {
   opacity: 0.92;
 }
 
-.pf-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  margin: 0;
-}
-
-.pf-row {
-  display: flex;
-  gap: 0.6rem;
-  align-items: baseline;
-}
-
-.pf-label {
-  flex: 0 0 38%;
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  opacity: 0.6;
-}
-
-.pf-value {
-  flex: 1;
-  color: var(--text);
-}
+/* Le vecchie righe etichetta/valore (.pf-rows/.pf-row/.pf-label/.pf-value)
+   sono state rimosse con il redesign 2B: i dati secondari sono ora chip
+   (vedi .pf-chips) e i tre fatti chiave hanno il loro blocco (.pf-facts). */
 
 /* ===== Foto profilo: griglia di gestione (editor) ===== */
 .photo-grid {
@@ -2621,26 +2603,25 @@ body:has(.install-banner) .rooms-hint {
   background: var(--error);
 }
 
-/* --- Schermata profilo: layout condiviso (mio/altrui) --- */
-.pf-header-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-}
+/* ═══ Schermata profilo (mio/altrui) — redesign 2B ═══════════════════════
+   Dall'alto: mosaico foto a filo bordo, riga identità con l'avatar che vi
+   risale sopra, bio, tre fatti chiave, «Mostra tutto» e barra azioni fissa.
+   Le vecchie card «Descrizione/Foto/Altre informazioni/Contatti» e le icone
+   sparse sopra l'hero non ci sono più.
 
-.pf-icon-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
+   Padding orizzontale dei blocchi di testo: 0.9rem. Il contenitore .app è già
+   rientrato dal padding del <body>, quindi non serve altro; il mosaico e i
+   bordi delle barre restano invece a filo del contenitore, come le card. */
 
+/* Bottone tondo di azione (blocca/segnala nella barra in basso). 2.75rem =
+   44px al testo di default, il minimo WCAG per un bersaglio tattile. */
 .pf-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 1px solid rgba(232, 177, 78, 0.25);
   border-radius: 50%;
   background: rgba(247, 239, 221, 0.04);
@@ -2656,55 +2637,183 @@ body:has(.install-banner) .rooms-hint {
   color: var(--error-text);
 }
 
-.pf-hero {
+/* --- Mosaico foto (sostituisce la card «Foto» e la griglia 3 colonne) ---
+   Foto principale a sinistra (flex 2), due celle in colonna a destra; la
+   terza porta l'overlay «+N» se restano altre foto. Altezza in rem così
+   cresce insieme al testo quando l'utente ingrandisce. */
+.pf-mosaic {
+  display: flex;
+  gap: 0.35rem;
+  height: 13.1rem;
+}
+.pf-mosaic-main {
+  flex: 2;
+  min-width: 0;
+}
+.pf-mosaic-side {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0 0.25rem;
+  gap: 0.35rem;
 }
-.pf-hero .pf-nick {
-  margin: 0.2rem 0 0;
+.pf-mosaic-side > * {
+  flex: 1;
+  min-height: 0;
 }
-
-.pf-key-facts {
-  margin: 0;
-  color: var(--text);
-  opacity: 0.8;
-  font-size: 0.92rem;
-}
-
-/* --- Galleria foto profilo: griglia 3 colonne + lightbox (vedi mockup
-   `.pf-gallery`) --- */
-.gallery-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-}
-/* Stato di caricamento: celle quadrate vuote che riprendono la griglia 3
-   colonne, così non c'è salto di layout quando arrivano le foto. */
-.gallery-ph {
-  aspect-ratio: 1;
-  border-radius: 8px;
-  background: rgba(247, 239, 221, 0.05);
-}
-
-.gallery-thumb {
+.pf-mosaic-cell {
+  position: relative;
+  display: block;
   width: 100%;
-  aspect-ratio: 1;
+  height: 100%;
   padding: 0;
-  border: none;
-  border-radius: 8px;
+  border: 0;
   overflow: hidden;
-  cursor: pointer;
   background: rgba(247, 239, 221, 0.05);
+  cursor: pointer;
 }
-.gallery-thumb img {
+.pf-mosaic-cell img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+/* Scritto sul velo scuro, non sulla foto: il contrasto non dipende
+   dall'immagine sottostante. */
+.pf-mosaic-more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23, 21, 32, 0.62);
+  color: #f7efdd;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+/* Scheletro di caricamento: stessa forma del mosaico, niente salto di layout. */
+.pf-mosaic-ph {
+  background: rgba(247, 239, 221, 0.05);
+}
+
+/* --- Riga identità: avatar + nickname + "età · città" --- */
+.pf-idrow {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.7rem;
+  padding: 0.9rem 0.9rem 0;
+  /* Senza `position` l'avatar finisce SOTTO le foto: le immagini del mosaico
+     sono contenuto inline, che nell'ordine di disegno viene dopo lo sfondo dei
+     blocchi in flusso — quindi il cerchio, per quanto venga dopo nel DOM,
+     resterebbe coperto. Posizionandolo lo si porta nel livello degli elementi
+     posizionati, che si disegna per ultimo. */
+  position: relative;
+  z-index: 1;
+  /* L'avatar risale a cavallo del mosaico. Senza foto il mosaico non c'è:
+     la riga torna al suo posto, senza spazio vuoto sopra. */
+  margin-top: -2.2rem;
+  text-align: left;
+}
+.pf-idrow-nophoto {
+  margin-top: 0;
+}
+.pf-idrow-text {
+  min-width: 0;
+  padding-bottom: 0.2rem;
+}
+.pf-hero-nick {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.pf-hero-sub {
+  margin: 0.1rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+/* --- Bio e blocchi di testo --- */
+.pf-block {
+  padding: 0.6rem 0.9rem 0;
+  text-align: left;
+}
+
+/* --- I tre fatti chiave: etichetta piccola, valore grande --- */
+.pf-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0.9rem 0.9rem 0;
+  text-align: left;
+}
+.pf-fact-label {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+}
+.pf-fact-value {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+/* --- «Mostra tutto (N)» e i chip che rivela --- */
+.pf-showall {
+  padding-top: 0.9rem;
+}
+.pf-showall .btn-secondary {
+  margin-top: 0;
+  min-height: 2.75rem;
+}
+.pf-chips {
+  padding: 0.4rem 0.9rem 0;
+  text-align: left;
+}
+/* Micro-intestazione di un gruppo di chip. È lei a dare senso al singolo
+   chip: «bilancia» sotto ASTROLOGIA o «un gatto» sotto STILE DI VITA si
+   leggono da soli, mentre in un unico mucchio non si capiva di quale campo
+   fossero — e due «altro» affiancati non dicevano proprio niente. */
+.pf-chipgroup-label {
+  margin: 0.85rem 0 0;
+  padding: 0 0.9rem;
+  font-weight: 700;
+  text-align: left;
+}
+/* Chip di sola lettura: non c'è niente da cliccare, quindi niente cursore a
+   mano che prometta un'interazione che non esiste. */
+.chip-static {
+  cursor: default;
+}
+
+/* --- Barra azioni fissa in basso (scrivi / blocca / segnala, oppure
+   «Modifica profilo» sulla propria anteprima) --- */
+.pf-actionbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  margin-top: 1.2rem;
+  padding: 0.6rem 0.9rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(232, 177, 78, 0.2);
+  background: var(--bg);
+  text-align: left;
+}
+.pf-actionbar .hint {
+  display: block;
+  margin: 0 0 0.5rem;
+}
+.pf-actionbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.pf-actionbar .btn-primary {
+  flex: 1;
+  margin-top: 0;
+  min-height: 2.75rem;
 }
 
 .lightbox {
@@ -2746,13 +2855,315 @@ body:has(.install-banner) .rooms-hint {
   background: var(--error);
 }
 
-/* --- Azioni profilo altrui (blocca/sblocca) --- */
-.pf-actions {
+/* ═══ Editor profilo — redesign 2F ═══════════════════════════════════════
+   Cinque schede a pillola, barra di completamento, e per la scheda «Vita» un
+   elenco di righe riassuntive che aprono un foglio dal basso. Il toggle
+   «Mostra nel profilo» ripetuto 18 volte è diventato la pillola occhio. */
+
+/* --- Schede dell'editor --- */
+.pf-etabs {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.5rem 0;
+  /* Le cinque etichette non vanno mai a capo né troncate. Alla dimensione
+     testo normale entrano tutte e i bottoni si allargano fino a riempire la
+     riga; ingrandendo il testo (o con OpenDyslexic, più largo) la fila
+     diventa scorrevole invece di sbordare dallo schermo. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.pf-etabs::-webkit-scrollbar {
+  display: none;
+}
+.pf-etabs button {
+  flex: 1 0 auto;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.15rem;
+  border: 1px solid rgba(232, 177, 78, 0.22);
+  border-radius: 999px;
+  background: rgba(247, 239, 221, 0.04);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.pf-etabs button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: rgba(232, 177, 78, 0.16);
+  color: var(--accent-text);
+}
+
+/* --- Barra di completamento --- */
+.pf-progress {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(232, 177, 78, 0.2);
+  text-align: left;
+}
+.pf-progress-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+.pf-progress-pct {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+.pf-progress-track {
+  height: 6px;
+  margin-top: 0.35rem;
+  border-radius: 999px;
+  background: rgba(247, 239, 221, 0.09);
+  overflow: hidden;
+}
+.pf-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+
+/* --- Scheda «Vita»: righe riassuntive --- */
+.pf-lrows {
   display: flex;
   flex-direction: column;
+}
+.pf-lrow {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 0.6rem;
+  width: 100%;
+  /* 3rem = 48px al testo di default: più dei 44px minimi, perché queste righe
+     sono fitte una sull'altra e vanno colpite senza sbagliare vicina. */
+  min-height: 3rem;
+  padding: 0.35rem 0;
+  border: 0;
+  border-bottom: 1px solid rgba(232, 177, 78, 0.2);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pf-lrow-ico {
+  flex: none;
+  color: var(--accent-text);
+}
+/* Titolo del campo in oro, valore sotto in testo normale attenuato: è la
+   coppia "che cosa" / "com'è adesso" che rende la scheda leggibile a colpo
+   d'occhio senza aprire niente. */
+.pf-lrow-txt {
+  flex: 1;
+  min-width: 0;
+  color: var(--accent-text);
+  font-size: 1rem;
+}
+.pf-lrow-val {
+  display: block;
+  color: var(--text);
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+.pf-lrow-empty .pf-lrow-txt {
+  opacity: 0.8;
+}
+/* Riga il cui foglio è aperto: si accende, così anche col foglio a metà
+   schermo si vede quale campo si sta modificando. */
+.pf-lrow-open {
+  border-color: var(--accent);
+}
+.pf-lrow-open .pf-lrow-txt {
+  font-weight: 700;
+}
+.pf-lrow-open .pf-lrow-val {
+  font-weight: 400;
+  opacity: 0.85;
+}
+.pf-lrow-eye,
+.pf-lrow-caret {
+  flex: none;
+  opacity: 0.75;
+}
+/* Stato di un interruttore, a destra della riga (scheda Privacy): acceso in
+   oro, spento in testo attenuato — il colore non è l'unico segnale, la parola
+   («attivo» / «nascosto») c'è sempre. */
+.pf-lrow-state {
+  flex: none;
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.75;
+}
+.pf-lrow-state.on {
+  color: var(--accent-text);
+  font-weight: 700;
+  opacity: 1;
+}
+/* Riga di un'azione distruttiva (elimina account). */
+.pf-lrow-danger .pf-lrow-ico,
+.pf-lrow-danger .pf-lrow-txt {
+  color: var(--error-text);
+}
+
+/* --- Pillola «visibile / nascosto» (ex ShowInProfileToggle) --- */
+.pf-eye {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  flex: none;
+  gap: 0.3rem;
+  min-height: 2.75rem;
+  padding: 0 0.7rem;
+  border: 1px solid rgba(232, 177, 78, 0.22);
+  border-radius: 999px;
+  background: rgba(247, 239, 221, 0.04);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.pf-eye[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: rgba(232, 177, 78, 0.14);
+  color: var(--accent-text);
+}
+/* Nell'intestazione di un campo la pillola sta su una riga con il titolo:
+   lì va centrata, non appesa in alto come quando è sola in una colonna. */
+.pf-field-head .pf-eye,
+.pf-vis-row .pf-eye {
+  align-self: auto;
+}
+
+/* --- Campo a chip con intestazione: titolo a sinistra, pillola a destra ---
+   Come .field, ma senza il gap in colonna: l'intestazione porta già il proprio
+   margine sotto, e sommarli staccherebbe troppo i chip dal titolo. */
+.pf-field {
+  gap: 0;
+}
+.pf-field-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+.pf-field-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: left;
+}
+/* Contatore di selezione accanto al titolo di un campo a scelta multipla. */
+.pf-count {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(232, 177, 78, 0.14);
+  color: var(--accent-text);
+  font-size: 0.75rem;
+}
+/* Chip «+ altri N»: tratteggiato per distinguerlo da una vera opzione. */
+.chip-more {
+  border-style: dashed;
+  color: var(--accent-text);
+}
+/* Batte per specificità `[data-theme="light"] .options .chip`, che
+   riporterebbe il testo al colore normale anche qui. */
+[data-theme="light"] .options .chip.chip-more {
+  color: var(--accent-text);
+}
+
+/* --- Elenco riassuntivo dei flag show_* (scheda Privacy) --- */
+.pf-vis-list {
+  display: flex;
+  flex-direction: column;
+}
+.pf-vis-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(232, 177, 78, 0.2);
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+/* --- Foglio di campo che sale dal basso --- */
+.pf-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(23, 21, 32, 0.55);
+}
+.pf-sheet {
+  width: 100%;
+  max-width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 1rem 0.9rem calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(232, 177, 78, 0.28);
+  border-radius: 16px 16px 0 0;
+  background: var(--surface);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  text-align: left;
+  animation: pf-sheet-in 180ms ease-out;
+}
+/* Entrata da sotto. La media query globale prefers-reduced-motion in fondo al
+   file azzera già la durata: qui non serve ripeterla. */
+@keyframes pf-sheet-in {
+  from { transform: translateY(100%); }
+  to   { transform: none; }
+}
+.pf-sheet-grip {
+  display: block;
+  width: 2.75rem;
+  height: 4px;
+  margin: 0 auto 0.8rem;
+  border-radius: 999px;
+  background: rgba(232, 177, 78, 0.28);
+}
+.pf-sheet-confirm {
+  width: 100%;
+  margin-top: 0.9rem;
+  min-height: 2.75rem;
+}
+
+/* --- Barra di salvataggio fissa in fondo all'editor --- */
+.pf-savebar {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(232, 177, 78, 0.2);
+  background: var(--bg);
+}
+/* .btn-secondary nasce `display:block; width:100%`: dentro la barra deve
+   dividersi lo spazio col primario, non pretenderlo tutto. */
+.pf-savebar .btn-secondary {
+  flex: 1;
+  width: auto;
+  margin-top: 0;
+  min-height: 2.75rem;
+}
+.pf-savebar .btn-primary {
+  flex: 1.4;
+  margin-top: 0;
+  min-height: 2.75rem;
 }
 
 /* --- Dialog upload foto: scelta sorgente, fotocamera, ritaglio --- */
@@ -3594,9 +4005,59 @@ button.dm-conv:hover {
   /*border-color: rgba(130, 90, 0, 0.25);*/
 }
 
-[data-theme="light"] .gallery-thumb,
-[data-theme="light"] .gallery-ph {
+[data-theme="light"] .pf-mosaic-cell,
+[data-theme="light"] .pf-mosaic-ph {
   background: rgba(23, 21, 32, 0.07);
+}
+
+/* ── Profilo/editor (redesign 2B–2F) nel tema chiaro ──────────────────────
+   Sul crema i bordi e i fondi "oro trasparente" del tema scuro spariscono:
+   qui si passa al bruno translucido già usato da card e chip. Il testo oro
+   resta --accent-text (--accent come testo non arriva a 4.5:1 sul chiaro). */
+[data-theme="light"] .pf-icon-btn,
+[data-theme="light"] .pf-etabs button,
+[data-theme="light"] .pf-eye {
+  border-color: rgba(130, 90, 0, 0.22);
+  background: rgba(23, 21, 32, 0.07);
+  color: var(--text);
+}
+[data-theme="light"] .pf-etabs button[aria-pressed='true'],
+[data-theme="light"] .pf-eye[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: rgba(154, 106, 0, 0.18);
+  color: var(--accent-text);
+}
+[data-theme="light"] .pf-lrow:not(.pf-lrow-open),
+[data-theme="light"] .pf-vis-row,
+[data-theme="light"] .pf-progress,
+[data-theme="light"] .pf-actionbar,
+[data-theme="light"] .pf-savebar {
+  border-color: rgba(130, 90, 0, 0.22);
+}
+[data-theme="light"] .pf-sheet {
+  border-color: rgba(130, 90, 0, 0.34);
+  box-shadow: 0 -8px 24px rgba(23, 21, 32, 0.18);
+}
+[data-theme="light"] .pf-progress-track {
+  background: rgba(23, 21, 32, 0.1);
+}
+/* L'oro chiaro --accent su crema è ~1.9:1: sotto il 3:1 richiesto a un
+   elemento grafico che porta informazione (WCAG 1.4.11). Sul chiaro la barra
+   si riempie quindi con l'oro scuro. */
+[data-theme="light"] .pf-progress-fill {
+  background: var(--accent-text);
+}
+[data-theme="light"] .pf-count {
+  background: rgba(154, 106, 0, 0.18);
+}
+[data-theme="light"] .pf-sheet-grip {
+  background: rgba(130, 90, 0, 0.34);
+}
+[data-theme="light"] .pf-mosaic-more {
+  /* Il velo resta scuro anche sul tema chiaro: sta sopra una foto, non sullo
+     sfondo della pagina, e il bianco crema non garantirebbe il contrasto. */
+  background: rgba(23, 21, 32, 0.62);
+  color: #f7efdd;
 }
 
 [data-theme="light"] .roster {

@@ -1,4 +1,27 @@
 import { useRef, useState, useMemo, useEffect } from 'react'
+import {
+  Baby,
+  BowlFood,
+  Broadcast,
+  ChatCircleDots,
+  Cigarette,
+  Compass,
+  Eye,
+  GraduationCap,
+  HandsPraying,
+  Heart,
+  MagnifyingGlass,
+  Medal,
+  PawPrint,
+  PersonSimpleRun,
+  Scales,
+  Sparkle,
+  Star,
+  Translate,
+  Trash,
+  User,
+  Users,
+} from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { AppHeader } from '../../components/AppHeader'
 import {
@@ -29,9 +52,17 @@ import {
   DM_FILTER_OPTIONS,
 } from '../../constants/options'
 import { ZODIAC_LABELS } from '../../constants/labels'
-import { SingleChoiceField, MultiChoiceField, ShowInProfileToggle } from './ChoiceField'
-import { FilterSection } from '../../components/FilterSection'
-import { normalize } from '../../lib/profile/formatters'
+import {
+  SingleChoiceField,
+  MultiChoiceField,
+  VisibilityPill,
+  FieldHead,
+} from './ChoiceField'
+import { FieldSheet } from './FieldSheet'
+import { SummaryRows, summarize, type SummaryRow } from './SummaryRows'
+import { DeleteAccountSection } from './DeleteAccountSection'
+import { normalize, labelOf } from '../../lib/profile/formatters'
+import { profileCompletion } from '../../lib/profile/completion'
 import {
   AVATAR_STYLES,
   AVATAR_GRID_SIZE,
@@ -57,6 +88,7 @@ import { PhotoUploadDialog } from '../../components/PhotoUploadDialog'
 import { ErrorBoundary } from '../../components/ErrorBoundary'
 import type {
   Profile,
+  Language,
   IdentityCategory,
   Orientation,
   Intent,
@@ -73,11 +105,70 @@ import type {
 
 type Comune = { nome: string; sigla: string; provincia: string; regione: string }
 
+// Le cinque schede dell'editor (redesign 2F). Un solo form sotto: cambiare
+// scheda nasconde dei campi, non ne perde il contenuto, e il salvataggio
+// resta uno solo.
+type EditorTab = 'base' | 'identita' | 'vita' | 'foto' | 'privacy'
+
+const TABS: { key: EditorTab; label: string }[] = [
+  { key: 'base', label: 'Base' },
+  { key: 'identita', label: 'Identità' },
+  { key: 'vita', label: 'Vita' },
+  { key: 'foto', label: 'Foto' },
+  { key: 'privacy', label: 'Privacy' },
+]
+
 const PHOTO_STATUS_LABEL: Record<PhotoStatus, string> = {
   pending: 'In revisione',
   approved: 'Approvata',
   rejected: 'Rifiutata',
 }
+
+// Elenco riassuntivo dei flag show_* nella scheda Privacy: un posto solo dove
+// vedere e cambiare tutto quello che è pubblico, senza girare le altre schede.
+// `show_online` non c'è: non riguarda un campo del profilo e ha già il suo
+// interruttore dedicato più in alto.
+const VIS_FIELDS: { key: VisKey; label: string }[] = [
+  { key: 'show_pronouns', label: 'Pronomi' },
+  { key: 'show_age', label: 'Età' },
+  { key: 'show_birth_date', label: 'Data di nascita' },
+  { key: 'show_identity', label: 'Come ti identifichi' },
+  { key: 'show_orientation', label: 'Orientamento' },
+  { key: 'show_city', label: 'Città' },
+  { key: 'show_intents', label: 'Cosa cerchi' },
+  { key: 'show_relationship', label: 'Stato relazionale' },
+  { key: 'show_languages', label: 'Lingue parlate' },
+  { key: 'show_education', label: 'Formazione' },
+  { key: 'show_diet', label: 'Alimentazione' },
+  { key: 'show_religion', label: 'Religione & credo' },
+  { key: 'show_politics', label: 'Orientamento politico' },
+  { key: 'show_children', label: 'Figli' },
+  { key: 'show_smoking', label: 'Fumo' },
+  { key: 'show_sport', label: 'Attività fisica' },
+  { key: 'show_pets', label: 'Animali domestici' },
+  { key: 'show_zodiac', label: 'Segno zodiacale' },
+]
+
+type VisKey =
+  | 'show_age'
+  | 'show_birth_date'
+  | 'show_identity'
+  | 'show_orientation'
+  | 'show_city'
+  | 'show_pronouns'
+  | 'show_intents'
+  | 'show_relationship'
+  | 'show_languages'
+  | 'show_children'
+  | 'show_pets'
+  | 'show_diet'
+  | 'show_religion'
+  | 'show_politics'
+  | 'show_education'
+  | 'show_smoking'
+  | 'show_sport'
+  | 'show_zodiac'
+  | 'show_online'
 
 function PhotoManager({ userId }: { userId: string }) {
   const [photos, setPhotos] = useState<ProfilePhoto[]>([])
@@ -307,23 +398,12 @@ export function ProfileEditor({
   const [error, setError] = useState<string | null>(null)
   const [layerEligibility, setLayerEligibility] = useState<LayerEligibility | null>(null)
 
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => ({
-    identity:
-      profile.orientations.length > 0 ||
-      profile.identity_category !== 'preferisco_non_specificare',
-    relations: !!profile.relationship_status || profile.intents.length > 0,
-    interests: profile.interests.length > 0 || profile.languages.length > 0,
-    lifestyle:
-      [
-        profile.education_level,
-        profile.diet,
-        profile.religion,
-        profile.politics,
-        profile.children_status,
-        profile.smoking,
-        profile.sport,
-      ].some((v) => v !== null) || profile.has_pets !== null,
-  }))
+  // Stato del redesign 2F: scheda attiva, foglio di campo aperto (chiave del
+  // campo, `null` se chiuso) e quali gruppi di chip sono stati espansi oltre
+  // i primi sei.
+  const [tab, setTab] = useState<EditorTab>('base')
+  const [openSheet, setOpenSheet] = useState<string | null>(null)
+  const [expandedChips, setExpandedChips] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     checkLayerEligibility()
@@ -331,21 +411,22 @@ export function ProfileEditor({
       .catch(() => {})
   }, [profile.id])
 
+  // Cambiando scheda il contenuto è tutt'altro: senza questo si resterebbe a
+  // metà pagina, davanti a campi diversi da quelli che si stava guardando.
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [tab])
+
   function toggle<T>(list: T[], value: T): T[] {
     return list.includes(value) ? list.filter((x) => x !== value) : [...list, value]
   }
 
-  function setVisFlag(key: keyof typeof vis, value: boolean) {
+  function setVisFlag(key: VisKey, value: boolean) {
     setVis((prev) => ({ ...prev, [key]: value }))
   }
 
-  function toggleSection(key: string) {
-    setOpenSections((s) => ({ ...s, [key]: !s[key] }))
-  }
-
-  function sectionBadge(count: number, open: boolean) {
-    if (count === 0) return null
-    return <span className="filter-section-badge">{open ? count : `${count} sel.`}</span>
+  function expand(key: string) {
+    setExpandedChips((prev) => ({ ...prev, [key]: true }))
   }
 
   function addInterest(raw: string) {
@@ -437,32 +518,46 @@ export function ProfileEditor({
     setCityOpen(false)
   }
 
+  // Il campo che ha fatto fallire la validazione può stare in una scheda che
+  // non è quella aperta: senza portarci sopra l'utente leggerebbe un errore
+  // senza vedere a cosa si riferisce.
+  function fail(message: string, where: EditorTab) {
+    setTab(where)
+    setError(message)
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     const nick = nickname.trim()
     if (nick.length < 3 || nick.length > 24) {
-      setError('Il nickname deve avere tra 3 e 24 caratteri.')
+      fail('Il nickname deve avere tra 3 e 24 caratteri.', 'base')
       return
     }
     if (bio.length > BIO_MAX) {
-      setError(`La bio non può superare i ${BIO_MAX} caratteri.`)
+      fail(`La bio non può superare i ${BIO_MAX} caratteri.`, 'base')
       return
     }
     if (pronouns.length > PRONOUNS_MAX) {
-      setError(`I pronomi non possono superare i ${PRONOUNS_MAX} caratteri.`)
+      fail(`I pronomi non possono superare i ${PRONOUNS_MAX} caratteri.`, 'base')
       return
     }
     if (hasPets && petsDetail.length > PETS_DETAIL_MAX) {
-      setError(`La specifica sugli animali domestici non può superare i ${PETS_DETAIL_MAX} caratteri.`)
+      fail(
+        `La specifica sugli animali domestici non può superare i ${PETS_DETAIL_MAX} caratteri.`,
+        'vita',
+      )
       return
     }
     if (educationInstitute.length > EDUCATION_INSTITUTE_MAX) {
-      setError(`Il nome di scuola/università non può superare i ${EDUCATION_INSTITUTE_MAX} caratteri.`)
+      fail(
+        `Il nome di scuola/università non può superare i ${EDUCATION_INSTITUTE_MAX} caratteri.`,
+        'vita',
+      )
       return
     }
     if (cityQuery.trim() && !citySelected.current) {
-      setError("Seleziona la città dall'elenco dei suggerimenti.")
+      fail("Seleziona la città dall'elenco dei suggerimenti.", 'base')
       return
     }
     // Data di nascita: si salva solo la prima volta (finché il profilo non ne ha
@@ -470,7 +565,7 @@ export function ProfileEditor({
     // utente potrebbe aggirare.
     const birthDateToSave = !profile.birth_date && birthDate ? birthDate : null
     if (birthDateToSave && birthDateToSave > maxBirthDate) {
-      setError('Devi avere almeno 18 anni per inserire la data di nascita.')
+      fail('Devi avere almeno 18 anni per inserire la data di nascita.', 'base')
       return
     }
     const relTypeToSave = relStatus === 'in_relazione' ? relType : null
@@ -557,360 +652,653 @@ export function ProfileEditor({
   const relStatusOpts = useMemo(() => RELATIONSHIP_STATUS_OPTIONS, [])
   const relTypeOpts = useMemo(() => RELATIONSHIP_TYPE_OPTIONS, [])
   const languageOpts = useMemo(() => LANGUAGE_OPTIONS, [])
-  const childrenOpts = useMemo(() => CHILDREN_OPTIONS, [])
-  const dietOpts = useMemo(() => DIET_OPTIONS, [])
-  const religionOpts = useMemo(() => RELIGION_OPTIONS, [])
-  const politicsOpts = useMemo(() => POLITICS_OPTIONS, [])
-  const educationOpts = useMemo(() => EDUCATION_OPTIONS, [])
-  const smokingOpts = useMemo(() => SMOKING_OPTIONS, [])
-  const sportOpts = useMemo(() => SPORT_OPTIONS, [])
 
-  const identityCount = orientations.length + (identity !== 'preferisco_non_specificare' ? 1 : 0)
-  const relationsCount = (relStatus ? 1 : 0) + intents.length
-  const interestsCount = interests.length + languages.length
-  const lifestyleCount =
-    [educationLevel, diet, religion, politics, childrenStatus, smoking, sport].filter((v) => v !== null).length +
-    (hasPets !== null ? 1 : 0)
+  // Barra di completamento: legge lo stato del form (non il profilo salvato),
+  // così la percentuale si muove mentre si compila.
+  const completion = profileCompletion({
+    avatar_preset: avatar,
+    pronouns,
+    bio,
+    city: citySelected.current ? cityName : null,
+    birth_date: profile.birth_date ?? (birthDate || null),
+    identity_category: identity,
+    orientations,
+    intents,
+    relationship_status: relStatus,
+    languages,
+    interests,
+    children_status: childrenStatus,
+    has_pets: hasPets,
+    diet,
+    religion,
+    politics,
+    education_level: educationLevel,
+    smoking,
+    sport,
+  })
 
-  return (
-    <main className="app profile">
-      <AppHeader backLabel="‹ Anteprima" onBack={onCancel} title="Modifica profilo" />
-
-      <form className="form profile-form" onSubmit={handleSave}>
-        <div className="avatar-preview">
-          <span className="avatar-bubble">
-            <Avatar preset={avatar} nickname={nickname} />
-          </span>
-          <span className="muted small-inline">@{nickname || '—'}</span>
-        </div>
-
-        <PhotoManager userId={profile.id} />
-
-        <fieldset className="field">
-          <legend>Avatar</legend>
-          {/* Selezione singola in un fieldset (la legend "Avatar" fa da
-              raggruppamento accessibile). Non è un vero tablist — manca
-              tabpanel/frecce — quindi usiamo bottoni con aria-pressed, come il
-              controllo dimensione testo, invece di role="tab" a metà. */}
-          <div className="avatar-tabs">
-            {AVATAR_STYLES.map((s) => (
-              <button
-                type="button"
-                key={s.key}
-                aria-pressed={avatarStyle === s.key}
-                className={avatarStyle === s.key ? 'avatar-tab sel' : 'avatar-tab'}
-                onClick={() => setAvatarStyle(s.key)}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-          <div className="avatar-grid">
-            {seeds.map((seed) => {
-              const value = avatarValue(avatarStyle, seed)
-              return (
-                <button
-                  type="button"
-                  key={value}
-                  className={avatar === value ? 'avatar-cell sel' : 'avatar-cell'}
-                  onClick={() => setAvatar(value)}
-                  aria-label={`Avatar ${seed}`}
-                  aria-pressed={avatar === value}
-                >
-                  <Avatar preset={value} nickname={nickname} />
-                </button>
-              )
-            })}
-          </div>
-          <button type="button" className="avatar-more" onClick={showMoreAvatars}>
-            🎲 Mostra altri
-          </button>
-          <span className="hint">
-            L'avatar che scegli resta selezionato: premendo «Mostra altri» non
-            lo perdi, rimane in cima alla griglia.
-          </span>
-        </fieldset>
-
-        <label className="field">
-          <span>Nickname</span>
-          <input
-            type="text"
-            required
-            minLength={3}
-            maxLength={24}
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-          />
-        </label>
-
-        <label className="field">
-          <span>Pronomi</span>
-          <input
-            type="text"
-            maxLength={PRONOUNS_MAX}
-            value={pronouns}
-            onChange={(e) => setPronouns(e.target.value)}
-            placeholder="es. lei/lei, they/them"
-          />
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={vis.show_pronouns}
-              onChange={(e) => setVisFlag('show_pronouns', e.target.checked)}
+  // ── Righe riassuntive + foglio di campo ───────────────────────────────
+  // Le schede «Vita», «Identità» e «Privacy» hanno tutte la stessa forma:
+  // un elenco di righe (icona, titolo, valore corrente) che toccate aprono
+  // in basso il foglio con i chip di quel campo. Descrivere ogni riga in una
+  // lista evita venti blocchi di markup identici — e la scheda si legge in un
+  // colpo d'occhio invece di essere un form da scorrere.
+  const lifeFields: SummaryRow[] = [
+    {
+      key: 'education',
+      label: 'Formazione',
+      icon: GraduationCap,
+      visible: vis.show_education,
+      value:
+        educationLevel && educationLevel !== 'preferisco_non_specificare'
+          ? labelOf(EDUCATION_OPTIONS, educationLevel) +
+            (educationInstitute.trim() ? ` · ${educationInstitute.trim()}` : '')
+          : null,
+      body: (
+        <SingleChoiceField
+          legend="Formazione"
+          name="education"
+          options={EDUCATION_OPTIONS}
+          value={educationLevel}
+          onChange={(v) => setEducationLevel(v)}
+          expanded={!!expandedChips.education}
+          onExpand={() => expand('education')}
+          visibility={
+            <VisibilityPill
+              field="Formazione"
+              checked={vis.show_education}
+              onChange={(v) => setVisFlag('show_education', v)}
             />
-            <span>Mostra nel profilo</span>
-          </label>
-        </label>
-
-        <label className="field">
-          <span>
-            Bio{' '}
-            {bio.length >= BIO_MAX
-              ? <span className="limit-warning">raggiunto limite caratteri</span>
-              : <span className="muted">({bio.length}/{BIO_MAX})</span>
-            }
-          </span>
-          <textarea
-            className={bio.length >= BIO_MAX ? 'textarea textarea--limit' : 'textarea'}
-            maxLength={BIO_MAX}
-            rows={4}
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            placeholder="due righe su di te…"
-          />
-        </label>
-
-        <div className="field">
-          <span>Città</span>
-          <div className="autocomplete">
+          }
+        >
+          <div className="composer inline-add">
             <input
               type="text"
-              value={cityQuery}
-              onChange={(e) => onCityInput(e.target.value)}
-              onFocus={() => { if (cityResults.length > 0) setCityOpen(true) }}
-              onBlur={() => window.setTimeout(() => setCityOpen(false), 150)}
-              placeholder="inizia a digitare il comune…"
-              autoComplete="off"
+              value={educationInstitute}
+              onChange={(e) => setEducationInstitute(e.target.value)}
+              placeholder="Scuola, Università o Ente (opzionale)…"
+              maxLength={EDUCATION_INSTITUTE_MAX}
+              aria-label="Scuola, Università o Ente"
             />
-            {cityQuery && (
-              <button type="button" className="ac-clear" onClick={clearCity} aria-label="Pulisci città">
-                ✕
+            <span className="muted">{educationInstitute.length}/{EDUCATION_INSTITUTE_MAX}</span>
+          </div>
+        </SingleChoiceField>
+      ),
+    },
+    {
+      key: 'diet',
+      label: 'Alimentazione',
+      icon: BowlFood,
+      value: diet ? labelOf(DIET_OPTIONS, diet) : null,
+      visible: vis.show_diet,
+      body: (
+        <SingleChoiceField
+          legend="Alimentazione"
+          name="diet"
+          options={DIET_OPTIONS}
+          value={diet}
+          onChange={(v) => setDiet(v)}
+          expanded={!!expandedChips.diet}
+          onExpand={() => expand('diet')}
+          visibility={
+            <VisibilityPill
+              field="Alimentazione"
+              checked={vis.show_diet}
+              onChange={(v) => setVisFlag('show_diet', v)}
+            />
+          }
+        />
+      ),
+    },
+    {
+      key: 'religion',
+      label: 'Religione & credo',
+      icon: HandsPraying,
+      value: religion ? labelOf(RELIGION_OPTIONS, religion) : null,
+      visible: vis.show_religion,
+      body: (
+        <SingleChoiceField
+          legend="Religione & credo"
+          name="religion"
+          options={RELIGION_OPTIONS}
+          value={religion}
+          onChange={(v) => setReligion(v)}
+          expanded={!!expandedChips.religion}
+          onExpand={() => expand('religion')}
+          visibility={
+            <VisibilityPill
+              field="Religione e credo"
+              checked={vis.show_religion}
+              onChange={(v) => setVisFlag('show_religion', v)}
+            />
+          }
+        />
+      ),
+    },
+    {
+      key: 'politics',
+      label: 'Orientamento politico',
+      icon: Scales,
+      value: politics ? labelOf(POLITICS_OPTIONS, politics) : null,
+      visible: vis.show_politics,
+      body: (
+        <SingleChoiceField
+          legend="Orientamento politico"
+          name="politics"
+          options={POLITICS_OPTIONS}
+          value={politics}
+          onChange={(v) => setPolitics(v)}
+          expanded={!!expandedChips.politics}
+          onExpand={() => expand('politics')}
+          visibility={
+            <VisibilityPill
+              field="Orientamento politico"
+              checked={vis.show_politics}
+              onChange={(v) => setVisFlag('show_politics', v)}
+            />
+          }
+        />
+      ),
+    },
+    {
+      key: 'children',
+      label: 'Figli',
+      icon: Baby,
+      value: childrenStatus ? labelOf(CHILDREN_OPTIONS, childrenStatus) : null,
+      visible: vis.show_children,
+      body: (
+        <SingleChoiceField
+          legend="Figli"
+          name="children"
+          options={CHILDREN_OPTIONS}
+          value={childrenStatus}
+          onChange={(v) => setChildrenStatus(v)}
+          visibility={
+            <VisibilityPill
+              field="Figli"
+              checked={vis.show_children}
+              onChange={(v) => setVisFlag('show_children', v)}
+            />
+          }
+        />
+      ),
+    },
+    {
+      key: 'smoking',
+      label: 'Fumo',
+      icon: Cigarette,
+      value: smoking ? labelOf(SMOKING_OPTIONS, smoking) : null,
+      visible: vis.show_smoking,
+      body: (
+        <SingleChoiceField
+          legend="Fumo"
+          name="smoking"
+          options={SMOKING_OPTIONS}
+          value={smoking}
+          onChange={(v) => setSmoking(v)}
+          visibility={
+            <VisibilityPill
+              field="Fumo"
+              checked={vis.show_smoking}
+              onChange={(v) => setVisFlag('show_smoking', v)}
+            />
+          }
+        />
+      ),
+    },
+    {
+      key: 'sport',
+      label: 'Attività fisica',
+      icon: PersonSimpleRun,
+      value: sport ? labelOf(SPORT_OPTIONS, sport) : null,
+      visible: vis.show_sport,
+      body: (
+        <SingleChoiceField
+          legend="Attività fisica"
+          name="sport"
+          options={SPORT_OPTIONS}
+          value={sport}
+          onChange={(v) => setSport(v)}
+          visibility={
+            <VisibilityPill
+              field="Attività fisica"
+              checked={vis.show_sport}
+              onChange={(v) => setVisFlag('show_sport', v)}
+            />
+          }
+        />
+      ),
+    },
+    {
+      key: 'pets',
+      label: 'Animali domestici',
+      icon: PawPrint,
+      value:
+        hasPets == null
+          ? null
+          : hasPets
+            ? petsDetail.trim()
+              ? `sì — ${petsDetail.trim()}`
+              : 'sì'
+            : 'no',
+      visible: vis.show_pets,
+      body: (
+        <div className="field pf-field" role="group" aria-labelledby="pf-pets-title">
+          <FieldHead
+            legend="Animali domestici"
+            titleId="pf-pets-title"
+            visibility={
+              <VisibilityPill
+                field="Animali domestici"
+                checked={vis.show_pets}
+                onChange={(v) => setVisFlag('show_pets', v)}
+              />
+            }
+          />
+          <div className="options">
+            <label className="chip">
+              <input
+                type="radio"
+                name="pets"
+                checked={hasPets === true}
+                onChange={() => setHasPets(true)}
+              />
+              <span>Sì</span>
+            </label>
+            <label className="chip">
+              <input
+                type="radio"
+                name="pets"
+                checked={hasPets === false}
+                onChange={() => { setHasPets(false); setPetsDetail('') }}
+              />
+              <span>No</span>
+            </label>
+            {hasPets !== null && (
+              <button
+                type="button"
+                className="link clear-sel"
+                onClick={() => { setHasPets(null); setPetsDetail('') }}
+              >
+                pulisci
               </button>
             )}
-            {cityOpen && cityResults.length > 0 && (
-              <ul className="ac-list">
-                {cityResults.map((c) => (
-                  <li key={`${c.nome}-${c.sigla}`}>
-                    <button
-                      type="button"
-                      className="ac-item"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => pickCity(c)}
-                    >
-                      {c.nome}{' '}
-                      <span className="muted">({c.sigla}) · {c.regione}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {cityOpen && cityResults.length === 0 && normalize(cityQuery).length >= 2 && (
-              <ul className="ac-list">
-                <li className="ac-empty">Nessun comune trovato</li>
-              </ul>
-            )}
           </div>
-          {/* La regione non è un campo a sé: si ricava dal comune scelto e finisce
-              in city_region, che alimenta il filtro "Regione" della ricerca. Senza
-              questo avviso l'utente non ha modo di sapere che scegliendo la città
-              diventa trovabile anche per regione. Stesso pattern del segno
-              zodiacale, che è pure derivato (dalla data di nascita). */}
-          {cityRegion && (
-            <p className="hint">
-              Regione: <strong>{cityRegion}</strong> · derivata dalla città. Se
-              mostri la città nel profilo, le altre persone possono trovarti anche
-              filtrando per regione.
-            </p>
-          )}
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={vis.show_city}
-              onChange={(e) => setVisFlag('show_city', e.target.checked)}
-            />
-            <span>Mostra nel profilo</span>
-          </label>
-        </div>
-
-        <fieldset className="field">
-          <legend>Età e data di nascita</legend>
-          {profile.birth_date ? (
-            <p className="hint">la data di nascita non è modificabile.</p>
-          ) : (
-            <label className="field">
-              <span>Data di nascita (facoltativa)</span>
+          {hasPets === true && (
+            <div className="composer inline-add">
               <input
-                type="date"
-                value={birthDate}
-                max={maxBirthDate}
-                min="1900-01-01"
-                onChange={(e) => setBirthDate(e.target.value)}
+                type="text"
+                value={petsDetail}
+                onChange={(e) => setPetsDetail(e.target.value)}
+                placeholder="Specifica (es. un gatto e un cane)…"
+                maxLength={PETS_DETAIL_MAX}
+                aria-label="Quali animali"
               />
-              <p className="hint">
-                Devi avere almeno 18 anni. Una volta salvata non sarà più
-                modificabile. Serve per mostrare la tua età e per i filtri di ricerca.
-              </p>
-            </label>
-          )}
-          {(profile.birth_date || birthDate) && (
-            <>
-              <label className="declare mini">
-                <input
-                  type="checkbox"
-                  checked={vis.show_age}
-                  onChange={(e) => setVisFlag('show_age', e.target.checked)}
-                />
-                <span>Mostra la mia età</span>
-              </label>
-              <label className="declare mini">
-                <input
-                  type="checkbox"
-                  checked={vis.show_birth_date}
-                  onChange={(e) => setVisFlag('show_birth_date', e.target.checked)}
-                />
-                <span>Mostra la data esatta</span>
-              </label>
-            </>
-          )}
-        </fieldset>
-
-        <FilterSection
-          legend="Identità & orientamento"
-          badge={sectionBadge(identityCount, !!openSections.identity)}
-          open={!!openSections.identity}
-          onToggle={() => toggleSection('identity')}
-        >
-          <fieldset className="field">
-            <legend>Come ti identifichi</legend>
-            <div className="options">
-              {identityOpts.map((opt) => (
-                <label key={opt.value} className="chip">
-                  <input
-                    type="radio"
-                    name="identity"
-                    checked={identity === opt.value}
-                    onChange={() => setIdentity(opt.value)}
-                  />
-                  <span>{opt.label}</span>
-                </label>
-              ))}
+              <span className="muted">{petsDetail.length}/{PETS_DETAIL_MAX}</span>
             </div>
-            <label className="declare mini">
-              <input
-                type="checkbox"
-                checked={vis.show_identity}
-                onChange={(e) => setVisFlag('show_identity', e.target.checked)}
-              />
-              <span>Mostra nel profilo</span>
-            </label>
-          </fieldset>
+          )}
+        </div>
+      ),
+    },
+  ]
 
-          <MultiChoiceField
-            legend="Orientamento"
-            options={orientationOpts}
-            selected={orientations}
-            onToggle={(v) => setOrientations(toggle(orientations, v))}
-          >
-            <ShowInProfileToggle
+  // ── Scheda «Identità» ─────────────────────────────────────────────────
+  const identityFields: SummaryRow[] = [
+    {
+      key: 'identity',
+      label: 'Come ti identifichi',
+      icon: User,
+      visible: vis.show_identity,
+      value:
+        identity !== 'preferisco_non_specificare' ? labelOf(identityOpts, identity) : null,
+      body: (
+        <SingleChoiceField
+          legend="Come ti identifichi"
+          name="identity"
+          options={identityOpts}
+          value={identity}
+          clearable={false}
+          onChange={(v) => setIdentity(v ?? 'preferisco_non_specificare')}
+          expanded={!!expandedChips.identity}
+          onExpand={() => expand('identity')}
+          visibility={
+            <VisibilityPill
+              field="Come ti identifichi"
+              checked={vis.show_identity}
+              onChange={(v) => setVisFlag('show_identity', v)}
+            />
+          }
+        />
+      ),
+    },
+    {
+      key: 'orientation',
+      label: 'Orientamento',
+      icon: Heart,
+      visible: vis.show_orientation,
+      value: summarize(orientations.map((o) => labelOf(orientationOpts, o))),
+      body: (
+        <MultiChoiceField
+          legend="Orientamento"
+          options={orientationOpts}
+          selected={orientations}
+          onToggle={(v) => setOrientations(toggle(orientations, v))}
+          expanded={!!expandedChips.orientation}
+          onExpand={() => expand('orientation')}
+          visibility={
+            <VisibilityPill
+              field="Orientamento"
               checked={vis.show_orientation}
               onChange={(v) => setVisFlag('show_orientation', v)}
             />
-          </MultiChoiceField>
-
-          {profile.zodiac && (
-            <fieldset className="field">
-              <legend>Segno zodiacale</legend>
-              <p className="hint">
-                {ZODIAC_LABELS[profile.zodiac]} · calcolato dalla data di nascita.
-              </p>
-              <label className="declare mini">
-                <input
-                  type="checkbox"
-                  checked={vis.show_zodiac}
-                  onChange={(e) => setVisFlag('show_zodiac', e.target.checked)}
-                />
-                <span>Mostra nel profilo</span>
-              </label>
-            </fieldset>
-          )}
-        </FilterSection>
-
-        <FilterSection
-          legend="Relazioni & obiettivi"
-          badge={sectionBadge(relationsCount, !!openSections.relations)}
-          open={!!openSections.relations}
-          onToggle={() => toggleSection('relations')}
+          }
+        />
+      ),
+    },
+    {
+      key: 'intents',
+      label: 'Cosa cerchi',
+      icon: Compass,
+      visible: vis.show_intents,
+      value: summarize(intents.map((i) => labelOf(intentOpts, i))),
+      body: (
+        <MultiChoiceField
+          legend="Cosa cerchi"
+          options={intentOpts}
+          selected={intents}
+          onToggle={(v) => setIntents(toggle(intents, v))}
+          expanded={!!expandedChips.intents}
+          onExpand={() => expand('intents')}
+          visibility={
+            <VisibilityPill
+              field="Cosa cerchi"
+              checked={vis.show_intents}
+              onChange={(v) => setVisFlag('show_intents', v)}
+            />
+          }
+        />
+      ),
+    },
+    {
+      key: 'relationship',
+      label: 'Stato relazionale',
+      icon: Users,
+      visible: vis.show_relationship,
+      value: relStatus
+        ? labelOf(relStatusOpts, relStatus) +
+          (relStatus === 'in_relazione' && relType ? ` · ${labelOf(relTypeOpts, relType)}` : '')
+        : null,
+      body: (
+        <SingleChoiceField
+          legend="Stato relazionale"
+          name="relstatus"
+          options={relStatusOpts}
+          value={relStatus}
+          onChange={(v) => { setRelStatus(v); if (!v) setRelType(null) }}
+          visibility={
+            <VisibilityPill
+              field="Stato relazionale"
+              checked={vis.show_relationship}
+              onChange={(v) => setVisFlag('show_relationship', v)}
+            />
+          }
         >
-          <fieldset className="field">
-            <legend>Stato relazionale</legend>
-            <div className="options">
-              {relStatusOpts.map((opt) => (
+          {relStatus === 'in_relazione' && (
+            <div className="options sub-options">
+              {relTypeOpts.map((opt) => (
                 <label key={opt.value} className="chip">
                   <input
                     type="radio"
-                    name="relstatus"
-                    checked={relStatus === opt.value}
-                    onChange={() => setRelStatus(opt.value)}
+                    name="reltype"
+                    checked={relType === opt.value}
+                    onChange={() => setRelType(opt.value)}
                   />
                   <span>{opt.label}</span>
                 </label>
               ))}
-              {relStatus && (
-                <button type="button" className="link clear-sel" onClick={() => { setRelStatus(null); setRelType(null) }}>
-                  pulisci
-                </button>
-              )}
             </div>
-            {relStatus === 'in_relazione' && (
-              <div className="options sub-options">
-                {relTypeOpts.map((opt) => (
-                  <label key={opt.value} className="chip">
+          )}
+        </SingleChoiceField>
+      ),
+    },
+    {
+      key: 'interests',
+      label: 'Interessi',
+      icon: Sparkle,
+      // Gli interessi non hanno un flag show_*: sono sempre pubblici, quindi
+      // niente occhio su questa riga.
+      value: summarize(interests),
+      body: (
+        <div className="field pf-field" role="group" aria-labelledby="pf-interests-title">
+          <FieldHead
+            legend={
+              <>
+                Interessi <span className="muted">({interests.length}/{MAX_INTERESTS})</span>
+              </>
+            }
+            titleId="pf-interests-title"
+          />
+          {INTEREST_CATEGORIES.map((cat) => (
+            <div key={cat.label} className="interest-cat">
+              <span className="interest-cat-label">{cat.label}</span>
+              <div className="options">
+                {cat.options.map((tag) => (
+                  <label key={tag} className="chip">
                     <input
-                      type="radio"
-                      name="reltype"
-                      checked={relType === opt.value}
-                      onChange={() => setRelType(opt.value)}
+                      type="checkbox"
+                      checked={interests.includes(tag)}
+                      onChange={() => toggleInterest(tag)}
+                      disabled={!interests.includes(tag) && interests.length >= MAX_INTERESTS}
                     />
-                    <span>{opt.label}</span>
+                    <span>{tag}</span>
                   </label>
                 ))}
               </div>
-            )}
-            <label className="declare mini">
-              <input
-                type="checkbox"
-                checked={vis.show_relationship}
-                onChange={(e) => setVisFlag('show_relationship', e.target.checked)}
-              />
-              <span>Mostra nel profilo</span>
-            </label>
-          </fieldset>
-
-          <MultiChoiceField
-            legend="Cosa cerchi"
-            options={intentOpts}
-            selected={intents}
-            onToggle={(v) => setIntents(toggle(intents, v))}
-          >
-            <ShowInProfileToggle
-              checked={vis.show_intents}
-              onChange={(v) => setVisFlag('show_intents', v)}
+            </div>
+          ))}
+          {customInterests.length > 0 && (
+            <div className="options">
+              {customInterests.map((tag) => (
+                <button type="button" key={tag} className="chip sel" onClick={() => toggleInterest(tag)}>
+                  {tag} ✕
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="composer inline-add">
+            <input
+              type="text"
+              value={newInterest}
+              onChange={(e) => setNewInterest(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addInterest(newInterest) } }}
+              placeholder="Altro (specifica)…"
+              maxLength={24}
+              disabled={interests.length >= MAX_INTERESTS}
+              aria-label="Aggiungi un interesse"
             />
-          </MultiChoiceField>
+            <button
+              type="button"
+              className="btn-primary btn-sm"
+              onClick={() => addInterest(newInterest)}
+              disabled={!newInterest.trim() || interests.length >= MAX_INTERESTS}
+            >
+              Aggiungi
+            </button>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'languages',
+      label: 'Lingue',
+      icon: Translate,
+      visible: vis.show_languages,
+      value: summarize(languages.map((l) => labelOf(languageOpts, l as Language))),
+      body: (
+        <div className="field pf-field" role="group" aria-labelledby="pf-lang-title">
+          <FieldHead
+            legend={
+              <>
+                Lingue parlate{' '}
+                <span className="muted">({languages.length}/{MAX_LANGUAGES})</span>
+              </>
+            }
+            titleId="pf-lang-title"
+            visibility={
+              <VisibilityPill
+                field="Lingue parlate"
+                checked={vis.show_languages}
+                onChange={(v) => setVisFlag('show_languages', v)}
+              />
+            }
+          />
+          <div className="options">
+            {languageOpts.map((opt) => (
+              <label key={opt.value} className="chip">
+                <input
+                  type="checkbox"
+                  checked={languages.includes(opt.value)}
+                  onChange={() => toggleLanguage(opt.value)}
+                  disabled={!languages.includes(opt.value) && languages.length >= MAX_LANGUAGES}
+                />
+                <span>{opt.label}</span>
+              </label>
+            ))}
+          </div>
+          {customLanguages.length > 0 && (
+            <div className="options">
+              {customLanguages.map((tag) => (
+                <button type="button" key={tag} className="chip sel" onClick={() => toggleLanguage(tag)}>
+                  {tag} ✕
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="composer inline-add">
+            <input
+              type="text"
+              value={newLanguage}
+              onChange={(e) => setNewLanguage(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLanguage(newLanguage) } }}
+              placeholder="Altra lingua…"
+              maxLength={LANGUAGE_MAX_LEN}
+              disabled={languages.length >= MAX_LANGUAGES}
+              aria-label="Aggiungi una lingua"
+            />
+            <button
+              type="button"
+              className="btn-primary btn-sm"
+              onClick={() => addLanguage(newLanguage)}
+              disabled={!newLanguage.trim() || languages.length >= MAX_LANGUAGES}
+            >
+              Aggiungi
+            </button>
+          </div>
+        </div>
+      ),
+    },
+    // Il segno è una colonna generata dal DB: la riga compare solo se c'è una
+    // data di nascita da cui ricavarlo, e nel foglio si può solo mostrarlo o
+    // nasconderlo.
+    ...(profile.zodiac
+      ? [{
+          key: 'zodiac',
+          label: 'Segno zodiacale',
+          icon: Star,
+          visible: vis.show_zodiac,
+          value: `${ZODIAC_LABELS[profile.zodiac]} · non modificabile`,
+          body: (
+            <div className="field pf-field" role="group" aria-labelledby="pf-zodiac-title">
+              <FieldHead
+                legend="Segno zodiacale"
+                titleId="pf-zodiac-title"
+                visibility={
+                  <VisibilityPill
+                    field="Segno zodiacale"
+                    checked={vis.show_zodiac}
+                    onChange={(v) => setVisFlag('show_zodiac', v)}
+                  />
+                }
+              />
+              <p className="hint">
+                {ZODIAC_LABELS[profile.zodiac]} · calcolato dalla data di nascita,
+                non si può cambiare.
+              </p>
+            </div>
+          ),
+        } satisfies SummaryRow]
+      : []),
+  ]
 
-          {profile.strato >= 2 && (
-            <fieldset className="field">
-              <legend>Chi può scrivermi in privato</legend>
+  // ── Scheda «Privacy» ──────────────────────────────────────────────────
+  const visibleFieldNames = VIS_FIELDS.filter((f) => vis[f.key]).map((f) => f.label.toLowerCase())
+
+  const privacyFields: SummaryRow[] = [
+    {
+      key: 'searchable',
+      label: 'Profilo trovabile',
+      icon: MagnifyingGlass,
+      value: 'appari nei risultati di ricerca',
+      state: { text: searchable ? 'attivo' : 'nascosto', on: searchable },
+      body: (
+        <div className="field pf-field" role="group" aria-labelledby="pf-searchable-title">
+          <FieldHead legend="Profilo trovabile" titleId="pf-searchable-title" />
+          <div className="options">
+            {[true, false].map((v) => (
+              <label key={String(v)} className="chip">
+                <input
+                  type="radio"
+                  name="searchable"
+                  checked={searchable === v}
+                  onChange={() => setSearchable(v)}
+                />
+                <span>{v ? 'attivo' : 'nascosto'}</span>
+              </label>
+            ))}
+          </div>
+          <p className="hint">
+            Da «nascosto» nessuno può trovarti dalla ricerca. Chi ha già una
+            conversazione con te continua a vederti.
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: 'online',
+      label: 'Stato online',
+      icon: Broadcast,
+      value: 'mostra quando sei attiva',
+      state: { text: vis.show_online ? 'visibile' : 'nascosto', on: vis.show_online },
+      body: (
+        <div className="field pf-field" role="group" aria-labelledby="pf-online-title">
+          <FieldHead legend="Stato online" titleId="pf-online-title" />
+          <div className="options">
+            {[true, false].map((v) => (
+              <label key={String(v)} className="chip">
+                <input
+                  type="radio"
+                  name="show_online"
+                  checked={vis.show_online === v}
+                  onChange={() => setVisFlag('show_online', v)}
+                />
+                <span>{v ? 'visibile' : 'nascosto'}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      ),
+    },
+    // Il filtro sulle richieste di DM ha senso solo da Strato 2, quando si
+    // iniziano a ricevere messaggi privati.
+    ...(profile.strato >= 2
+      ? [{
+          key: 'dmfilter',
+          label: 'Chi può scriverti',
+          icon: ChatCircleDots,
+          value: labelOf(DM_FILTER_OPTIONS, dmFilter),
+          body: (
+            <div className="field pf-field" role="group" aria-labelledby="pf-dmfilter-title">
+              <FieldHead legend="Chi può scriverti in privato" titleId="pf-dmfilter-title" />
               <div className="options">
                 {DM_FILTER_OPTIONS.map((opt) => (
                   <label key={opt.value} className="chip">
@@ -925,280 +1313,368 @@ export function ProfileEditor({
                   </label>
                 ))}
               </div>
-              <p className="hint">
-                Filtra le richieste di messaggio privato che ricevi.
-              </p>
-            </fieldset>
-          )}
-        </FilterSection>
-
-        <FilterSection
-          legend="Interessi & lingue"
-          badge={sectionBadge(interestsCount, !!openSections.interests)}
-          open={!!openSections.interests}
-          onToggle={() => toggleSection('interests')}
-        >
-          <fieldset className="field">
-            <legend>
-              Interessi <span className="muted">({interests.length}/{MAX_INTERESTS})</span>
-            </legend>
-            {INTEREST_CATEGORIES.map((cat) => (
-              <div key={cat.label} className="interest-cat">
-                <span className="interest-cat-label">{cat.label}</span>
-                <div className="options">
-                  {cat.options.map((tag) => (
-                    <label key={tag} className="chip">
-                      <input
-                        type="checkbox"
-                        checked={interests.includes(tag)}
-                        onChange={() => toggleInterest(tag)}
-                        disabled={!interests.includes(tag) && interests.length >= MAX_INTERESTS}
-                      />
-                      <span>{tag}</span>
-                    </label>
-                  ))}
-                </div>
+              <p className="hint">Filtra le richieste di messaggio privato che ricevi.</p>
+            </div>
+          ),
+        } satisfies SummaryRow]
+      : []),
+    {
+      key: 'visfields',
+      label: 'Campi visibili nel profilo',
+      icon: Eye,
+      value: summarize(visibleFieldNames) ?? 'nessun campo visibile',
+      body: (
+        <div className="field pf-field" role="group" aria-labelledby="pf-visfields-title">
+          <FieldHead legend="Campi visibili nel profilo" titleId="pf-visfields-title" />
+          <p className="hint">
+            Ogni campo del profilo, con lo stesso interruttore che trovi nella sua
+            scheda. Quello che è «nascosto» resta solo tuo.
+          </p>
+          <div className="pf-vis-list">
+            {VIS_FIELDS.map((f) => (
+              <div key={f.key} className="pf-vis-row">
+                <span>{f.label}</span>
+                <VisibilityPill
+                  field={f.label}
+                  checked={vis[f.key]}
+                  onChange={(v) => setVisFlag(f.key, v)}
+                />
               </div>
             ))}
-            {customInterests.length > 0 && (
-              <div className="options">
-                {customInterests.map((tag) => (
-                  <button type="button" key={tag} className="chip sel" onClick={() => toggleInterest(tag)}>
-                    {tag} ✕
-                  </button>
-                ))}
-              </div>
-            )}
-            <div className="composer inline-add">
-              <input
-                type="text"
-                value={newInterest}
-                onChange={(e) => setNewInterest(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addInterest(newInterest) } }}
-                placeholder="Altro (specifica)…"
-                maxLength={24}
-                disabled={interests.length >= MAX_INTERESTS}
-              />
-              <button
-                type="button"
-                className="btn-primary btn-sm"
-                onClick={() => addInterest(newInterest)}
-                disabled={!newInterest.trim() || interests.length >= MAX_INTERESTS}
-              >
-                Aggiungi
-              </button>
-            </div>
-          </fieldset>
-
-          <fieldset className="field">
-            <legend>
-              Lingue parlate <span className="muted">({languages.length}/{MAX_LANGUAGES})</span>
-            </legend>
-            <div className="options">
-              {languageOpts.map((opt) => (
-                <label key={opt.value} className="chip">
-                  <input
-                    type="checkbox"
-                    checked={languages.includes(opt.value)}
-                    onChange={() => toggleLanguage(opt.value)}
-                    disabled={!languages.includes(opt.value) && languages.length >= MAX_LANGUAGES}
-                  />
-                  <span>{opt.label}</span>
-                </label>
-              ))}
-            </div>
-            {customLanguages.length > 0 && (
-              <div className="options">
-                {customLanguages.map((tag) => (
-                  <button type="button" key={tag} className="chip sel" onClick={() => toggleLanguage(tag)}>
-                    {tag} ✕
-                  </button>
-                ))}
-              </div>
-            )}
-            <div className="composer inline-add">
-              <input
-                type="text"
-                value={newLanguage}
-                onChange={(e) => setNewLanguage(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLanguage(newLanguage) } }}
-                placeholder="Altra lingua…"
-                maxLength={LANGUAGE_MAX_LEN}
-                disabled={languages.length >= MAX_LANGUAGES}
-              />
-              <button
-                type="button"
-                className="btn-primary btn-sm"
-                onClick={() => addLanguage(newLanguage)}
-                disabled={!newLanguage.trim() || languages.length >= MAX_LANGUAGES}
-              >
-                Aggiungi
-              </button>
-            </div>
-            <ShowInProfileToggle
-              checked={vis.show_languages}
-              onChange={(v) => setVisFlag('show_languages', v)}
-            />
-          </fieldset>
-        </FilterSection>
-
-        <FilterSection
-          legend="Stile di vita"
-          badge={sectionBadge(lifestyleCount, !!openSections.lifestyle)}
-          open={!!openSections.lifestyle}
-          onToggle={() => toggleSection('lifestyle')}
-        >
-          <SingleChoiceField legend="Titolo di studio" name="education" options={educationOpts} value={educationLevel} onChange={(v) => setEducationLevel(v)}>
-            <div className="composer inline-add">
-              <input
-                type="text"
-                value={educationInstitute}
-                onChange={(e) => setEducationInstitute(e.target.value)}
-                placeholder="Scuola, Università o Ente (opzionale)…"
-                maxLength={EDUCATION_INSTITUTE_MAX}
-              />
-              <span className="muted">{educationInstitute.length}/{EDUCATION_INSTITUTE_MAX}</span>
-            </div>
-            <ShowInProfileToggle checked={vis.show_education} onChange={(v) => setVisFlag('show_education', v)} />
-          </SingleChoiceField>
-
-          <SingleChoiceField legend="Alimentazione" name="diet" options={dietOpts} value={diet} onChange={(v) => setDiet(v)}>
-            <ShowInProfileToggle checked={vis.show_diet} onChange={(v) => setVisFlag('show_diet', v)} />
-          </SingleChoiceField>
-
-          <SingleChoiceField legend="Religione & credo" name="religion" options={religionOpts} value={religion} onChange={(v) => setReligion(v)}>
-            <ShowInProfileToggle checked={vis.show_religion} onChange={(v) => setVisFlag('show_religion', v)} />
-          </SingleChoiceField>
-
-          <SingleChoiceField legend="Orientamento politico" name="politics" options={politicsOpts} value={politics} onChange={(v) => setPolitics(v)}>
-            <ShowInProfileToggle checked={vis.show_politics} onChange={(v) => setVisFlag('show_politics', v)} />
-          </SingleChoiceField>
-
-          <SingleChoiceField legend="Figli" name="children" options={childrenOpts} value={childrenStatus} onChange={(v) => setChildrenStatus(v)}>
-            <ShowInProfileToggle checked={vis.show_children} onChange={(v) => setVisFlag('show_children', v)} />
-          </SingleChoiceField>
-
-          <SingleChoiceField legend="Fumo" name="smoking" options={smokingOpts} value={smoking} onChange={(v) => setSmoking(v)}>
-            <ShowInProfileToggle checked={vis.show_smoking} onChange={(v) => setVisFlag('show_smoking', v)} />
-          </SingleChoiceField>
-
-          <SingleChoiceField legend="Attività fisica" name="sport" options={sportOpts} value={sport} onChange={(v) => setSport(v)}>
-            <ShowInProfileToggle checked={vis.show_sport} onChange={(v) => setVisFlag('show_sport', v)} />
-          </SingleChoiceField>
-
-          <fieldset className="field">
-            <legend>Animali domestici</legend>
-            <div className="options">
-              <label className="chip">
-                <input
-                  type="radio"
-                  name="pets"
-                  checked={hasPets === true}
-                  onChange={() => setHasPets(true)}
-                />
-                <span>Sì</span>
-              </label>
-              <label className="chip">
-                <input
-                  type="radio"
-                  name="pets"
-                  checked={hasPets === false}
-                  onChange={() => { setHasPets(false); setPetsDetail('') }}
-                />
-                <span>No</span>
-              </label>
-              {hasPets !== null && (
-                <button type="button" className="link clear-sel" onClick={() => { setHasPets(null); setPetsDetail('') }}>
-                  pulisci
-                </button>
+          </div>
+        </div>
+      ),
+    },
+    ...(layerEligibility
+      ? [{
+          key: 'layer',
+          label: 'Il tuo livello',
+          icon: Medal,
+          value: `strato ${layerEligibility.currentLayer}`,
+          body: (
+            <div className="field pf-field" role="group" aria-labelledby="pf-layer-title">
+              <FieldHead legend="Il tuo livello" titleId="pf-layer-title" />
+              <p className="hint">
+                Sei al <strong>Strato {layerEligibility.currentLayer}</strong>
+                {layerEligibility.nextLayer
+                  ? ` — per avanzare allo Strato ${layerEligibility.nextLayer}:`
+                  : ' — hai raggiunto il livello massimo.'}
+              </p>
+              {layerEligibility.nextLayer && (
+                <>
+                  {layerEligibility.eligible ? (
+                    <p className="ok" role="status">Hai soddisfatto tutti i requisiti. L'avanzamento avviene automaticamente al tuo prossimo accesso.</p>
+                  ) : (
+                    <>
+                      {(layerEligibility.missingHours > 0 || layerEligibility.missingMessages > 0) && (
+                        <ul className="layer-requirements">
+                          {layerEligibility.missingHours > 0 && (
+                            <li>
+                              ancora{' '}
+                              <strong>
+                                {layerEligibility.missingHours >= 24
+                                  ? `${Math.ceil(layerEligibility.missingHours / 24)} giorni`
+                                  : `${layerEligibility.missingHours} ore`}
+                              </strong>{' '}
+                              di permanenza
+                            </li>
+                          )}
+                          {layerEligibility.missingMessages > 0 && (
+                            <li>ancora <strong>{layerEligibility.missingMessages} messaggi</strong> in chatroom</li>
+                          )}
+                        </ul>
+                      )}
+                      {!layerEligibility.reputationOk && (
+                        <p className="hint">
+                          Per ora non hai ancora i requisiti per scrivere messaggi privati.
+                          Continua a partecipare in modo positivo nelle chat: la situazione si aggiorna
+                          automaticamente nel tempo.
+                        </p>
+                      )}
+                    </>
+                  )}
+                </>
               )}
             </div>
-            {hasPets === true && (
-              <div className="composer inline-add">
+          ),
+        } satisfies SummaryRow]
+      : []),
+    {
+      key: 'delete',
+      label: 'Elimina account',
+      icon: Trash,
+      danger: true,
+      value: null,
+      emptyText: 'cancellazione definitiva',
+      body: <DeleteAccountSection profileId={profile.id} />,
+    },
+  ]
+
+  const sheetField =
+    [...lifeFields, ...identityFields, ...privacyFields].find((f) => f.key === openSheet) ?? null
+
+  return (
+    <main className="app profile">
+      <AppHeader backLabel="‹ Anteprima" onBack={onCancel} title="Modifica profilo" />
+
+      {/* Non è un vero tablist (niente tabpanel né navigazione con le frecce):
+          usiamo bottoni con aria-pressed, come già fa il selettore di avatar. */}
+      <div className="pf-etabs" role="group" aria-label="Sezioni del profilo">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            aria-pressed={tab === t.key}
+            onClick={() => setTab(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="pf-progress">
+        <div className="pf-progress-head">
+          <span>Profilo compilato</span>
+          <span className="pf-progress-pct">{completion.percent}%</span>
+        </div>
+        <div
+          className="pf-progress-track"
+          role="progressbar"
+          aria-valuenow={completion.percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Profilo compilato al ${completion.percent} per cento: ${completion.filled} campi su ${completion.total}`}
+        >
+          <div className="pf-progress-fill" style={{ width: `${completion.percent}%` }} />
+        </div>
+      </div>
+
+      <form className="form profile-form" onSubmit={handleSave}>
+        {tab === 'base' && (
+          <>
+            <div className="avatar-preview">
+              <span className="avatar-bubble">
+                <Avatar preset={avatar} nickname={nickname} />
+              </span>
+              <span className="muted small-inline">@{nickname || '—'}</span>
+            </div>
+
+            <label className="field">
+              <span>Nickname</span>
+              <input
+                type="text"
+                required
+                minLength={3}
+                maxLength={24}
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+              />
+            </label>
+
+            <fieldset className="field">
+              <legend>Avatar</legend>
+              {/* Selezione singola in un fieldset (la legend "Avatar" fa da
+                  raggruppamento accessibile). Non è un vero tablist — manca
+                  tabpanel/frecce — quindi usiamo bottoni con aria-pressed, come il
+                  controllo dimensione testo, invece di role="tab" a metà. */}
+              <div className="avatar-tabs">
+                {AVATAR_STYLES.map((s) => (
+                  <button
+                    type="button"
+                    key={s.key}
+                    aria-pressed={avatarStyle === s.key}
+                    className={avatarStyle === s.key ? 'avatar-tab sel' : 'avatar-tab'}
+                    onClick={() => setAvatarStyle(s.key)}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+              <div className="avatar-grid">
+                {seeds.map((seed) => {
+                  const value = avatarValue(avatarStyle, seed)
+                  return (
+                    <button
+                      type="button"
+                      key={value}
+                      className={avatar === value ? 'avatar-cell sel' : 'avatar-cell'}
+                      onClick={() => setAvatar(value)}
+                      aria-label={`Avatar ${seed}`}
+                      aria-pressed={avatar === value}
+                    >
+                      <Avatar preset={value} nickname={nickname} />
+                    </button>
+                  )
+                })}
+              </div>
+              <button type="button" className="avatar-more" onClick={showMoreAvatars}>
+                🎲 Mostra altri
+              </button>
+              <span className="hint">
+                L'avatar che scegli resta selezionato: premendo «Mostra altri» non
+                lo perdi, rimane in cima alla griglia.
+              </span>
+            </fieldset>
+
+            {/* Un <div>, non un <label>: la pillola occhio è un bottone, e un
+                bottone dentro l'etichetta di un campo ne ruberebbe il click. */}
+            <div className="field">
+              <label className="field">
+                <span>Pronomi</span>
                 <input
                   type="text"
-                  value={petsDetail}
-                  onChange={(e) => setPetsDetail(e.target.value)}
-                  placeholder="Specifica (es. un gatto e un cane)…"
-                  maxLength={PETS_DETAIL_MAX}
+                  maxLength={PRONOUNS_MAX}
+                  value={pronouns}
+                  onChange={(e) => setPronouns(e.target.value)}
+                  placeholder="es. lei/lei, they/them"
                 />
-                <span className="muted">{petsDetail.length}/{PETS_DETAIL_MAX}</span>
-              </div>
-            )}
-            <ShowInProfileToggle checked={vis.show_pets} onChange={(v) => setVisFlag('show_pets', v)} />
-          </fieldset>
-        </FilterSection>
+              </label>
+              <VisibilityPill
+                field="Pronomi"
+                checked={vis.show_pronouns}
+                onChange={(v) => setVisFlag('show_pronouns', v)}
+              />
+            </div>
 
-        {layerEligibility && (
-          <fieldset className="field">
-            <legend>Il tuo livello</legend>
-            <p className="hint">
-              Sei al <strong>Strato {layerEligibility.currentLayer}</strong>
-              {layerEligibility.nextLayer
-                ? ` — per avanzare allo Strato ${layerEligibility.nextLayer}:`
-                : ' — hai raggiunto il livello massimo.'}
-            </p>
-            {layerEligibility.nextLayer && (
-              <>
-                {layerEligibility.eligible ? (
-                  <p className="ok" role="status">Hai soddisfatto tutti i requisiti. L'avanzamento avviene automaticamente al tuo prossimo accesso.</p>
-                ) : (
-                  <>
-                    {(layerEligibility.missingHours > 0 || layerEligibility.missingMessages > 0) && (
-                      <ul className="layer-requirements">
-                        {layerEligibility.missingHours > 0 && (
-                          <li>
-                            ancora{' '}
-                            <strong>
-                              {layerEligibility.missingHours >= 24
-                                ? `${Math.ceil(layerEligibility.missingHours / 24)} giorni`
-                                : `${layerEligibility.missingHours} ore`}
-                            </strong>{' '}
-                            di permanenza
-                          </li>
-                        )}
-                        {layerEligibility.missingMessages > 0 && (
-                          <li>ancora <strong>{layerEligibility.missingMessages} messaggi</strong> in chatroom</li>
-                        )}
-                      </ul>
-                    )}
-                    {!layerEligibility.reputationOk && (
-                      <p className="hint">
-                        Per ora non hai ancora i requisiti per scrivere messaggi privati.
-                        Continua a partecipare in modo positivo nelle chat: la situazione si aggiorna
-                        automaticamente nel tempo.
-                      </p>
-                    )}
-                  </>
+            <label className="field">
+              <span>
+                Bio{' '}
+                {bio.length >= BIO_MAX
+                  ? <span className="limit-warning">raggiunto limite caratteri</span>
+                  : <span className="muted">({bio.length}/{BIO_MAX})</span>
+                }
+              </span>
+              <textarea
+                className={bio.length >= BIO_MAX ? 'textarea textarea--limit' : 'textarea'}
+                maxLength={BIO_MAX}
+                rows={4}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="due righe su di te…"
+              />
+            </label>
+
+            <div className="field">
+              <span>Città</span>
+              <div className="autocomplete">
+                <input
+                  type="text"
+                  value={cityQuery}
+                  onChange={(e) => onCityInput(e.target.value)}
+                  onFocus={() => { if (cityResults.length > 0) setCityOpen(true) }}
+                  onBlur={() => window.setTimeout(() => setCityOpen(false), 150)}
+                  placeholder="inizia a digitare il comune…"
+                  autoComplete="off"
+                  aria-label="Città"
+                />
+                {cityQuery && (
+                  <button type="button" className="ac-clear" onClick={clearCity} aria-label="Pulisci città">
+                    ✕
+                  </button>
                 )}
-              </>
-            )}
-          </fieldset>
+                {cityOpen && cityResults.length > 0 && (
+                  <ul className="ac-list">
+                    {cityResults.map((c) => (
+                      <li key={`${c.nome}-${c.sigla}`}>
+                        <button
+                          type="button"
+                          className="ac-item"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => pickCity(c)}
+                        >
+                          {c.nome}{' '}
+                          <span className="muted">({c.sigla}) · {c.regione}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {cityOpen && cityResults.length === 0 && normalize(cityQuery).length >= 2 && (
+                  <ul className="ac-list">
+                    <li className="ac-empty">Nessun comune trovato</li>
+                  </ul>
+                )}
+              </div>
+              {/* La regione non è un campo a sé: si ricava dal comune scelto e finisce
+                  in city_region, che alimenta il filtro "Regione" della ricerca. Senza
+                  questo avviso l'utente non ha modo di sapere che scegliendo la città
+                  diventa trovabile anche per regione. Stesso pattern del segno
+                  zodiacale, che è pure derivato (dalla data di nascita). */}
+              {cityRegion && (
+                <p className="hint">
+                  Regione: <strong>{cityRegion}</strong> · derivata dalla città. Se
+                  mostri la città nel profilo, le altre persone possono trovarti anche
+                  filtrando per regione.
+                </p>
+              )}
+              <VisibilityPill
+                field="Città"
+                checked={vis.show_city}
+                onChange={(v) => setVisFlag('show_city', v)}
+              />
+            </div>
+
+            <fieldset className="field">
+              <legend>Età e data di nascita</legend>
+              {profile.birth_date ? (
+                <p className="hint">la data di nascita non è modificabile.</p>
+              ) : (
+                <label className="field">
+                  <span>Data di nascita (facoltativa)</span>
+                  <input
+                    type="date"
+                    value={birthDate}
+                    max={maxBirthDate}
+                    min="1900-01-01"
+                    onChange={(e) => setBirthDate(e.target.value)}
+                  />
+                  <p className="hint">
+                    Devi avere almeno 18 anni. Una volta salvata non sarà più
+                    modificabile. Serve per mostrare la tua età e per i filtri di ricerca.
+                  </p>
+                </label>
+              )}
+              {(profile.birth_date || birthDate) && (
+                <div className="pf-vis-list">
+                  <div className="pf-vis-row">
+                    <span>La mia età</span>
+                    <VisibilityPill
+                      field="Età"
+                      checked={vis.show_age}
+                      onChange={(v) => setVisFlag('show_age', v)}
+                    />
+                  </div>
+                  <div className="pf-vis-row">
+                    <span>La data esatta</span>
+                    <VisibilityPill
+                      field="Data di nascita esatta"
+                      checked={vis.show_birth_date}
+                      onChange={(v) => setVisFlag('show_birth_date', v)}
+                    />
+                  </div>
+                </div>
+              )}
+            </fieldset>
+          </>
         )}
 
-        <fieldset className="field">
-          <legend>Privacy</legend>
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={searchable}
-              onChange={(e) => setSearchable(e.target.checked)}
-            />
-            <span>Sono cercabile (le altre persone possono trovarmi nella ricerca)</span>
-          </label>
-          <label className="declare mini">
-            <input
-              type="checkbox"
-              checked={vis.show_online}
-              onChange={(e) => setVisFlag('show_online', e.target.checked)}
-            />
-            <span>Mostra quando sono online</span>
-          </label>
-        </fieldset>
+        {tab === 'identita' && (
+          <SummaryRows rows={identityFields} openKey={openSheet} onOpen={setOpenSheet} />
+        )}
+
+        {tab === 'vita' && (
+          <SummaryRows rows={lifeFields} openKey={openSheet} onOpen={setOpenSheet} />
+        )}
+
+        {tab === 'foto' && <PhotoManager userId={profile.id} />}
+
+        {tab === 'privacy' && (
+          <SummaryRows rows={privacyFields} openKey={openSheet} onOpen={setOpenSheet} />
+        )}
 
         {error && <p className="err" role="alert">{error}</p>}
 
-        <div className="composer inline-add profile-actions">
+        <div className="pf-savebar">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
             Annulla
           </button>
@@ -1207,6 +1683,14 @@ export function ProfileEditor({
           </button>
         </div>
       </form>
+
+      {/* Il foglio sta fuori dal <form>: dentro, un Invio in uno dei suoi campi
+          di testo farebbe partire il salvataggio invece di confermare il campo. */}
+      {sheetField && (
+        <FieldSheet title={sheetField.label} onClose={() => setOpenSheet(null)}>
+          {sheetField.body}
+        </FieldSheet>
+      )}
     </main>
   )
 }

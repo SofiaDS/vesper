@@ -1,7 +1,6 @@
 import { ageFrom } from '../../lib/profile/formatters'
 import { ProfileLayout } from './ProfileLayout'
-import { buildProfileRows, buildKeyFacts, type ProfileFacts } from './profileFacts'
-import { DeleteAccountSection } from './DeleteAccountSection'
+import { buildHeroLine, buildKeyFacts, buildFactChips, type ProfileFacts } from './profileFacts'
 import type { Profile } from '../../types'
 
 export function ProfilePreview({
@@ -16,8 +15,8 @@ export function ProfilePreview({
   const age = ageFrom(profile.birth_date)
 
   // ProfilePreview mostra il proprio profilo: i campi nascosti dai flag
-  // show_* vanno passati come null così buildProfileRows/buildKeyFacts
-  // li omettono — stessa logica di filtraggio già usata da public_profiles,
+  // show_* vanno passati come null così le funzioni di profileFacts li
+  // omettono — stessa logica di filtraggio già usata da public_profiles,
   // qui replicata esplicitamente perché lavoriamo sui dati grezzi.
   const facts: ProfileFacts = {
     pronouns: profile.show_pronouns ? profile.pronouns : null,
@@ -45,8 +44,6 @@ export function ProfilePreview({
     intents: profile.show_intents ? profile.intents : null,
     age: profile.show_age ? age : null,
   }
-  const rows = buildProfileRows(facts)
-  const keyFacts = buildKeyFacts(facts)
 
   return (
     <ProfileLayout
@@ -55,14 +52,22 @@ export function ProfilePreview({
       nickname={profile.nickname}
       avatarPreset={profile.avatar_preset}
       bio={profile.bio}
-      keyFacts={keyFacts}
-      rows={rows}
-      topActions={
-        <button type="button" className="pf-icon-btn" title="Modifica profilo" aria-label="Modifica profilo" onClick={onEdit}>
-          ✎
-        </button>
+      heroLine={buildHeroLine(facts)}
+      keyFacts={buildKeyFacts(facts)}
+      factChips={buildFactChips(facts)}
+      /* Nessuna azione nell'header: «Modifica profilo» sta già nella barra in
+         basso, e ripeterla in alto sarebbe solo un doppione.
+         La cancellazione dell'account non sta più qui: è finita nella scheda
+         «Privacy» dell'editor, insieme agli altri controlli di privacy. */
+      actionBar={
+        <div className="pf-actionbar">
+          <div className="pf-actionbar-row">
+            <button type="button" className="btn-primary" onClick={onEdit}>
+              Modifica profilo
+            </button>
+          </div>
+        </div>
       }
-      bottomCard={<DeleteAccountSection profileId={profile.id} />}
     />
   )
 }

@@ -1,82 +1,120 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { AppHeader } from '../../components/AppHeader'
 import { Avatar } from '../../components/Avatar'
 import { ProfileGallery } from './ProfileGallery'
+import { countFactChips, type KeyFact, type FactChipGroup } from './profileFacts'
 
-// Layout condiviso della schermata profilo (mio o altrui): header con avatar
-// in miniatura, icone azione in alto a destra, sezione "hero" con avatar
-// grande + nome + info principali, e la pila di card (descrizione, galleria,
-// altre informazioni, eventuale card finale). ProfilePreview e
-// PublicProfileScreen vi inseriscono i propri dati e azioni.
+// Layout condiviso della schermata profilo (mio o altrui) — redesign 2B.
+// Dall'alto: header con il solo @nickname (l'avatar sta nell'hero) ed
+// eventuale azione a destra, mosaico foto a filo bordo, riga identità con
+// l'avatar che risale a sovrapporsi al mosaico, bio, i tre fatti chiave e
+// infine «Mostra tutto (N)» che apre il resto sotto forma di chip. Le azioni
+// (scrivi/blocca/segnala, oppure modifica) vivono in una barra fissa in basso.
+// ProfilePreview e PublicProfileScreen vi inseriscono i propri dati.
 export function ProfileLayout({
   onBack,
+  backLabel,
   userId,
   nickname,
   avatarPreset,
   bio,
+  heroLine,
   keyFacts,
-  rows,
-  topActions,
+  factChips,
   onReportPhoto,
-  bottomCard,
+  actionBar,
 }: {
   onBack: () => void
+  backLabel?: string
   userId: string
   nickname: string
   avatarPreset: string | null
   bio: string | null
-  // Identità, orientamento, cosa cerca, età — già formattati; gli assenti (per
-  // privacy o perché non impostati) vengono filtrati prima di mostrarli.
-  keyFacts: (string | null)[]
-  rows: ReactNode[]
-  // Icone in alto a destra: modifica (proprio profilo) oppure blocca/segnala (altrui).
-  topActions: ReactNode
+  // "31 anni · Bologna" — già formattata, null se entrambi i dati mancano.
+  heroLine: string | null
+  // I tre fatti chiave (Si presenta come / Cerca / Parla), già filtrati.
+  keyFacts: KeyFact[]
+  // Tutti gli altri fatti, come chip sotto «Mostra tutto», raggruppati.
+  factChips: FactChipGroup[]
   onReportPhoto?: (photoId: string) => void
-  // Card finale opzionale: zona pericolosa (proprio) o azioni di contatto (altrui).
-  bottomCard?: ReactNode
+  // Barra fissa in basso: contatto (profilo altrui) o modifica (proprio).
+  actionBar?: ReactNode
 }) {
-  const facts = keyFacts.filter((f): f is string => Boolean(f))
+  const [showAll, setShowAll] = useState(false)
+  // `null` finché la galleria non ha risposto: fino ad allora c'è comunque lo
+  // scheletro del mosaico, quindi l'avatar può già risalire.
+  const [photoCount, setPhotoCount] = useState<number | null>(null)
+  const hasMosaic = photoCount == null || photoCount > 0
+  const chipCount = countFactChips(factChips)
 
   return (
     <main className="app profile">
-      <AppHeader
-        onBack={onBack}
-        title={
-          <span className="pf-header-title">
-            <span className="avatar-bubble avatar-bubble-sm"><Avatar preset={avatarPreset} nickname={nickname} /></span>
-            <span>@{nickname}</span>
-          </span>
-        }
-      />
+      <AppHeader onBack={onBack} backLabel={backLabel} title={`@${nickname}`} />
 
-      {topActions && <div className="pf-icon-actions">{topActions}</div>}
+      <ProfileGallery userId={userId} onReportPhoto={onReportPhoto} onLoaded={setPhotoCount} />
 
-      <header className="pf-hero">
-        <span className="avatar-bubble avatar-bubble-lg"><Avatar preset={avatarPreset} nickname={nickname} /></span>
-        <h2 className="pf-nick">@{nickname}</h2>
-        {facts.length > 0 && <p className="pf-key-facts">{facts.join(' · ')}</p>}
+      <header className={hasMosaic ? 'pf-idrow' : 'pf-idrow pf-idrow-nophoto'}>
+        <span className="avatar-bubble avatar-bubble-hero">
+          <Avatar preset={avatarPreset} nickname={nickname} />
+        </span>
+        <div className="pf-idrow-text">
+          <h2 className="pf-hero-nick">@{nickname}</h2>
+          {heroLine && <p className="pf-hero-sub">{heroLine}</p>}
+        </div>
       </header>
 
       {bio && (
-        <section className="card box-shadow">
-          <h2 className="pf-section-title">Descrizione</h2>
+        <div className="pf-block">
           <p className="pf-bio">{bio}</p>
-        </section>
+        </div>
       )}
 
-      <section className="card box-shadow">
-        <h2 className="pf-section-title">Foto</h2>
-        <ProfileGallery userId={userId} onReportPhoto={onReportPhoto} />
-      </section>
-
-      {rows.length > 0 && (
-        <section className="card box-shadow">
-          <h2 className="pf-section-title">Altre informazioni</h2>
-          <div className="pf-rows">{rows}</div>
-        </section>
+      {keyFacts.length > 0 && (
+        <div className="pf-facts">
+          {keyFacts.map((f) => (
+            <div key={f.label}>
+              <h3 className="pf-section-title pf-fact-label">{f.label}</h3>
+              <p className="pf-fact-value">{f.value}</p>
+            </div>
+          ))}
+        </div>
       )}
 
-      {bottomCard}
+      {chipCount > 0 && (
+        <>
+          <div className="pf-block pf-showall">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setShowAll((v) => !v)}
+              aria-expanded={showAll}
+              aria-controls="pf-all-chips"
+            >
+              {showAll ? 'Nascondi i dettagli' : `Mostra tutto (${chipCount})`}
+            </button>
+          </div>
+          {showAll && (
+            <div id="pf-all-chips">
+              {factChips.map((group) => (
+                <div key={group.label}>
+                  <h3 className="pf-section-title pf-chipgroup-label">{group.label}</h3>
+                  <div className="options pf-chips">
+                    {group.chips.map((c, i) => (
+                      /* Chip di sola lettura: <span>, non bottoni — qui non c'è
+                         niente da selezionare, è solo il valore del campo. La
+                         chiave include l'indice perché due campi diversi
+                         possono avere la stessa etichetta. */
+                      <span key={`${i}-${c}`} className="chip chip-static">{c}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {actionBar}
     </main>
   )
 }

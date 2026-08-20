@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
+import { Flag, Prohibit } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { AppHeader } from '../components/AppHeader'
 import { sendDmRequest, findDmConversation, deleteDmConversation } from '../lib/dm'
 import { ProfileLayout } from './profile/ProfileLayout'
-import { buildProfileRows, buildKeyFacts } from './profile/profileFacts'
+import { buildHeroLine, buildKeyFacts, buildFactChips } from './profile/profileFacts'
 import { ReportDialog } from '../components/ReportDialog'
 import { BlockConfirmDialog } from '../components/BlockConfirmDialog'
 import { blockUser, unblockUser, isBlocked } from '../lib/blocks'
@@ -169,8 +170,12 @@ export function PublicProfileScreen({
 
   // public_profiles espone solo i campi che l'utente ha scelto di mostrare:
   // p soddisfa già la forma di ProfileFacts, nessun filtro aggiuntivo qui.
-  const rows = buildProfileRows(p)
+  const heroLine = buildHeroLine(p)
   const keyFacts = buildKeyFacts(p)
+  const factChips = buildFactChips(p)
+  const canDm = (myProfile?.strato ?? 0) >= 2
+  const STRATO_HINT =
+    'Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi.'
 
   return (
     <>
@@ -180,77 +185,58 @@ export function PublicProfileScreen({
         nickname={p.nickname}
         avatarPreset={p.avatar_preset}
         bio={p.bio}
+        heroLine={heroLine}
         keyFacts={keyFacts}
-        rows={rows}
+        factChips={factChips}
         onReportPhoto={p.is_self ? undefined : (id) => setReportPhotoId(id)}
-        topActions={
-          !p.is_self && (
-            <>
-              <button
-                type="button"
-                className={blocked ? 'pf-icon-btn danger' : 'pf-icon-btn'}
-                title={blocked ? 'Sblocca' : 'Blocca'}
-                aria-label={blocked ? 'Sblocca' : 'Blocca'}
-                onClick={handleBlockClick}
-                disabled={blockBusy}
-              >
-                ⛔
-              </button>
-              <button
-                type="button"
-                className="pf-icon-btn"
-                title="Segnala profilo"
-                aria-label="Segnala profilo"
-                onClick={() => setReporting(true)}
-              >
-                ⚑
-              </button>
-            </>
-          )
-        }
-        bottomCard={
-          !p.is_self && (
-            <section className="card box-shadow">
-              <h2 className="pf-section-title">Contatti</h2>
-              <div className="pf-actions">
-                {!blocked && (() => {
-                  const strato = myProfile?.strato ?? 0
-                  if (strato >= 2) return (
-                    <>
-                      <button
-                        type="button"
-                        className="btn-primary"
-                        onClick={sendDm}
-                        disabled={dmBusy || dmFeedback === 'Richiesta inviata.'}
-                      >
-                        {dmBusy ? 'Invio…' : 'Manda messaggio'}
-                      </button>
-                      {dmFeedback && <p className="hint" role="status">{dmFeedback}</p>}
-                    </>
-                  )
-                  return (
-                    <>
-                      <button
-                        type="button"
-                        className="btn-primary"
-                        disabled
-                        title="Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi"
-                      >
-                        Manda messaggio
-                      </button>
-                      <p className="hint hint-active">
-                        Per inviare messaggi privati devi essere attiva in chatroom per almeno 7 giorni e aver scritto 20 messaggi.
-                      </p>
-                    </>
-                  )
-                })()}
-                {blocked && (
-                  <p className="hint">
-                    Hai bloccato questa persona: non vedrai più i suoi messaggi.
-                  </p>
+        actionBar={
+          p.is_self ? undefined : (
+            <div className="pf-actionbar">
+              {/* L'avviso sui requisiti sta SOPRA la barra: il bottone
+                  disabilitato da solo non spiegherebbe perché. */}
+              {blocked ? (
+                <p className="hint hint-active">
+                  Hai bloccato questa persona: non vedrai più i suoi messaggi.
+                </p>
+              ) : (
+                <>
+                  {!canDm && <p className="hint hint-active">{STRATO_HINT}</p>}
+                  {dmFeedback && <p className="hint" role="status">{dmFeedback}</p>}
+                </>
+              )}
+              <div className="pf-actionbar-row">
+                {!blocked && (
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={sendDm}
+                    disabled={!canDm || dmBusy || dmFeedback === 'Richiesta inviata.'}
+                    title={canDm ? undefined : STRATO_HINT}
+                  >
+                    {dmBusy ? 'Invio…' : 'Manda messaggio'}
+                  </button>
                 )}
+                <button
+                  type="button"
+                  className={blocked ? 'pf-icon-btn danger' : 'pf-icon-btn'}
+                  title={blocked ? 'Sblocca' : 'Blocca'}
+                  aria-label={blocked ? 'Sblocca' : 'Blocca'}
+                  onClick={handleBlockClick}
+                  disabled={blockBusy}
+                >
+                  <Prohibit size={20} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="pf-icon-btn"
+                  title="Segnala profilo"
+                  aria-label="Segnala profilo"
+                  onClick={() => setReporting(true)}
+                >
+                  <Flag size={20} aria-hidden="true" />
+                </button>
               </div>
-            </section>
+            </div>
           )
         }
       />

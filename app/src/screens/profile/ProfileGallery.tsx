@@ -5,22 +5,35 @@ import { useModalA11y } from '../../hooks/useModalA11y'
 
 type GalleryPhoto = { id: string; url: string }
 
-// Galleria foto del profilo: griglia 3 colonne di miniature quadrate che si
-// aprono a schermo intero (con navigazione) cliccandoci — usata sia per il
-// proprio profilo che per quello altrui (vedi ProfileLayout). Sostituisce il
-// vecchio PhotoCarousel a foto singola.
+// Foto del profilo, redesign 2B: un mosaico a filo bordo in cima alla
+// schermata (foto principale grande a sinistra, due celle in colonna a
+// destra) al posto della vecchia card «Foto» con la griglia 3×N. Le foto
+// oltre la terza non spariscono: la terza cella porta un overlay «+N» e la
+// lightbox continua a scorrerle tutte.
+//
+// Senza foto approvate il componente non disegna nulla (nemmeno un
+// segnaposto): il profilo passa direttamente all'avatar, senza buco.
 export function ProfileGallery({
   userId,
   onReportPhoto,
+  onLoaded,
 }: {
   userId: string
   // Se fornito, mostra un pulsante per segnalare la foto aperta (profilo altrui).
   onReportPhoto?: (photoId: string) => void
+  // Quante foto approvate sono state trovate (0 comprese). Serve a chi ci
+  // contiene per sapere se il mosaico c'è: senza foto l'avatar dell'hero non
+  // deve più risalire a sovrapporsi a un mosaico che non esiste.
+  onLoaded?: (count: number) => void
 }) {
   const [items, setItems] = useState<GalleryPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [openIdx, setOpenIdx] = useState<number | null>(null)
   const lightboxRef = useRef<HTMLDivElement | null>(null)
+  // Tenuta in un ref così un onLoaded ricreato a ogni render non fa ripartire
+  // il caricamento delle foto.
+  const onLoadedRef = useRef(onLoaded)
+  onLoadedRef.current = onLoaded
 
   useEffect(() => {
     let alive = true
@@ -34,9 +47,13 @@ export function ProfileGallery({
         const ordered = list
           .map((p) => ({ id: p.id, url: map[p.storage_path] }))
           .filter((x): x is GalleryPhoto => Boolean(x.url))
-        if (alive) setItems(ordered)
+        if (alive) {
+          setItems(ordered)
+          onLoadedRef.current?.(ordered.length)
+        }
       } catch {
-        // Nessuna foto da mostrare: la card resta vuota.
+        // Nessuna foto da mostrare: il mosaico resta assente.
+        if (alive) onLoadedRef.current?.(0)
       } finally {
         if (alive) setLoading(false)
       }
@@ -50,28 +67,57 @@ export function ProfileGallery({
 
   if (loading)
     return (
-      <div className="gallery-strip" aria-busy="true">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="gallery-ph" />
-        ))}
+      <div className="pf-mosaic" aria-busy="true">
+        <div className="pf-mosaic-main pf-mosaic-ph" />
+        <div className="pf-mosaic-side">
+          <div className="pf-mosaic-ph" />
+          <div className="pf-mosaic-ph" />
+        </div>
       </div>
     )
-  if (items.length === 0) return <p className="hint">Nessuna foto da mostrare.</p>
+  if (items.length === 0) return null
+
+  // Al massimo tre celle visibili: la principale e due di spalla. Con una o
+  // due foto le celle mancanti non vengono disegnate e la principale si
+  // allarga, così non restano riquadri vuoti.
+  const side = items.slice(1, 3)
+  const hidden = items.length - 3
+
+  function cell(photo: GalleryPhoto, index: number, extraLabel?: string) {
+    return (
+      <button
+        key={photo.id}
+        type="button"
+        className="pf-mosaic-cell"
+        onClick={() => setOpenIdx(index)}
+        aria-label={extraLabel ?? `Ingrandisci foto ${index + 1} di ${items.length}`}
+      >
+        <img src={photo.url} alt="" />
+        {extraLabel && (
+          <span className="pf-mosaic-more" aria-hidden="true">+{hidden}</span>
+        )}
+      </button>
+    )
+  }
 
   return (
     <>
-      <div className="gallery-strip">
-        {items.map((photo, i) => (
-          <button
-            key={photo.id}
-            type="button"
-            className="gallery-thumb"
-            onClick={() => setOpenIdx(i)}
-            aria-label="Ingrandisci foto"
-          >
-            <img src={photo.url} alt="Foto profilo" />
-          </button>
-        ))}
+      <div className="pf-mosaic">
+        <div className="pf-mosaic-main">{cell(items[0], 0)}</div>
+        {side.length > 0 && (
+          <div className="pf-mosaic-side">
+            {side.map((photo, i) =>
+              // L'overlay «+N» sta sull'ultima cella solo se restano foto fuori.
+              cell(
+                photo,
+                i + 1,
+                i === side.length - 1 && hidden > 0
+                  ? `Vedi tutte le foto: altre ${hidden} oltre a questa`
+                  : undefined,
+              ),
+            )}
+          </div>
+        )}
       </div>
 
       {opened && openIdx != null && (

@@ -20,8 +20,8 @@ android {
         // IMPORTANTE: deve superare il versionCode più alto MAI caricato su Play
         // (canale testing). L'ultima TWA in testing era 2/3 → 10 lascia margine.
         // Verificare in Play Console prima dell'upload e alzarlo se serve.
-        versionCode 11
-        versionName "1.1.11"
+        versionCode 12
+        versionName "1.1.12"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
