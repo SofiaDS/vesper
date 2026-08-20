@@ -41,11 +41,62 @@ export function useChatMessages({
   // inviati prima, così entrando non si eredita tutto lo storico pregresso.
   // (Il Foyer è auto-join alla registrazione → joined_at ≈ signup.)
   const joinedAt = useRef<string | null>(null)
+  // Copia dei messaggi leggibile dentro le callback (catchUp) senza rientrare
+  // nelle dipendenze degli effetti.
+  const messagesRef = useRef<ChatMessage[]>([])
+  messagesRef.current = messages
+  // Evita due recuperi sovrapposti (resume + riaggancio del realtime insieme).
+  const catchingUp = useRef(false)
 
   function appendMessage(msg: ChatMessage) {
     setMessages((prev) =>
       prev.some((m) => m.id === msg.id) ? prev : [...prev, msg],
     )
+  }
+
+  // Ripesca i messaggi arrivati mentre eravamo "via": in background la WebView
+  // viene sospesa e il websocket realtime cade, così i messaggi inseriti nel
+  // frattempo non li vede nessuno — la chat si apriva senza il messaggio della
+  // notifica finché non si usciva e rientrava. Qui li chiediamo al server e li
+  // accodiamo, senza svuotare la lista (niente sfarfallio, niente salto dello
+  // scroll a chi sta leggendo indietro).
+  async function catchUp() {
+    if (catchingUp.current || !roomId) return
+    const last = messagesRef.current[messagesRef.current.length - 1]
+    const since = last?.created_at ?? joinedAt.current
+    catchingUp.current = true
+    try {
+      let query = supabase
+        .from('messages')
+        .select('id, body, created_at, sender_id, reply_to_id')
+        .eq('chatroom_id', roomId)
+      if (since) query = query.gt('created_at', since)
+      const { data: rows, error: gapErr } = await query
+        .order('created_at', { ascending: true })
+        .limit(PAGE_SIZE)
+      if (gapErr || !rows || rows.length === 0) return
+
+      const fresh = rows.filter((r) => !blockedIds.current.has(r.sender_id))
+      if (fresh.length === 0) return
+      await cacheNicknames([...new Set(fresh.map((r) => r.sender_id))])
+
+      setMessages((prev) => {
+        const known = new Set(prev.map((m) => m.id))
+        const added = fresh
+          .filter((r) => !known.has(r.id))
+          .map((r) => ({
+            id: r.id,
+            body: r.body,
+            created_at: r.created_at,
+            sender_id: r.sender_id,
+            nickname: nicknameCache.current.get(r.sender_id) ?? '—',
+            reply_to_id: r.reply_to_id,
+          }))
+        return added.length > 0 ? [...prev, ...added] : prev
+      })
+    } finally {
+      catchingUp.current = false
+    }
   }
 
   useEffect(() => {
@@ -173,5 +224,6 @@ export function useChatMessages({
     loadOlder,
     setError,
     reload,
+    catchUp,
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import type { ChatMessage } from './useChatMessages'
 
@@ -7,6 +7,12 @@ interface Options {
   blockedIds: React.MutableRefObject<Set<string>>
   resolveNickname: (senderId: string) => Promise<string>
   onMessage: (msg: ChatMessage) => void
+  /**
+   * Chiamata quando il canale si riaggancia dopo una caduta (schermo spento,
+   * app in background, rete persa). Il realtime NON rigioca ciò che è successo
+   * mentre era giù: chi ci usa deve ripescare il buco da solo.
+   */
+  onResync?: () => void
 }
 
 export function useChatRealtime({
@@ -14,8 +20,14 @@ export function useChatRealtime({
   blockedIds,
   resolveNickname,
   onMessage,
+  onResync,
 }: Options) {
+  // Callback sempre fresche senza rimettere in piedi il canale a ogni render.
+  const resyncRef = useRef(onResync)
+  resyncRef.current = onResync
+
   useEffect(() => {
+    let subscribedOnce = false
     const channel = supabase
       .channel(`room:${roomId}`)
       .on(
@@ -46,7 +58,14 @@ export function useChatRealtime({
           })
         },
       )
-      .subscribe()
+      .subscribe((status) => {
+        // Il primo SUBSCRIBED è l'iscrizione iniziale (la lista è appena stata
+        // caricata dal server, niente da recuperare). Quelli successivi sono
+        // riagganci dopo una caduta: lì sì che può esserci un buco.
+        if (status !== 'SUBSCRIBED') return
+        if (subscribedOnce) resyncRef.current?.()
+        subscribedOnce = true
+      })
 
     return () => { supabase.removeChannel(channel) }
   }, [roomId])

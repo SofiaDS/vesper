@@ -13,6 +13,7 @@ import {
   acceptDmRequest,
   rejectDmRequest,
   getDmMessages,
+  getDmMessagesAfter,
   sendDmMessage,
   type DmConversation,
   type DmMessage,
@@ -22,6 +23,7 @@ import { markRead } from '../lib/reads'
 import { dayKey, dayLabel } from '../lib/dayLabel'
 import { useDmUnread } from '../hooks/useUnreadCounts'
 import { useOnlinePresence } from '../hooks/useOnlinePresence'
+import { useAppResume } from '../hooks/useAppResume'
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
@@ -55,6 +57,10 @@ function ConversationView({
   const [replyTo, setReplyTo] = useState<DmMessage | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const skipScroll = useRef(false)
+  // Messaggi leggibili dentro le callback senza rifare i listener a ogni render.
+  const messagesRef = useRef<DmMessage[]>([])
+  messagesRef.current = messages
+  const catchingUp = useRef(false)
 
   const otherId =
     conversation.from_user_id === myId
@@ -104,7 +110,37 @@ function ConversationView({
     }
   }, [conversation.id, otherId])
 
+  // Ripesca i messaggi arrivati mentre l'app era in background: lì la WebView
+  // è sospesa e il websocket realtime cade, così i messaggi di quel periodo non
+  // arrivano mai (aprendo la chat dal tap sulla notifica il messaggio non
+  // c'era finché non si usciva e rientrava).
+  async function catchUp() {
+    if (catchingUp.current) return
+    const last = messagesRef.current[messagesRef.current.length - 1]
+    catchingUp.current = true
+    try {
+      // Conversazione ancora vuota a schermo: non c'è un "dopo" da cui partire,
+      // ricarichiamo la prima pagina.
+      const missed = last
+        ? await getDmMessagesAfter(conversation.id, last.created_at)
+        : await getDmMessages(conversation.id)
+      if (missed.length === 0) return
+      setMessages((prev) => {
+        const known = new Set(prev.map((m) => m.id))
+        const added = missed.filter((m) => !known.has(m.id))
+        return added.length > 0 ? [...prev, ...added] : prev
+      })
+    } catch {
+      // Rete ancora assente al risveglio: riproverà al prossimo resume.
+    } finally {
+      catchingUp.current = false
+    }
+  }
+
+  useAppResume(() => { void catchUp() })
+
   useEffect(() => {
+    let subscribedOnce = false
     const ch = supabase
       .channel(`dm:${conversation.id}`)
       .on(
@@ -122,10 +158,18 @@ function ConversationView({
           )
         },
       )
-      .subscribe()
+      .subscribe((status) => {
+        // Il primo SUBSCRIBED è l'iscrizione iniziale; i successivi sono
+        // riagganci dopo una caduta → lì può esserci un buco da recuperare.
+        if (status !== 'SUBSCRIBED') return
+        if (subscribedOnce) void catchUp()
+        subscribedOnce = true
+      })
     return () => {
       supabase.removeChannel(ch)
     }
+    // catchUp legge lo stato via ref: non serve rifare il canale quando cambia.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation.id])
 
   useEffect(() => {
@@ -298,16 +342,24 @@ function ListView({
   myId,
   onBack,
   onOpen,
+  openConversationId,
+  onConversationOpened,
 }: {
   myId: string
   onBack: () => void
   onOpen: (conv: DmConversation) => void
+  /** Conversazione da aprire appena la lista è carica (deep-link notifica). */
+  openConversationId?: string | null
+  onConversationOpened?: () => void
 }) {
   const [convs, setConvs] = useState<DmConversation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const unread = useDmUnread(myId)
+  // L'apertura automatica da notifica vale una volta sola: dopo, l'utente è
+  // libero di tornare all'elenco senza che la conversazione si riapra da sé.
+  const autoOpened = useRef(false)
 
   useEffect(() => {
     let alive = true
@@ -318,6 +370,16 @@ function ListView({
         if (alive) {
           setConvs(list)
           setError(null)
+          // Deep-link "/?dm=1&c=<id>": la notifica indica la conversazione, non
+          // solo la sezione. Senza questo si finiva sempre sull'elenco.
+          if (openConversationId && !autoOpened.current) {
+            const target = list.find((c) => c.id === openConversationId)
+            if (target && target.status === 'accepted') {
+              autoOpened.current = true
+              onConversationOpened?.()
+              onOpen(target)
+            }
+          }
         }
       } catch (e) {
         if (alive) setError(e instanceof Error ? e.message : 'Errore.')
@@ -352,7 +414,10 @@ function ListView({
       alive = false
       supabase.removeChannel(ch)
     }
-  }, [myId])
+    // onOpen/onConversationOpened stabili nella pratica: ricaricare la lista a
+    // ogni render del genitore sarebbe peggio del rischio di una closure vecchia.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myId, openConversationId])
 
   async function accept(id: string) {
     setBusy(id)
@@ -527,9 +592,14 @@ function ListView({
 export function DmScreen({
   onBack,
   onOpenProfile,
+  openConversationId,
+  onConversationOpened,
 }: {
   onBack: () => void
   onOpenProfile: (userId: string) => void
+  /** Conversazione indicata dal deep-link di una notifica push, se c'è. */
+  openConversationId?: string | null
+  onConversationOpened?: () => void
 }) {
   const { session } = useAuth()
   const myId = session!.user.id
@@ -546,5 +616,13 @@ export function DmScreen({
     )
   }
 
-  return <ListView myId={myId} onBack={onBack} onOpen={setActiveConv} />
+  return (
+    <ListView
+      myId={myId}
+      onBack={onBack}
+      onOpen={setActiveConv}
+      openConversationId={openConversationId}
+      onConversationOpened={onConversationOpened}
+    />
+  )
 }

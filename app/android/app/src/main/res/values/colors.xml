@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Oro "Inchiostro & oro": tinta della small icon e dell'accento notifica. -->
+    <color name="vesper_gold">#E8B14E</color>
+</resources>

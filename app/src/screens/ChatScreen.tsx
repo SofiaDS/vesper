@@ -5,6 +5,7 @@ import { useChatCache } from '../hooks/useChatCache'
 import { useChatMembers } from '../hooks/useChatMembers'
 import { useChatMessages } from '../hooks/useChatMessages'
 import { useChatRealtime } from '../hooks/useChatRealtime'
+import { useAppResume } from '../hooks/useAppResume'
 import { AppHeader } from '../components/AppHeader'
 import { ReportDialog } from '../components/ReportDialog'
 import { RoomRoster } from '../components/RoomRoster'
@@ -62,6 +63,7 @@ export function ChatScreen({
     loadOlder,
     setError,
     reload,
+    catchUp,
   } = useChatMessages({
     roomId: room.id,
     myId,
@@ -76,7 +78,15 @@ export function ChatScreen({
     blockedIds,
     resolveNickname,
     onMessage: appendMessage,
+    // Canale ricaduto e riagganciato: recupera ciò che è passato mentre era giù.
+    onResync: catchUp,
   })
+
+  // Ritorno in primo piano: mentre l'app era in background la WebView è
+  // sospesa e il realtime non consegna nulla. Senza questo recupero, aprendo
+  // la stanza dal tap su una notifica il messaggio della notifica non c'era
+  // finché non si usciva e rientrava.
+  useAppResume(catchUp)
 
   // Nelle stanze l'indicatore resta anonimo ("qualcunə sta scrivendo"), quindi
   // il nickname non viene mostrato — lo passiamo comunque perché il hook è lo

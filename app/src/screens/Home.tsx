@@ -54,6 +54,9 @@ export function Home() {
   const [showBlocked, setShowBlocked] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [showDm, setShowDm] = useState(false)
+  // Conversazione DM da aprire subito, arrivata dal deep-link di una notifica
+  // ("/?dm=1&c=<id>"). null = apri il solo elenco "Messaggi".
+  const [dmConvId, setDmConvId] = useState<string | null>(null)
   const [showSettings, setShowSettings] = useState(false)
   const [showAltro, setShowAltro] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
@@ -72,6 +75,7 @@ export function Home() {
     setShowBlocked(false)
     setShowSearch(false)
     setShowDm(false)
+    setDmConvId(null)
     setShowSettings(false)
     setShowAltro(false)
     setShowSupport(false)
@@ -167,7 +171,13 @@ export function Home() {
   useEffect(() => {
     if (!deepLink) return
     if (deepLink.type === 'dm') {
-      if (canDm) openScreen(() => setShowDm(true))
+      if (canDm) {
+        const convId = deepLink.conversationId ?? null
+        openScreen(() => {
+          setShowDm(true)
+          setDmConvId(convId)
+        })
+      }
       consumeDeepLink()
       return
     }
@@ -179,18 +189,34 @@ export function Home() {
       consumeDeepLink()
       return
     }
+    const roomId = deepLink.id
     let alive = true
-    supabase
-      .from('chatrooms')
-      .select('id, slug, name, description, kind')
-      .eq('id', deepLink.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!alive) return
-        if (data) openScreen(() => setRoom(data as Chatroom))
-        consumeDeepLink()
-      })
-    return () => { alive = false }
+    let retry: ReturnType<typeof setTimeout> | undefined
+
+    // Al tap su una notifica l'app spesso sta appena tornando dal background:
+    // la rete può non essere ancora pronta e questa query fallire. Consumare
+    // l'intento in quel caso lascerebbe l'utente sull'elenco stanze (bug
+    // segnalato), quindi al primo errore riproviamo una volta.
+    async function openRoom(attempt: number) {
+      const { data, error } = await supabase
+        .from('chatrooms')
+        .select('id, slug, name, description, kind')
+        .eq('id', roomId)
+        .maybeSingle()
+      if (!alive) return
+      if (error && attempt === 0) {
+        retry = setTimeout(() => { void openRoom(1) }, 1500)
+        return
+      }
+      if (data) openScreen(() => setRoom(data as Chatroom))
+      consumeDeepLink()
+    }
+
+    void openRoom(0)
+    return () => {
+      alive = false
+      if (retry) clearTimeout(retry)
+    }
     // openScreen/consumeDeepLink stabili nella pratica: dipendiamo dall'intento.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deepLink, canDm])
@@ -241,7 +267,14 @@ export function Home() {
     screen = <SearchScreen onBack={goBack} onOpenProfile={setViewUserId} />
   } else if (showDm) {
     goBack = () => setShowDm(false)
-    screen = <DmScreen onBack={goBack} onOpenProfile={setViewUserId} />
+    screen = (
+      <DmScreen
+        onBack={goBack}
+        onOpenProfile={setViewUserId}
+        openConversationId={dmConvId}
+        onConversationOpened={() => setDmConvId(null)}
+      />
+    )
   } else if (showProfile) {
     goBack = () => setShowProfile(false)
     screen = <ProfileScreen onBack={goBack} />

@@ -8,7 +8,10 @@
 // il query param non fa mai 404. Per retrocompatibilità continuiamo a leggere
 // anche il vecchio formato path (notifiche già consegnate).
 export type DeepLinkIntent =
-  | { type: 'dm' }
+  // `conversationId` (query param `c`) apre direttamente quella conversazione
+  // invece del solo elenco "Messaggi". Resta opzionale: le notifiche già
+  // consegnate prima di questa versione hanno solo "/?dm=1".
+  | { type: 'dm'; conversationId?: string }
   | { type: 'room'; id: string }
   | { type: 'vouch' }
 
@@ -25,7 +28,10 @@ export function parseDeepLink(input: string): DeepLinkIntent | null {
   // Formato attuale: query param sulla root.
   const roomId = url.searchParams.get('room')
   if (roomId) return { type: 'room', id: roomId }
-  if (url.searchParams.get('dm') !== null) return { type: 'dm' }
+  if (url.searchParams.get('dm') !== null) {
+    const conv = url.searchParams.get('c')
+    return conv ? { type: 'dm', conversationId: conv } : { type: 'dm' }
+  }
   if (url.searchParams.get('vouch') !== null) return { type: 'vouch' }
 
   // Formato legacy: path (/dm, /room/<id>).

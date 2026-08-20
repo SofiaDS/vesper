@@ -20,6 +20,17 @@
             </intent-filter>
         </activity>
 
+        <!-- Icona e tinta di default delle notifiche FCM. Senza la prima, il
+             sistema usa @mipmap/ic_launcher come small icon e — visto che la
+             status bar ne disegna solo la silhouette (alpha) — appare un
+             quadrato bianco pieno. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_vesper" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/vesper_gold" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

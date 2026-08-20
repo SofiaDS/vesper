@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Icona di stato per le notifiche push (la piccola nel drawer/status bar).
+  Android 5+ disegna la small icon come SILHOUETTE: usa solo il canale alpha e
+  la ricolora col colore di sistema. Senza questa icona FCM ripiega su
+  @mipmap/ic_launcher, che è un quadrato interamente opaco → si vede un
+  quadratino bianco pieno (bug segnalato su Redmi Note). Qui la forma è tutta
+  in alpha: orb pieno + alone sottile, niente sfondo.
+  Cerchi disegnati con curve di Bézier invece che con archi: il PathParser di
+  Android è più permissivo con le cubiche.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Orb centrale (r 5.75) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,6.25 C15.176,6.25 17.75,8.824 17.75,12 C17.75,15.176 15.176,17.75 12,17.75 C8.824,17.75 6.25,15.176 6.25,12 C6.25,8.824 8.824,6.25 12,6.25 Z" />
+
+    <!-- Alone (anello r 9.6 → 8.2), più tenue: l'alpha è ciò che il sistema disegna -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillAlpha="0.55"
+        android:fillType="evenOdd"
+        android:pathData="M12,2.4 C17.302,2.4 21.6,6.698 21.6,12 C21.6,17.302 17.302,21.6 12,21.6 C6.698,21.6 2.4,17.302 2.4,12 C2.4,6.698 6.698,2.4 12,2.4 Z M12,3.8 C16.529,3.8 20.2,7.471 20.2,12 C20.2,16.529 16.529,20.2 12,20.2 C7.471,20.2 3.8,16.529 3.8,12 C3.8,7.471 7.471,3.8 12,3.8 Z" />
+</vector>

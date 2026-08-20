@@ -137,6 +137,24 @@ export async function getDmMessages(
   return ((data ?? []) as DmMessage[]).reverse()
 }
 
+// Messaggi arrivati DOPO un certo istante, in ordine cronologico. Serve a
+// ripescare il buco lasciato dal realtime quando l'app era in background (il
+// websocket cade e non rigioca ciò che si è perso).
+export async function getDmMessagesAfter(
+  conversationId: string,
+  after: string,
+): Promise<DmMessage[]> {
+  const { data, error } = await supabase
+    .from('dm_messages')
+    .select('id, conversation_id, sender_id, body, created_at, reply_to_id')
+    .eq('conversation_id', conversationId)
+    .gt('created_at', after)
+    .order('created_at', { ascending: true })
+    .limit(DM_PAGE_SIZE)
+  if (error) throw error
+  return (data ?? []) as DmMessage[]
+}
+
 // Trova la conversazione DM (in qualunque stato) tra l'utente corrente e
 // un'altra persona, se esiste.
 export async function findDmConversation(

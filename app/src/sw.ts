@@ -112,7 +112,11 @@ self.addEventListener('push', (event: PushEvent) => {
         await self.registration.showNotification(data.title ?? 'Vesper', {
           body: data.body ?? '',
           icon: '/icon-192.png',
-          badge: '/icon-192.png',
+          // `badge` = l'icona piccola nella status bar: Android ne disegna solo
+          // la silhouette (canale alpha), quindi dev'essere monocromatica su
+          // sfondo trasparente. Con icon-192 (quadrato opaco) si vedeva un
+          // quadratino bianco pieno.
+          badge: '/badge-96.png',
           data: { url, count: 1, lines: [] } satisfies NotifData,
         })
         return
@@ -135,7 +139,7 @@ self.addEventListener('push', (event: PushEvent) => {
         // Da chiusa Android mostra la prima riga, al tocco espande l'elenco.
         body: grouped ? lines.join('\n') : (data.body ?? ''),
         icon: '/icon-192.png',
-        badge: '/icon-192.png',
+        badge: '/badge-96.png',
         tag,
         // Senza questo la sostituzione è silenziosa: la notifica si
         // aggiornerebbe senza avvisare che è arrivato un altro messaggio.

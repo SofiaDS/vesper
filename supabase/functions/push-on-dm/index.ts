@@ -43,7 +43,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
     title: `Messaggio da @${nick}`,
     body: preview,
     // Query param sulla root: la "/" risponde sempre 200 (niente rewrite SPA).
-    url: '/?dm=1',
+    // `c` porta la conversazione: senza, il tap apriva solo l'elenco "Messaggi"
+    // e toccava ritrovare la chat a mano.
+    url: `/?dm=1&c=${msg.conversation_id}`,
     // Il service worker la scarta se la sezione "Messaggi" è già aperta e in
     // primo piano: la stai leggendo, la notifica sarebbe rumore. L'id serve a
     // raggruppare per conversazione: messaggi da persone diverse restano

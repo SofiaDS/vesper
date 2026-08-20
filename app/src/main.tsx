@@ -6,6 +6,7 @@ import App from './App.tsx'
 import { AuthProvider } from './auth/AuthProvider'
 import { initFont } from './hooks/useFont'
 import { initTextSize } from './hooks/useTextSize'
+import { initPushDeepLink } from './lib/pushDeepLink'
 
 // Applica le preferenze di accessibilità salvate prima del render (font ad alta
 // leggibilità + dimensione testo), così valgono su tutte le schermate: i
@@ -20,6 +21,12 @@ initTextSize()
 if (Capacitor.isNativePlatform()) {
   document.documentElement.dataset.native = 'true'
 }
+
+// Aggancia SUBITO il tap sulle notifiche native: Capacitor consegna l'evento
+// del tap una volta sola, al primo listener registrato. Registrarlo qui (prima
+// del render) evita di perderlo quando la schermata che lo consuma monta tardi
+// — avvio a freddo, sessione da ripristinare, blocco PIN. Vedi pushDeepLink.ts.
+initPushDeepLink()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
