@@ -514,6 +514,14 @@ export function ProfileEditor({
         if (updErr.code === '23505') {
           throw new Error('Questo nickname è già in uso, scegline un altro.')
         }
+        // 23514 = CHECK violato: una delle liste in constants/options.ts offre un
+        // valore che il DB non ammette più (è già successo con `intents`, vedi
+        // 20260820000000_sync_profile_checks). Senza questo ramo l'utente vede il
+        // messaggio grezzo di Postgres e noi non capiamo quale campo sia.
+        if (updErr.code === '23514') {
+          console.error('CHECK violato nel salvataggio profilo:', updErr.message)
+          throw new Error('Una delle opzioni selezionate non è più valida. Ricontrolla i campi del profilo.')
+        }
         throw updErr
       }
       await onSaved()

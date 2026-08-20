@@ -54,14 +54,12 @@ export const SMOKING_LABELS: Record<Smoking, string> = {
   fuma: 'fumo regolarmente',
   occasionalmente: 'fumo occasionalmente',
   no: 'non fumo',
-  non_dico: 'preferisco non dire',
 }
 
 export const SPORT_LABELS: Record<Sport, string> = {
   regolarmente: 'regolare',
   saltuariamente: 'saltuaria',
   no: 'no',
-  non_dico: 'preferisco non dire',
 }
 
 export const ZODIAC_LABELS: Record<Zodiac, string> = {

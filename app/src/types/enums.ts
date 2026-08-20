@@ -29,8 +29,6 @@ export type Orientation =
 
 export type Intent =
   | 'amicizia'
-  | 'dating'
-  | 'relazione'
   | 'networking'
   | 'confronto'
   | 'solo_chattare'
@@ -51,7 +49,6 @@ export type RelationshipType =
   | 'nme'
   | 'complicato'
   | 'non_so_ancora'
-  | 'preferisco_non_specificare'
 
 export type Language =
   | 'italiano'
@@ -110,9 +107,9 @@ export type EducationLevel =
   | 'autodidatta'
   | 'altro'
 
-export type Smoking = 'fuma' | 'no' | 'occasionalmente' | 'non_dico'
+export type Smoking = 'fuma' | 'no' | 'occasionalmente'
 
-export type Sport = 'regolarmente' | 'saltuariamente' | 'no' | 'non_dico'
+export type Sport = 'regolarmente' | 'saltuariamente' | 'no'
 
 export type DmFilter = 'tuttə' | 'citta' | 'intenti' | 'verificatə'
 

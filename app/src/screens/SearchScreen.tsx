@@ -131,14 +131,6 @@ export function SearchScreen({
     () => ORIENTATION_OPTIONS.filter((o) => o.value !== 'preferisco_non_dire'),
     [],
   )
-  const SMOKING_F = useMemo(
-    () => SMOKING_OPTIONS.filter((o) => o.value !== 'non_dico'),
-    [],
-  )
-  const SPORT_F = useMemo(
-    () => SPORT_OPTIONS.filter((o) => o.value !== 'non_dico'),
-    [],
-  )
   const ZODIAC_F = useMemo(
     () => (Object.keys(ZODIAC_LABELS) as Zodiac[]).map((z) => ({ value: z, label: ZODIAC_LABELS[z] })),
     [],
@@ -418,8 +410,8 @@ export function SearchScreen({
             { key: 'interests', legend: 'Interessi', options: INTEREST_F, selected: filters.interests },
             { key: 'intents', legend: 'Cerco', options: INTENT_F, selected: filters.intents },
             { key: 'educations', legend: 'Formazione', options: EDUCATION_F, selected: filters.educations },
-            { key: 'smoking', legend: 'Fumo', options: SMOKING_F, selected: filters.smoking },
-            { key: 'sport', legend: 'Sport', options: SPORT_F, selected: filters.sport },
+            { key: 'smoking', legend: 'Fumo', options: SMOKING_OPTIONS, selected: filters.smoking },
+            { key: 'sport', legend: 'Sport', options: SPORT_OPTIONS, selected: filters.sport },
             { key: 'zodiac', legend: 'Segno zodiacale', options: ZODIAC_F, selected: filters.zodiac },
           ].map((section) => {
             const count = section.selected?.length ?? 0
