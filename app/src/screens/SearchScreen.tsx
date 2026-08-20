@@ -7,9 +7,16 @@ import {
   SMOKING_OPTIONS,
   SPORT_OPTIONS,
   EDUCATION_OPTIONS,
+  RELATIONSHIP_STATUS_OPTIONS,
+  RELATIONSHIP_TYPE_OPTIONS,
+  LANGUAGE_OPTIONS,
+  CHILDREN_OPTIONS,
+  DIET_OPTIONS,
+  RELIGION_OPTIONS,
+  POLITICS_OPTIONS,
 } from '../constants/options'
 import { ZODIAC_LABELS } from '../constants/labels'
-import { INTEREST_SUGGESTIONS } from '../constants/limits'
+import { INTEREST_SUGGESTIONS, LANGUAGE_MAX_LEN } from '../constants/limits'
 import { REGIONS } from '../constants/regions'
 import {
   searchByNickname,
@@ -67,6 +74,43 @@ function loadHistory(): SavedSearch[] {
 
 function saveHistory(h: SavedSearch[]) {
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, HISTORY_MAX))) } catch {}
+}
+
+// Casella di testo libero per i filtri che nel profilo accettano valori custom
+// (interessi e lingue). Il profilo li salva con trim().toLowerCase(), quindi qui
+// si normalizza allo stesso modo: senza, un "Spagnolo" digitato nel filtro non
+// troverebbe mai lo "spagnolo" salvato nel profilo.
+function FreeTextAdd({
+  placeholder,
+  maxLength,
+  onAdd,
+}: {
+  placeholder: string
+  maxLength: number
+  onAdd: (value: string) => void
+}) {
+  const [value, setValue] = useState('')
+  function submit() {
+    const tag = value.trim().toLowerCase()
+    if (!tag) return
+    onAdd(tag)
+    setValue('')
+  }
+  return (
+    <div className="composer inline-add">
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit() } }}
+        placeholder={placeholder}
+        maxLength={maxLength}
+      />
+      <button type="button" className="btn-primary btn-sm" onClick={submit} disabled={!value.trim()}>
+        Aggiungi
+      </button>
+    </div>
+  )
 }
 
 export function SearchScreen({
@@ -140,8 +184,26 @@ export function SearchScreen({
     [],
   )
   const REGION_F = useMemo(() => REGIONS.map((r) => ({ value: r, label: r })), [])
-  const INTEREST_F = useMemo(() => INTEREST_SUGGESTIONS.map((i) => ({ value: i, label: i })), [])
   const INTENT_F = useMemo(() => INTENT_OPTIONS, [])
+  const REL_STATUS_F = useMemo(
+    () => RELATIONSHIP_STATUS_OPTIONS.filter((o) => o.value !== 'non_dico'),
+    [],
+  )
+
+  // Interessi e lingue accettano valori custom: alle opzioni fisse si aggiungono
+  // quelli già selezionati che non stanno nella lista canonica, altrimenti
+  // ChipGroup non li disegnerebbe e l'utente non potrebbe più deselezionarli.
+  const INTEREST_F = useMemo(() => {
+    const custom = (filters.interests ?? []).filter((i) => !INTEREST_SUGGESTIONS.includes(i))
+    return [...INTEREST_SUGGESTIONS, ...custom].map((i) => ({ value: i, label: i }))
+  }, [filters.interests])
+
+  const LANGUAGE_F = useMemo(() => {
+    const base = LANGUAGE_OPTIONS.map((o) => ({ value: o.value as string, label: o.label }))
+    const known = new Set(base.map((o) => o.value))
+    const custom = (filters.languages ?? []).filter((l) => !known.has(l))
+    return [...base, ...custom.map((l) => ({ value: l, label: l }))]
+  }, [filters.languages])
 
   function toggleSection(key: string) {
     setOpenSections((s) => ({ ...s, [key]: !s[key] }))
@@ -160,6 +222,17 @@ export function SearchScreen({
     })
   }
 
+  // Diverso da `toggle`: aggiunge e basta. Se un valore digitato è già
+  // selezionato, `toggle` lo toglierebbe — l'opposto di quello che si aspetta
+  // chi ha appena premuto "Aggiungi".
+  function addFilterValue(key: keyof SearchFilters, v: string) {
+    setFilters((f) => {
+      const cur = (f[key] as string[] | undefined) ?? []
+      if (cur.includes(v)) return f
+      return { ...f, [key]: [...cur, v] }
+    })
+  }
+
   function builtFilters(): SearchFilters {
     return { ...filters, ageMin: ageOn ? ageMin : null, ageMax: ageOn ? ageMax : null }
   }
@@ -169,6 +242,57 @@ export function SearchScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [filters, ageOn, ageMin, ageMax],
   )
+
+  // Sezioni a chip, nello stesso ordine in cui i campi compaiono nel profilo
+  // (identità → relazioni → interessi e lingue → stile di vita), così chi ha
+  // appena compilato il profilo ritrova le voci dove se le aspetta.
+  const chipSections: {
+    key: keyof SearchFilters
+    legend: string
+    options: { value: string; label: string }[]
+    selected?: string[]
+    extra?: React.ReactNode
+  }[] = [
+    { key: 'identities', legend: 'Identità', options: IDENTITY_F, selected: filters.identities },
+    { key: 'orientations', legend: 'Orientamento', options: ORIENTATION_F, selected: filters.orientations },
+    {
+      key: 'interests',
+      legend: 'Interessi',
+      options: INTEREST_F,
+      selected: filters.interests,
+      extra: (
+        <FreeTextAdd
+          placeholder="Altro interesse…"
+          maxLength={24}
+          onAdd={(v) => addFilterValue('interests', v)}
+        />
+      ),
+    },
+    { key: 'intents', legend: 'Cerco', options: INTENT_F, selected: filters.intents },
+    { key: 'relStatuses', legend: 'Stato relazionale', options: REL_STATUS_F, selected: filters.relStatuses },
+    { key: 'relTypes', legend: 'Tipo di relazione', options: RELATIONSHIP_TYPE_OPTIONS, selected: filters.relTypes },
+    {
+      key: 'languages',
+      legend: 'Lingue parlate',
+      options: LANGUAGE_F,
+      selected: filters.languages,
+      extra: (
+        <FreeTextAdd
+          placeholder="Altra lingua…"
+          maxLength={LANGUAGE_MAX_LEN}
+          onAdd={(v) => addFilterValue('languages', v)}
+        />
+      ),
+    },
+    { key: 'educations', legend: 'Formazione', options: EDUCATION_F, selected: filters.educations },
+    { key: 'children', legend: 'Figli', options: CHILDREN_OPTIONS, selected: filters.children },
+    { key: 'diets', legend: 'Alimentazione', options: DIET_OPTIONS, selected: filters.diets },
+    { key: 'religions', legend: 'Religione & credo', options: RELIGION_OPTIONS, selected: filters.religions },
+    { key: 'politics', legend: 'Orientamento politico', options: POLITICS_OPTIONS, selected: filters.politics },
+    { key: 'smoking', legend: 'Fumo', options: SMOKING_OPTIONS, selected: filters.smoking },
+    { key: 'sport', legend: 'Sport', options: SPORT_OPTIONS, selected: filters.sport },
+    { key: 'zodiac', legend: 'Segno zodiacale', options: ZODIAC_F, selected: filters.zodiac },
+  ]
 
   function pushHistory(entry: Omit<SavedSearch, 'id' | 'savedAt'> & { label: string }) {
     setHistory((prev) => {
@@ -404,16 +528,7 @@ export function SearchScreen({
             />
           </FilterSection>
 
-          {[
-            { key: 'identities', legend: 'Identità', options: IDENTITY_F, selected: filters.identities },
-            { key: 'orientations', legend: 'Orientamento', options: ORIENTATION_F, selected: filters.orientations },
-            { key: 'interests', legend: 'Interessi', options: INTEREST_F, selected: filters.interests },
-            { key: 'intents', legend: 'Cerco', options: INTENT_F, selected: filters.intents },
-            { key: 'educations', legend: 'Formazione', options: EDUCATION_F, selected: filters.educations },
-            { key: 'smoking', legend: 'Fumo', options: SMOKING_OPTIONS, selected: filters.smoking },
-            { key: 'sport', legend: 'Sport', options: SPORT_OPTIONS, selected: filters.sport },
-            { key: 'zodiac', legend: 'Segno zodiacale', options: ZODIAC_F, selected: filters.zodiac },
-          ].map((section) => {
+          {chipSections.map((section) => {
             const count = section.selected?.length ?? 0
             const open = !!openSections[section.key]
             return (
@@ -427,11 +542,39 @@ export function SearchScreen({
                 <ChipGroup
                   options={section.options}
                   selected={section.selected ?? []}
-                  onToggle={(v) => toggle(section.key as keyof SearchFilters, v)}
+                  onToggle={(v) => toggle(section.key, v)}
                 />
+                {section.extra}
               </FilterSection>
             )
           })}
+
+          <FilterSection
+            legend="Animali domestici"
+            badge={sectionBadge(filters.hasPets != null ? 1 : 0, !!openSections.pets)}
+            open={!!openSections.pets}
+            onToggle={() => toggleSection('pets')}
+          >
+            <div className="chip-row">
+              {[
+                { value: true, label: 'ha animali' },
+                { value: false, label: 'non ha animali' },
+              ].map((o) => (
+                <button
+                  key={String(o.value)}
+                  type="button"
+                  className={filters.hasPets === o.value ? 'chip on' : 'chip'}
+                  // Ripremendo la scelta attiva si torna a "nessun filtro":
+                  // senza questo non ci sarebbe modo di annullarla.
+                  onClick={() =>
+                    setFilters((f) => ({ ...f, hasPets: f.hasPets === o.value ? null : o.value }))
+                  }
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </FilterSection>
 
           <div className="search-go-row">
             <button

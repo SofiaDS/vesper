@@ -30,6 +30,15 @@ export interface SearchFilters {
   sport?: string[]
   zodiac?: string[]
   educations?: string[]
+  relStatuses?: string[]
+  relTypes?: string[]
+  languages?: string[]
+  children?: string[]
+  diets?: string[]
+  religions?: string[]
+  politics?: string[]
+  // Tri-stato: null/undefined = nessun filtro, true = ha animali, false = non ne ha.
+  hasPets?: boolean | null
 }
 
 function orNull<T>(arr: T[] | undefined): T[] | null {
@@ -49,6 +58,14 @@ export function activeFilterCount(f: SearchFilters): number {
   n += orNull(f.sport) ? 1 : 0
   n += orNull(f.zodiac) ? 1 : 0
   n += orNull(f.educations) ? 1 : 0
+  n += orNull(f.relStatuses) ? 1 : 0
+  n += orNull(f.relTypes) ? 1 : 0
+  n += orNull(f.languages) ? 1 : 0
+  n += orNull(f.children) ? 1 : 0
+  n += orNull(f.diets) ? 1 : 0
+  n += orNull(f.religions) ? 1 : 0
+  n += orNull(f.politics) ? 1 : 0
+  if (f.hasPets != null) n++
   return n
 }
 
@@ -89,6 +106,14 @@ export async function searchByFilters(f: SearchFilters, offset = 0): Promise<Sea
     p_sport: orNull(f.sport),
     p_zodiac: orNull(f.zodiac),
     p_educations: orNull(f.educations),
+    p_rel_statuses: orNull(f.relStatuses),
+    p_rel_types: orNull(f.relTypes),
+    p_languages: orNull(f.languages),
+    p_children: orNull(f.children),
+    p_diets: orNull(f.diets),
+    p_religions: orNull(f.religions),
+    p_politics: orNull(f.politics),
+    p_has_pets: f.hasPets ?? null,
     p_limit: SEARCH_PAGE,
     p_offset: offset,
   })
