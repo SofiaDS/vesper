@@ -11,6 +11,7 @@ import {
   REPUTATION_EVENTS,
   type ReputationEventType,
 } from '../../lib/reputation'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
 
 const REPORT_TARGET_LABEL: Record<string, string> = {
   user:    'Utente',
@@ -74,6 +75,11 @@ export function ReportsModeration() {
     })()
     return () => { alive = false }
   }, [filter])
+
+  // Le tre azioni su una segnalazione stanno una accanto all'altra e si
+  // decidono in serie: "Rigetta" archivia chiudendo il caso, e da qui non si
+  // riapre. Le altre due non distruggono niente, quindi restano immediate.
+  const [confirmDismiss, setConfirmDismiss] = useState<ReportRow | null>(null)
 
   async function resolve(
     id: string,
@@ -214,7 +220,7 @@ export function ReportsModeration() {
                 <button
                   type="button"
                   className="btn-reject"
-                  onClick={() => resolve(r.id, 'dismissed')}
+                  onClick={() => setConfirmDismiss(r)}
                   disabled={busy === r.id}
                   title="Nessuna violazione riscontrata — segnalazione archiviata"
                 >
@@ -239,6 +245,25 @@ export function ReportsModeration() {
             )}
           </div>
         ))
+      )}
+
+      {confirmDismiss && (
+        <ConfirmDialog
+          title="Rigettare la segnalazione?"
+          body={
+            confirmDismiss.target_nick
+              ? `La segnalazione su @${confirmDismiss.target_nick} verrà archiviata come "nessuna violazione riscontrata". Chi l'ha inviata non riceverà alcuna azione e il caso non si riapre da qui.`
+              : 'La segnalazione verrà archiviata come "nessuna violazione riscontrata". Il caso non si riapre da qui.'
+          }
+          confirmLabel="Rigetta segnalazione"
+          busyLabel="Archivio…"
+          onCancel={() => setConfirmDismiss(null)}
+          onConfirm={() => {
+            const report = confirmDismiss
+            setConfirmDismiss(null)
+            void resolve(report.id, 'dismissed')
+          }}
+        />
       )}
     </div>
   )

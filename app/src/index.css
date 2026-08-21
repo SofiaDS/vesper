@@ -2507,6 +2507,64 @@ body:has(.install-banner) .rooms-hint {
   opacity: 1;
 }
 
+/* --- FAQ e consigli di sicurezza (HelpScreen) ---------------------------
+   Le domande sono <details> nativi: qui togliamo solo il triangolino di
+   default del browser e mettiamo il nostro, così l'aspetto è lo stesso su
+   Chrome e Safari. */
+.help-intro {
+  margin: 0 0 0.9rem;
+  text-align: left;
+}
+.help-card + .help-card {
+  margin-top: 1rem;
+}
+.faq-item {
+  border-top: 1px solid rgba(232, 177, 78, 0.14);
+}
+.faq-item:first-of-type {
+  border-top: 0;
+}
+.faq-q {
+  position: relative;
+  display: block;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.6rem 0.75rem 0;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+.faq-q::-webkit-details-marker {
+  display: none;
+}
+/* Chevron ruotante disegnato col bordo: nessuna icona da importare. */
+.faq-q::after {
+  content: "";
+  position: absolute;
+  top: 1.25rem;
+  right: 0.35rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid var(--accent-text);
+  border-bottom: 2px solid var(--accent-text);
+  transform: rotate(45deg);
+  transition: transform 0.18s ease;
+}
+.faq-item[open] .faq-q::after {
+  transform: rotate(-135deg);
+}
+.faq-q:hover {
+  color: var(--accent-text);
+}
+.faq-a {
+  margin: 0 0 0.7rem;
+  padding-right: 1.6rem;
+  opacity: 0.85;
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-q::after { transition: none; }
+}
+
 /* --- Modale generica (es. segnalazione) --- */
 .modal-overlay {
   position: fixed;

@@ -24,6 +24,7 @@ import { SettingsScreen } from './SettingsScreen'
 import { AdminScreen, ADMIN_TAB_LABELS, type AdminTab } from './admin/AdminScreen'
 import { DmScreen } from './DmScreen'
 import { LegalScreen, LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
+import { HelpScreen, HELP_DOC_LABELS, type HelpDoc } from './HelpScreen'
 import { SupportScreen } from './SupportScreen'
 import { VouchRequestsScreen } from './VouchRequestsScreen'
 import { openSupportEmail } from '../lib/support'
@@ -66,6 +67,9 @@ export function Home() {
   const [showVouch, setShowVouch] = useState(false)
   const [viewUserId, setViewUserId] = useState<string | null>(null)
   const [legalDoc, setLegalDoc] = useState<LegalDoc | null>(null)
+  // FAQ e consigli di sicurezza: stesso meccanismo di legalDoc, una sola voce
+  // di stato per due schermate di contenuto.
+  const [helpDoc, setHelpDoc] = useState<HelpDoc | null>(null)
 
   // Chiude ogni schermata aperta prima di aprirne (eventualmente) una nuova:
   // evita che una vecchia voce di stato (es. showSearch) resti "true" e prenda
@@ -82,6 +86,7 @@ export function Home() {
     setShowSettings(false)
     setShowAltro(false)
     setShowSupport(false)
+    setHelpDoc(null)
     setShowVouch(false)
     setViewUserId(null)
     setLegalDoc(null)
@@ -134,7 +139,8 @@ export function Home() {
     !showSupport &&
     !showVouch &&
     !viewUserId &&
-    !legalDoc
+    !legalDoc &&
+    !helpDoc
 
   const onLobby = inStanze && !room
 
@@ -145,6 +151,8 @@ export function Home() {
     ? `Moderazione · ${ADMIN_TAB_LABELS[adminTab]}`
     : legalDoc
     ? LEGAL_DOC_LABELS[legalDoc]
+    : helpDoc
+    ? HELP_DOC_LABELS[helpDoc]
     : showBlocked
     ? 'Utenti bloccati'
     : showSettings
@@ -246,7 +254,7 @@ export function Home() {
   // Ricerca → Profilo pubblico = 2): serve a sapere se il prossimo `goBack`
   // riporta alla lobby, per decidere se ri-armare la guardia sulla history
   // (vedi useBackNavigation).
-  const stackDepth = [room, showProfile, showAdmin, showBlocked, showSearch, showDm, showSettings, showAltro, showSupport, showVouch, viewUserId, legalDoc]
+  const stackDepth = [room, showProfile, showAdmin, showBlocked, showSearch, showDm, showSettings, showAltro, showSupport, showVouch, viewUserId, legalDoc, helpDoc]
     .filter(Boolean).length
 
   let screen: React.ReactNode
@@ -257,6 +265,9 @@ export function Home() {
   } else if (legalDoc) {
     goBack = () => setLegalDoc(null)
     screen = <LegalScreen doc={legalDoc} onBack={goBack} backLabel={showSettings ? '‹ Impostazioni' : showAltro ? '‹ Altro' : '‹ Stanze'} />
+  } else if (helpDoc) {
+    goBack = () => setHelpDoc(null)
+    screen = <HelpScreen doc={helpDoc} onBack={goBack} backLabel={showAltro ? '‹ Altro' : '‹ Stanze'} />
   } else if (showBlocked) {
     goBack = () => setShowBlocked(false)
     screen = <BlockedUsersScreen onBack={goBack} backLabel={showSettings ? '‹ Impostazioni' : showAltro ? '‹ Altro' : '‹ Profilo'} />
@@ -307,6 +318,7 @@ export function Home() {
         onOpenSettings={() => setShowSettings(true)}
         onOpenBlocked={() => setShowBlocked(true)}
         onOpenLegal={(doc) => setLegalDoc(doc)}
+        onOpenHelp={(doc) => setHelpDoc(doc)}
         onOpenAdmin={() => {
           setAdminTab('stats')
           setShowAdmin(true)

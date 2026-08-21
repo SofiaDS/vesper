@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useAuth } from '../auth/AuthProvider'
 import { AppHeader } from '../components/AppHeader'
 import { useRooms } from '../hooks/useRooms'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useRoomOnlineCount } from '../hooks/useRoomOnlineCount'
 import { useRoomUnread } from '../hooks/useUnreadCounts'
 import { MAX_TEMATICHE } from '../constants/limits'
@@ -29,6 +31,10 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
   } = useRooms(myId)
 
   const unread = useRoomUnread(myId)
+
+  // Uscire da una stanza è a un tap da "Apri": senza conferma un dito storto
+  // fa perdere il posto in una tematica (se ne possono seguire solo tre).
+  const [confirmLeave, setConfirmLeave] = useState<Chatroom | null>(null)
 
   return (
     <main className="app rooms">
@@ -103,7 +109,7 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
                         <button
                           type="button"
                           className="btn-danger btn-sm"
-                          onClick={() => handleLeave(room)}
+                          onClick={() => setConfirmLeave(room)}
                           disabled={working}
                         >
                           {working ? 'Uscendo…' : 'Esci'}
@@ -136,6 +142,21 @@ export function RoomsScreen({ onOpen }: { onOpen: (room: Chatroom) => void }) {
         <p className="hint hint-active rooms-hint">
           Stanze tematiche: {tematicheJoined}/{MAX_TEMATICHE}.
         </p>
+      )}
+
+      {confirmLeave && (
+        <ConfirmDialog
+          title={`Abbandonare ${confirmLeave.name}?`}
+          body="Non riceverai più i messaggi di questa stanza e libererai un posto fra le tue tematiche. Potrai rientrare quando vuoi."
+          confirmLabel="Abbandona stanza"
+          busyLabel="Esco…"
+          onCancel={() => setConfirmLeave(null)}
+          onConfirm={() => {
+            const room = confirmLeave
+            setConfirmLeave(null)
+            void handleLeave(room)
+          }}
+        />
       )}
     </main>
   )

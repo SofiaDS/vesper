@@ -14,11 +14,19 @@ import {
   SignOut,
   CaretRight,
   Handshake,
+  Question,
+  ShieldWarning,
+  Envelope,
+  Key,
 } from '@phosphor-icons/react'
 import { AppHeader } from '../components/AppHeader'
 import { useTheme } from '../hooks/useTheme'
 import { useModalA11y } from '../hooks/useModalA11y'
 import { LEGAL_DOC_LABELS, type LegalDoc } from './LegalScreen'
+import { HELP_DOC_LABELS, type HelpDoc } from './HelpScreen'
+import { ChangeEmailDialog } from '../components/ChangeEmailDialog'
+import { ChangePasswordDialog } from '../components/ChangePasswordDialog'
+import { useAuth } from '../auth/AuthProvider'
 
 // Hub "Altro": sostituisce il vecchio burger menu (rimosso dagli header) con
 // una schermata a card, come nei mockup. Raccoglie tutte le voci che non hanno
@@ -32,6 +40,7 @@ export function AltroScreen({
   onOpenSettings,
   onOpenBlocked,
   onOpenLegal,
+  onOpenHelp,
   onOpenAdmin,
   onOpenVouch,
   onReportBug,
@@ -53,6 +62,7 @@ export function AltroScreen({
   onOpenSettings: () => void
   onOpenBlocked: () => void
   onOpenLegal: (doc: LegalDoc) => void
+  onOpenHelp: (doc: HelpDoc) => void
   onOpenAdmin: () => void
   onOpenVouch: () => void
   onReportBug: () => void
@@ -60,8 +70,11 @@ export function AltroScreen({
   onOpenSupport: () => void
   onSignOut: () => void
 }) {
+  const { session } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
   const isDark = theme === 'dark'
+  const [changingEmail, setChangingEmail] = useState(false)
+  const [changingPassword, setChangingPassword] = useState(false)
   const [confirmLogout, setConfirmLogout] = useState(false)
   const logoutModalRef = useRef<HTMLDivElement | null>(null)
   useModalA11y(logoutModalRef, confirmLogout, () => setConfirmLogout(false))
@@ -84,6 +97,34 @@ export function AltroScreen({
             <Prohibit size={20} weight="duotone" />
           </span>
           <span className="nav-row-label">Utenti bloccati</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
+        </button>
+        <button type="button" className="nav-row" onClick={() => setChangingEmail(true)}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <Envelope size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">Cambia email</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
+        </button>
+        <button type="button" className="nav-row" onClick={() => setChangingPassword(true)}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <Key size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">Cambia password</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
+        </button>
+        <button type="button" className="nav-row" onClick={() => onOpenHelp('faq')}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <Question size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">{HELP_DOC_LABELS.faq}</span>
+          <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
+        </button>
+        <button type="button" className="nav-row" onClick={() => onOpenHelp('safety')}>
+          <span className="nav-row-ico" aria-hidden="true">
+            <ShieldWarning size={20} weight="duotone" />
+          </span>
+          <span className="nav-row-label">{HELP_DOC_LABELS.safety}</span>
           <CaretRight className="nav-row-chev" size={16} weight="bold" aria-hidden="true" />
         </button>
         {showVouch && (
@@ -208,6 +249,17 @@ export function AltroScreen({
           <span className="nav-row-label">Esci</span>
         </button>
       </section>
+
+      {changingEmail && (
+        <ChangeEmailDialog
+          currentEmail={session?.user.email}
+          onClose={() => setChangingEmail(false)}
+        />
+      )}
+
+      {changingPassword && (
+        <ChangePasswordDialog onClose={() => setChangingPassword(false)} />
+      )}
 
       {confirmLogout && (
         <div className="modal-overlay" onClick={() => setConfirmLogout(false)}>

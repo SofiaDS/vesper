@@ -8,6 +8,7 @@ import { ProfileLayout } from './profile/ProfileLayout'
 import { buildHeroLine, buildKeyFacts, buildFactChips } from './profile/profileFacts'
 import { ReportDialog } from '../components/ReportDialog'
 import { BlockConfirmDialog } from '../components/BlockConfirmDialog'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { blockUser, unblockUser, isBlocked } from '../lib/blocks'
 import type {
   IdentityCategory,
@@ -80,6 +81,7 @@ export function PublicProfileScreen({
   const [blocked, setBlocked] = useState(false)
   const [blockBusy, setBlockBusy] = useState(false)
   const [blockConfirmOpen, setBlockConfirmOpen] = useState(false)
+  const [unblockConfirmOpen, setUnblockConfirmOpen] = useState(false)
   const [dmBusy, setDmBusy] = useState(false)
   const [dmFeedback, setDmFeedback] = useState<string | null>(null)
 
@@ -125,20 +127,25 @@ export function PublicProfileScreen({
     }
   }
 
-  async function handleBlockClick() {
-    if (blocked) {
-      setBlockBusy(true)
-      try {
-        await unblockUser(userId)
-        setBlocked(false)
-      } catch {
-        // silenzioso: l'utente può riprovare
-      } finally {
-        setBlockBusy(false)
-      }
-      return
+  function handleBlockClick() {
+    // Anche sbloccare passa da una conferma: il bottone è rosso e sta accanto
+    // agli altri, e uno sblocco per errore rimette in contatto con qualcuna da
+    // cui ci si era protette senza che nulla lo segnali.
+    if (blocked) setUnblockConfirmOpen(true)
+    else setBlockConfirmOpen(true)
+  }
+
+  async function confirmUnblock() {
+    setBlockBusy(true)
+    try {
+      await unblockUser(userId)
+      setBlocked(false)
+      setUnblockConfirmOpen(false)
+    } catch {
+      // silenzioso: l'utente può riprovare
+    } finally {
+      setBlockBusy(false)
     }
-    setBlockConfirmOpen(true)
   }
 
   async function confirmBlock(deleteConversation: boolean) {
@@ -247,6 +254,18 @@ export function PublicProfileScreen({
           busy={blockBusy}
           onCancel={() => setBlockConfirmOpen(false)}
           onConfirm={confirmBlock}
+        />
+      )}
+
+      {unblockConfirmOpen && (
+        <ConfirmDialog
+          title={`Sbloccare @${p.nickname}?`}
+          body={`@${p.nickname} tornerà a vedere il tuo profilo e a poterti scrivere. Non riceverà nessuna notifica dello sblocco, e potrai bloccarla di nuovo quando vuoi.`}
+          confirmLabel="Sblocca"
+          busyLabel="Sblocco…"
+          busy={blockBusy}
+          onCancel={() => setUnblockConfirmOpen(false)}
+          onConfirm={confirmUnblock}
         />
       )}
 

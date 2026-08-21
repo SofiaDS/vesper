@@ -4,12 +4,17 @@ import {
   moderatePhoto,
   type PendingPhoto,
 } from '../../lib/admin'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
 
 export function PhotoModeration() {
   const [photos, setPhotos] = useState<PendingPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(null)
+  // "Approva" e "Rifiuta" sono affiancati e si modera in serie, tap dopo tap:
+  // è proprio la situazione in cui il dito sbaglia bottone. Approvare per
+  // errore si corregge (la foto resta visibile e rimoderabile), rifiutare no.
+  const [confirmReject, setConfirmReject] = useState<PendingPhoto | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -73,7 +78,7 @@ export function PhotoModeration() {
               <button
                 type="button"
                 className="btn-reject"
-                onClick={() => decide(p, 'rejected')}
+                onClick={() => setConfirmReject(p)}
                 disabled={busy === p.id}
               >
                 Rifiuta
@@ -82,6 +87,21 @@ export function PhotoModeration() {
           </div>
         </div>
       ))}
+
+      {confirmReject && (
+        <ConfirmDialog
+          title="Rifiutare questa foto?"
+          body={`La foto di @${confirmReject.nickname} non comparirà sul profilo e la persona ne verrà informata. La decisione non si annulla da qui.`}
+          confirmLabel="Rifiuta la foto"
+          busyLabel="Rifiuto…"
+          onCancel={() => setConfirmReject(null)}
+          onConfirm={() => {
+            const photo = confirmReject
+            setConfirmReject(null)
+            void decide(photo, 'rejected')
+          }}
+        />
+      )}
     </div>
   )
 }
