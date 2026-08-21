@@ -1405,7 +1405,7 @@ export function ProfileEditor({
     [...avatarFields, ...lifeFields, ...identityFields, ...privacyFields].find((f) => f.key === openSheet) ?? null
 
   return (
-    <main className="app profile">
+    <main className="app profile pf-editor">
       <AppHeader backLabel="‹ Anteprima" onBack={onCancel} title="Modifica profilo" />
 
       {/* Non è un vero tablist (niente tabpanel né navigazione con le frecce):

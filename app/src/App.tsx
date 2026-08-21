@@ -18,7 +18,7 @@ function App() {
 
   if (!isSupabaseConfigured) {
     return (
-      <main className="app">
+      <main className="app app-plain">
         <header className="brand">
           <BrandMark />
         </header>
@@ -34,7 +34,7 @@ function App() {
 
   if (loading) {
     return (
-      <main className="app">
+      <main className="app app-plain">
         <header className="brand">
           <BrandMark />
         </header>

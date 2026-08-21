@@ -155,6 +155,17 @@ body {
   text-align: center;
 }
 
+/* Schermate senza shell: login/registrazione, onboarding, verifica, blocco PIN.
+   #root riserva in cima lo spazio per l'header e la tab bar fissi della Home,
+   che qui non esistono: recuperiamo quei ~6.5rem di vuoto e teniamo solo il
+   margine sotto la status bar (--safe-top, già nel padding di #root).
+   Il padding-bottom serve perché quello di <body> non trattiene il contenuto
+   che sfora: su schermi bassi l'ultimo bottone finiva a filo del bordo. */
+.app-plain {
+  margin-top: calc(-1 * (var(--header-h) + var(--tabbar-h)));
+  padding-bottom: 1.5rem;
+}
+
 .brand h1 {
   margin: 0;
   font-size: 2.5rem;
@@ -2776,6 +2787,38 @@ body:has(.install-banner) .rooms-hint {
   cursor: default;
 }
 
+/* --- Schermate profilo con barra ancorata in fondo -----------------------
+   `position: sticky; bottom: 0` da sola incolla la barra al bordo inferiore
+   SOLO finché il contenuto è più alto della finestra: con una scheda corta
+   (o un profilo quasi vuoto) la barra restava appesa a metà schermo. Diamo
+   quindi al contenitore un'altezza minima pari allo spazio disponibile sotto
+   header e tab bar e lo rendiamo una colonna flex: `margin-top: auto` sulla
+   barra si mangia lo spazio che avanza e la spinge in fondo, mentre lo sticky
+   continua a tenerla incollata quando invece il contenuto scorre. */
+.pf-editor,
+.pf-view {
+  display: flex;
+  flex-direction: column;
+  /* 3rem = il padding sopra e sotto di <body>, che è anche lo scroll container
+     (ha overflow-x: hidden): lo sticky si ferma sul bordo del suo scrollport,
+     cioè 1.5rem sopra il fondo della finestra. Scalandolo anche qui, la barra
+     cade nello stesso punto sia a scheda corta sia a scheda lunga, e l'altezza
+     minima non fa comparire uno scroll fantasma. */
+  min-height: calc(100dvh - 3rem - var(--safe-top) - var(--header-h) - var(--tabbar-h));
+}
+/* Il form è l'unico figlio elastico: cresce fino al fondo portandosi dietro
+   la savebar, che è il suo ultimo figlio (`margin-top: auto`; la distanza dal
+   contenuto la garantisce comunque il `gap` di .form). */
+.pf-editor .profile-form {
+  flex: 1;
+}
+/* Nella schermata profilo la barra non può usare `margin-top: auto`: perderebbe
+   l'1.2rem di stacco dal contenuto quando il profilo è pieno. Lo spazio che
+   avanza se lo mangia questo riempitivo, che a profilo pieno si azzera. */
+.pf-fill {
+  flex: 1;
+}
+
 /* --- Barra azioni fissa in basso (scrivi / blocca / segnala, oppure
    «Modifica profilo» sulla propria anteprima) --- */
 .pf-actionbar {
@@ -3135,7 +3178,8 @@ body:has(.install-banner) .rooms-hint {
   z-index: 4;
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.6rem;
+  /* auto = spinge la barra in fondo quando la scheda è corta (vedi .pf-editor) */
+  margin-top: auto;
   padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid rgba(232, 177, 78, 0.2);
   background: var(--bg);
@@ -4192,7 +4236,10 @@ button.dm-conv:hover {
 /* ── Theme icon button (fixed, tutte le schermate) ────── */
 .theme-btn {
   position: fixed;
-  top: 0.85rem;
+  /* Il bottone è fisso rispetto alla finestra, quindi il padding di #root non
+     lo tocca: senza --safe-top finisce sotto l'orologio della status bar nel
+     guscio nativo (WebView edge-to-edge, targetSdk 36). */
+  top: calc(var(--safe-top) + 0.85rem);
   right: 0.9rem;
   z-index: 300;
   width: 34px;

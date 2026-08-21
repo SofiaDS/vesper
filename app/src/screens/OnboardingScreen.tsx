@@ -100,7 +100,7 @@ export function OnboardingScreen() {
 
   if (step === 'vouch') {
     return (
-      <main className="app">
+      <main className="app app-plain">
         <header className="brand">
           <BrandMark />
           <p className="tagline">Hai delle garanti?</p>
@@ -172,7 +172,7 @@ export function OnboardingScreen() {
   }
 
   return (
-    <main className="app">
+    <main className="app app-plain">
       <header className="brand">
         <BrandMark />
         <p className="tagline">Crea il tuo profilo</p>

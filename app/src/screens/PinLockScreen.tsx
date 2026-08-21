@@ -22,7 +22,7 @@ export function PinLockScreen({ onUnlock }: Props) {
   }
 
   return (
-    <main className="app">
+    <main className="app app-plain">
       <header className="brand">
         <BrandMark />
         <p className="tagline">App bloccata</p>

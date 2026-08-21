@@ -83,7 +83,7 @@ export function AuthScreen() {
 
   if (mode === 'declare') {
     return (
-      <main className="app">
+      <main className="app app-plain">
         <header className="brand">
           <BrandMark />
           <p className="tagline">{tagline}</p>
@@ -139,7 +139,7 @@ export function AuthScreen() {
   }
 
   return (
-    <main className="app">
+    <main className="app app-plain">
       <header className="brand">
         <BrandMark />
         <p className="tagline">{tagline}</p>

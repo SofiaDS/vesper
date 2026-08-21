@@ -191,7 +191,7 @@ export function VerificationScreen() {
   }, [previewUrl])
 
   return (
-    <main className="app verif">
+    <main className="app verif app-plain">
       <header className="brand">
         <BrandMark />
       </header>

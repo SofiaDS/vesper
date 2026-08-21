@@ -48,7 +48,7 @@ export function ProfileLayout({
   const chipCount = countFactChips(factChips)
 
   return (
-    <main className="app profile">
+    <main className="app profile pf-view">
       <AppHeader onBack={onBack} backLabel={backLabel} title={`@${nickname}`} />
 
       <ProfileGallery userId={userId} onReportPhoto={onReportPhoto} onLoaded={setPhotoCount} />
@@ -114,6 +114,10 @@ export function ProfileLayout({
         </>
       )}
 
+      {/* Si mangia lo spazio che avanza, così con un profilo scarno la barra
+          azioni finisce comunque in fondo allo schermo invece di restare
+          appesa a metà pagina (vedi .pf-view in index.css). */}
+      <div className="pf-fill" aria-hidden="true" />
       {actionBar}
     </main>
   )

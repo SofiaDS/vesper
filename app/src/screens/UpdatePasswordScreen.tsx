@@ -42,7 +42,7 @@ export function UpdatePasswordScreen() {
   }
 
   return (
-    <main className="app">
+    <main className="app app-plain">
       <header className="brand">
         <BrandMark />
         <p className="tagline">Nuova password</p>
