@@ -9,12 +9,15 @@ import { useAppResume } from '../hooks/useAppResume'
 import { AppHeader } from '../components/AppHeader'
 import { ReportDialog } from '../components/ReportDialog'
 import { RoomRoster } from '../components/RoomRoster'
+import { HeaderMenu } from '../components/HeaderMenu'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { MessageComposer } from '../components/MessageComposer'
 import { MentionText } from '../components/MentionText'
 import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
 import { useMessageReactions } from '../hooks/useMessageReactions'
 import { useTypingIndicator } from '../hooks/useTypingIndicator'
+import { leaveRoom } from '../lib/chat'
 import { promoteLayer } from '../lib/layers'
 import { markRead } from '../lib/reads'
 import { dayKey, dayLabel } from '../lib/dayLabel'
@@ -43,8 +46,28 @@ export function ChatScreen({
   const [text, setText] = useState('')
   const [reportMsg, setReportMsg] = useState<ChatMessage | null>(null)
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null)
+  const [leaveOpen, setLeaveOpen] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const [leaveError, setLeaveError] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const myId = session?.user.id
+
+  // La Foyer non si può abbandonare (lo impedisce il database), quindi lì il
+  // menu ⋯ resterebbe vuoto: non lo mostriamo proprio.
+  const canLeave = room.kind !== 'foyer'
+
+  async function handleLeave() {
+    if (!myId) return
+    setLeaving(true)
+    setLeaveError(null)
+    try {
+      await leaveRoom(myId, room.id)
+      onBack()
+    } catch (err) {
+      setLeaveError(err instanceof Error ? err.message : 'Operazione non riuscita. Riprova.')
+      setLeaving(false)
+    }
+  }
 
   const members = useChatMembers(room.id)
   const reactions = useMessageReactions({ scope: 'room', scopeId: room.id, myId })
@@ -153,11 +176,21 @@ export function ChatScreen({
   }
 
   return (
-    <main className="chat">
+    <main className="chat chat-focus">
       <AppHeader
         backLabel="‹ Stanze"
         onBack={onBack}
         title={room.name}
+        action={
+          canLeave ? (
+            <HeaderMenu
+              label="Opzioni stanza"
+              items={[
+                { key: 'leave', label: 'Abbandona stanza', danger: true, onClick: () => setLeaveOpen(true) },
+              ]}
+            />
+          ) : undefined
+        }
         extra={
           <RoomRoster
             room={room}
@@ -294,6 +327,22 @@ export function ChatScreen({
           targetMessageId={reportMsg.id}
           targetLabel="messaggio"
           onClose={() => setReportMsg(null)}
+        />
+      )}
+
+      {leaveOpen && (
+        <ConfirmDialog
+          title={`Abbandonare ${room.name}?`}
+          body="Non riceverai più i messaggi di questa stanza. Potrai rientrare quando vuoi dall'elenco delle stanze."
+          confirmLabel="Abbandona stanza"
+          busyLabel="Esco…"
+          busy={leaving}
+          error={leaveError}
+          onCancel={() => {
+            setLeaveOpen(false)
+            setLeaveError(null)
+          }}
+          onConfirm={handleLeave}
         />
       )}
     </main>

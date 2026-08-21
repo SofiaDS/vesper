@@ -687,6 +687,17 @@ code {
   text-align: left;
 }
 
+/* Conversazione aperta (stanza o DM): Home non renderizza la tab bar, così i
+   suoi 3.4rem vanno ai messaggi — che su un pieghevole valgono una bolla in
+   più. #root riserva comunque lo spazio per entrambe le barre fisse, quindi qui
+   lo recuperiamo con un margine negativo, stessa tecnica di .app-plain.
+   Essendo entrambi selettori a una classe vince l'ordine: questo viene dopo
+   .chat, quindi l'altezza qui sotto sovrascrive quella sopra. */
+.chat-focus {
+  margin-top: calc(-1 * var(--tabbar-h));
+  height: calc(100dvh - 3rem - var(--header-h) - var(--safe-top));
+}
+
 .small-inline {
   margin: 0.15rem 0 0;
   font-size: 0.8rem;
@@ -840,7 +851,6 @@ code {
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  padding: 0;
   background: var(--bg);
   border-bottom: 1px solid rgba(232, 177, 78, 0.18);
 }
@@ -4257,6 +4267,95 @@ button.dm-conv:hover {
   transition: background 0.18s, border-color 0.18s;
 }
 .theme-btn:hover { background: rgba(232, 177, 78, 0.24); }
+
+/* ── Menu ⋯ nell'header delle conversazioni ─────────────────────────────
+   Occupa lo stesso spazio del segnaposto che sostituisce (44px), così il
+   titolo resta centrato. Il popover riprende la forma di .roster, l'altro
+   pannello ancorato dell'header. */
+.hmenu-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+}
+.hmenu-btn {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--accent-text);
+  cursor: pointer;
+  border-radius: 50%;
+}
+.hmenu-btn:hover {
+  background: rgba(232, 177, 78, 0.12);
+}
+/* Chiude toccando fuori. Sta nello stacking context di .app-header (z-index 5):
+   copre la conversazione, non le modali. */
+.hmenu-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+}
+.hmenu {
+  position: absolute;
+  /* Staccato dal bordo destro dello schermo: allineato al ⋯ finirebbe a filo,
+     e un pannello a filo sembra tagliato. */
+  right: 0.4rem;
+  top: calc(100% + 0.35rem);
+  z-index: 20;
+  min-width: 190px;
+  max-width: min(260px, calc(100vw - 2rem));
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.3rem;
+  background: var(--bg);
+  border: 1px solid rgba(232, 177, 78, 0.25);
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+.hmenu-item {
+  min-height: 2.75rem;
+  padding: 0.6rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.hmenu-item:hover {
+  background: rgba(232, 177, 78, 0.12);
+}
+/* Azione distruttiva: rossa e staccata da quelle innocue sopra di lei, così
+   non la si tocca per sbaglio scorrendo la lista. */
+.hmenu-item.danger {
+  color: var(--error-text);
+}
+.hmenu-item.danger:hover {
+  background: rgba(215, 38, 56, 0.14);
+}
+.hmenu-item + .hmenu-item.danger {
+  margin-top: 0.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(232, 177, 78, 0.18);
+  border-radius: 0 0 8px 8px;
+}
+
+[data-theme="light"] .hmenu {
+  border-color: rgba(130, 90, 0, 0.3);
+  box-shadow: 0 10px 28px rgba(23, 21, 32, 0.2);
+}
 
 /* ── Burger menu (fisso, sostituisce il toggle tema nelle schermate Home) */
 .burger-btn {

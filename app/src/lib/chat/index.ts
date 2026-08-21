@@ -51,3 +51,20 @@ export async function getRoomMembers(roomId: string): Promise<RoomMember[]> {
 
   return (profiles ?? []) as RoomMember[]
 }
+
+// Uscita da una stanza: basta cancellare la riga di iscrizione. La Foyer è
+// protetta lato database, quindi qui traduciamo solo il messaggio d'errore.
+// Usata sia dalla lista stanze (useRooms) sia dal menu ⋯ dentro la chat.
+export async function leaveRoom(myId: string, roomId: string): Promise<void> {
+  const { error } = await supabase
+    .from('chat_membership')
+    .delete()
+    .eq('user_id', myId)
+    .eq('chatroom_id', roomId)
+  if (!error) return
+  throw new Error(
+    error.message.includes('Foyer')
+      ? 'La Foyer non può essere abbandonata.'
+      : 'Operazione non riuscita. Riprova.',
+  )
+}

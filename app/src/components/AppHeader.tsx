@@ -7,11 +7,16 @@ import { CaretLeft } from '@phosphor-icons/react'
 export function AppHeader({
   title,
   extra,
+  action,
   onBack,
   backLabel = '‹ Indietro',
 }: {
   title: ReactNode
   extra?: ReactNode
+  // Azione a destra (oggi il menu ⋯ delle conversazioni). Senza, resta il
+  // segnaposto vuoto che fa da contrappeso alla freccia e tiene il titolo
+  // centrato: le due cose occupano la stessa larghezza.
+  action?: ReactNode
   onBack?: () => void
   backLabel?: string
 }) {
@@ -31,7 +36,7 @@ export function AppHeader({
         <h1>{title}</h1>
         {extra}
       </div>
-      <span className="link-placeholder" />
+      {action ?? <span className="link-placeholder" />}
     </header>
   )
 }

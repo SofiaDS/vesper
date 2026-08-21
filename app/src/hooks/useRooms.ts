@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { leaveRoom } from '../lib/chat'
 import { MAX_TEMATICHE } from '../constants/limits'
 import type { Chatroom } from '../types'
 
@@ -83,24 +84,14 @@ export function useRooms(myId: string | undefined) {
     setBusyRoom(room.id)
     setError(null)
     try {
-      const { error: delErr } = await supabase
-        .from('chat_membership')
-        .delete()
-        .eq('user_id', myId)
-        .eq('chatroom_id', room.id)
-      if (delErr) throw delErr
+      await leaveRoom(myId, room.id)
       setJoined((prev) => {
         const next = new Set(prev)
         next.delete(room.id)
         return next
       })
     } catch (err) {
-      const msg = err instanceof Error ? err.message : ''
-      setError(
-        msg.includes('Foyer')
-          ? 'La Foyer non può essere abbandonata.'
-          : 'Operazione non riuscita. Riprova.',
-      )
+      setError(err instanceof Error ? err.message : 'Operazione non riuscita. Riprova.')
     } finally {
       setBusyRoom(null)
     }

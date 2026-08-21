@@ -57,6 +57,9 @@ export function Home() {
   // Conversazione DM da aprire subito, arrivata dal deep-link di una notifica
   // ("/?dm=1&c=<id>"). null = apri il solo elenco "Messaggi".
   const [dmConvId, setDmConvId] = useState<string | null>(null)
+  // true mentre è aperta una conversazione DM (non l'elenco "Messaggi"):
+  // lo riporta DmScreen, che è l'unico a saperlo.
+  const [dmConversationOpen, setDmConversationOpen] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showAltro, setShowAltro] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
@@ -273,6 +276,7 @@ export function Home() {
         onOpenProfile={setViewUserId}
         openConversationId={dmConvId}
         onConversationOpened={() => setDmConvId(null)}
+        onConversationOpenChange={setDmConversationOpen}
       />
     )
   } else if (showProfile) {
@@ -322,9 +326,16 @@ export function Home() {
 
   useBackNavigation({ active: !onLobby, exitsOnBack: stackDepth <= 1, onBack: goBack })
 
+  // Dentro una conversazione (stanza o DM) la tab bar sparisce: su schermi
+  // piccoli quei 3.4rem valgono una bolla di messaggio in più, e le azioni che
+  // restano utili qui stanno nel menu ⋯ dell'header. Non la nascondiamo
+  // sull'elenco "Messaggi", che è una schermata di navigazione come le altre.
+  // Il recupero dello spazio lo fa `.chat-focus` (vedi index.css).
+  const chatFocus = Boolean(room) || (showDm && dmConversationOpen)
+
   return (
     <>
-      <TabBar items={tabItems} />
+      {!chatFocus && <TabBar items={tabItems} />}
       {screen}
       <GlobalToast toast={notif.toast} onOpen={openFromToast} onDismiss={notif.dismiss} />
     </>

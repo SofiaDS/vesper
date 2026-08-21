@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { AppHeader } from '../components/AppHeader'
+import { HeaderMenu } from '../components/HeaderMenu'
+import { ReportDialog } from '../components/ReportDialog'
+import { BlockConfirmDialog } from '../components/BlockConfirmDialog'
 import { MessageComposer } from '../components/MessageComposer'
 import { MessageReactions } from '../components/MessageReactions'
 import { QuotePreview } from '../components/QuotePreview'
@@ -15,10 +18,11 @@ import {
   getDmMessages,
   getDmMessagesAfter,
   sendDmMessage,
+  deleteDmConversation,
   type DmConversation,
   type DmMessage,
 } from '../lib/dm'
-import { isBlocked } from '../lib/blocks'
+import { isBlocked, blockUser, unblockUser } from '../lib/blocks'
 import { markRead } from '../lib/reads'
 import { dayKey, dayLabel } from '../lib/dayLabel'
 import { useDmUnread } from '../hooks/useUnreadCounts'
@@ -54,6 +58,9 @@ function ConversationView({
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [otherBlocked, setOtherBlocked] = useState(false)
+  const [blockConfirmOpen, setBlockConfirmOpen] = useState(false)
+  const [blockBusy, setBlockBusy] = useState(false)
+  const [reporting, setReporting] = useState(false)
   const [replyTo, setReplyTo] = useState<DmMessage | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const skipScroll = useRef(false)
@@ -224,8 +231,45 @@ function ConversationView({
     }
   }
 
+  // Stessa semantica del profilo pubblico: sbloccare è immediato, bloccare
+  // passa dalla conferma che offre anche di cancellare la conversazione.
+  async function handleBlockClick() {
+    if (!otherBlocked) {
+      setBlockConfirmOpen(true)
+      return
+    }
+    setBlockBusy(true)
+    try {
+      await unblockUser(otherId)
+      setOtherBlocked(false)
+    } catch {
+      // silenzioso: si può riprovare
+    } finally {
+      setBlockBusy(false)
+    }
+  }
+
+  async function confirmBlock(deleteConversation: boolean) {
+    setBlockBusy(true)
+    try {
+      await blockUser(otherId)
+      setOtherBlocked(true)
+      setBlockConfirmOpen(false)
+      // Cancellata la conversazione non c'è più niente da guardare qui:
+      // torniamo all'elenco invece di lasciare a schermo messaggi fantasma.
+      if (deleteConversation) {
+        await deleteDmConversation(conversation.id)
+        onBack()
+      }
+    } catch {
+      setBlockConfirmOpen(false)
+    } finally {
+      setBlockBusy(false)
+    }
+  }
+
   return (
-    <main className="chat">
+    <main className="chat chat-focus">
       <AppHeader
         backLabel="‹ Messaggi"
         onBack={onBack}
@@ -246,6 +290,28 @@ function ConversationView({
               </span>
             )}
           </span>
+        }
+        action={
+          <HeaderMenu
+            label="Opzioni conversazione"
+            /* La voce distruttiva sta in fondo e staccata: scorrendo la
+               lista non la si tocca per sbaglio al posto di «Segnala». */
+            items={[
+              {
+                key: 'report',
+                label: `Segnala @${conversation.other_nickname}`,
+                onClick: () => setReporting(true),
+              },
+              {
+                key: 'block',
+                label: otherBlocked
+                  ? `Sblocca @${conversation.other_nickname}`
+                  : `Blocca @${conversation.other_nickname}`,
+                danger: !otherBlocked,
+                onClick: handleBlockClick,
+              },
+            ]}
+          />
         }
       />
 
@@ -332,6 +398,24 @@ function ConversationView({
         onTyping={typing.notifyTyping}
         onStopTyping={typing.stopTyping}
       />
+
+      {blockConfirmOpen && (
+        <BlockConfirmDialog
+          nickname={conversation.other_nickname}
+          busy={blockBusy}
+          onCancel={() => setBlockConfirmOpen(false)}
+          onConfirm={confirmBlock}
+        />
+      )}
+
+      {reporting && (
+        <ReportDialog
+          targetType="user"
+          targetUserId={otherId}
+          targetLabel={`@${conversation.other_nickname}`}
+          onClose={() => setReporting(false)}
+        />
+      )}
     </main>
   )
 }
@@ -594,16 +678,30 @@ export function DmScreen({
   onOpenProfile,
   openConversationId,
   onConversationOpened,
+  onConversationOpenChange,
 }: {
   onBack: () => void
   onOpenProfile: (userId: string) => void
   /** Conversazione indicata dal deep-link di una notifica push, se c'è. */
   openConversationId?: string | null
   onConversationOpened?: () => void
+  /**
+   * Segnala a Home se siamo dentro una conversazione (true) o sull'elenco
+   * "Messaggi" (false): serve a nascondere la tab bar solo nel primo caso.
+   * Deve essere una funzione stabile (un setter di stato).
+   */
+  onConversationOpenChange?: (open: boolean) => void
 }) {
   const { session } = useAuth()
   const myId = session!.user.id
   const [activeConv, setActiveConv] = useState<DmConversation | null>(null)
+
+  useEffect(() => {
+    onConversationOpenChange?.(activeConv != null)
+    // Uscendo dai DM la tab bar deve tornare anche se si esce dalla
+    // conversazione senza passare dall'elenco (es. tap su un toast).
+    return () => onConversationOpenChange?.(false)
+  }, [activeConv, onConversationOpenChange])
 
   if (activeConv) {
     return (
