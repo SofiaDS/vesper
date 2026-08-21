@@ -2524,15 +2524,23 @@ body:has(.install-banner) .rooms-hint {
 .faq-item:first-of-type {
   border-top: 0;
 }
+/* Peso normale da chiusa: una FAQ è quasi sempre una colonna di sole domande,
+   e in grassetto diventa un muro. A dire che sono toccabili bastano il chevron,
+   i separatori e il target da 44px. Il grassetto lo prende solo quella aperta,
+   dove serve davvero: lì la domanda fa da titolo alla risposta. */
 .faq-q {
   position: relative;
   display: block;
   min-height: 2.75rem;
   padding: 0.75rem 1.6rem 0.75rem 0;
   color: var(--text);
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   list-style: none;
+}
+.faq-item[open] .faq-q {
+  font-weight: 600;
+  color: var(--accent-text);
 }
 .faq-q::-webkit-details-marker {
   display: none;
