@@ -28,8 +28,12 @@ interface Options {
   // Stanza attualmente aperta in ChatScreen: i suoi messaggi non generano toast
   // (li stai già leggendo). null se non sei in una chat di stanza.
   activeRoomId: string | null
-  // true se la sezione "Messaggi" (DM) è aperta: in tal caso niente toast DM.
+  // true se la sezione "Messaggi" (DM) è aperta.
   dmOpen: boolean
+  // Conversazione DM aperta a schermo, se ce n'è una. Sull'elenco "Messaggi"
+  // è null: lì sopprimiamo comunque tutto, perché la lista stessa mostra già
+  // i non letti e il toast sarebbe un doppione.
+  activeDmConversationId: string | null
 }
 
 // Verifica se `body` contiene una menzione "@nickname" dell'utente corrente.
@@ -60,6 +64,7 @@ export function useMessageNotifications({
   myNickname,
   activeRoomId,
   dmOpen,
+  activeDmConversationId,
 }: Options): { toast: MessageNotification | null; dismiss: () => void } {
   const [toast, setToast] = useState<MessageNotification | null>(null)
   const { blockedIds, loadBlockedIds, resolveNickname } = useChatCache()
@@ -69,9 +74,11 @@ export function useMessageNotifications({
   // ri-sottoscrivere il canale a ogni navigazione.
   const activeRoomIdRef = useRef(activeRoomId)
   const dmOpenRef = useRef(dmOpen)
+  const activeDmIdRef = useRef(activeDmConversationId)
   const myNicknameRef = useRef(myNickname)
   activeRoomIdRef.current = activeRoomId
   dmOpenRef.current = dmOpen
+  activeDmIdRef.current = activeDmConversationId
   myNicknameRef.current = myNickname
 
   // Cache delle stanze già risolte (id → Chatroom) e degli eventi già visti.
@@ -143,9 +150,22 @@ export function useMessageNotifications({
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'dm_messages' },
         async (payload) => {
-          const r = payload.new as { id: number; body: string; sender_id: string }
+          const r = payload.new as {
+            id: number
+            body: string
+            sender_id: string
+            conversation_id: string
+          }
           if (r.sender_id === myId) return
-          if (dmOpenRef.current) return
+          // Dentro una conversazione tacciamo solo quella: un messaggio da
+          // un'altra persona deve comunque avvisarti. Sull'elenco (id null)
+          // restiamo silenziosi su tutto, come prima.
+          if (
+            dmOpenRef.current &&
+            (activeDmIdRef.current === null || activeDmIdRef.current === r.conversation_id)
+          ) {
+            return
+          }
           if (blockedIds.current.has(r.sender_id)) return
           const key = `dm:${r.id}`
           if (!remember(key)) return

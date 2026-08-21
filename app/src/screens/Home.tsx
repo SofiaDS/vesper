@@ -57,9 +57,9 @@ export function Home() {
   // Conversazione DM da aprire subito, arrivata dal deep-link di una notifica
   // ("/?dm=1&c=<id>"). null = apri il solo elenco "Messaggi".
   const [dmConvId, setDmConvId] = useState<string | null>(null)
-  // true mentre è aperta una conversazione DM (non l'elenco "Messaggi"):
+  // Id della conversazione DM aperta a schermo (null sull'elenco "Messaggi"):
   // lo riporta DmScreen, che è l'unico a saperlo.
-  const [dmConversationOpen, setDmConversationOpen] = useState(false)
+  const [dmConversationId, setDmConversationId] = useState<string | null>(null)
   const [showSettings, setShowSettings] = useState(false)
   const [showAltro, setShowAltro] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
@@ -100,11 +100,12 @@ export function Home() {
     myNickname: profile?.nickname,
     activeRoomId: room?.id ?? null,
     dmOpen: showDm,
+    activeDmConversationId: showDm ? dmConversationId : null,
   })
 
   // Stessa regola, applicata alle notifiche push di sistema: comunica al
   // service worker cosa c'è a schermo così può scartare quelle ridondanti.
-  useActiveViewReporter(room?.id ?? null, showDm)
+  useActiveViewReporter(room?.id ?? null, showDm, showDm ? dmConversationId : null)
 
   function openFromToast() {
     const t = notif.toast
@@ -276,7 +277,7 @@ export function Home() {
         onOpenProfile={setViewUserId}
         openConversationId={dmConvId}
         onConversationOpened={() => setDmConvId(null)}
-        onConversationOpenChange={setDmConversationOpen}
+        onConversationChange={setDmConversationId}
       />
     )
   } else if (showProfile) {
@@ -331,7 +332,9 @@ export function Home() {
   // restano utili qui stanno nel menu ⋯ dell'header. Non la nascondiamo
   // sull'elenco "Messaggi", che è una schermata di navigazione come le altre.
   // Il recupero dello spazio lo fa `.chat-focus` (vedi index.css).
-  const chatFocus = Boolean(room) || (showDm && dmConversationOpen)
+  // `dmConvId` è un'altra cosa: è la conversazione da APRIRE arrivata da un
+  // deep-link, mentre `dmConversationId` è quella già a schermo.
+  const chatFocus = Boolean(room) || (showDm && dmConversationId != null)
 
   return (
     <>

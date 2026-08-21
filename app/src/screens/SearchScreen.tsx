@@ -32,6 +32,7 @@ import { ChipGroup } from '../components/ChipGroup'
 import { FilterSection } from '../components/FilterSection'
 import { SkeletonCard } from '../components/SkeletonCard'
 import { UserCard } from '../components/UserCard'
+import { useProfileThumbs } from '../hooks/useProfileThumbs'
 import type { Zodiac } from '../types'
 
 type Tab = 'nickname' | 'filtri'
@@ -166,6 +167,10 @@ export function SearchScreen({
   const [history, setHistory] = useState<SavedSearch[]>(loadHistory)
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem(ONBOARDING_KEY))
   const manualSearchRef = useRef(false)
+
+  // Foto principale di ciascun risultato, se ne ha una approvata: sostituisce
+  // l'avatar generato nella scheda.
+  const thumbs = useProfileThumbs(results.map((r) => r.id))
 
   const IDENTITY_F = useMemo(
     () => IDENTITY_OPTIONS.filter((o) => o.value !== 'preferisco_non_specificare'),
@@ -438,14 +443,14 @@ export function SearchScreen({
       <div className="search-tabs">
         <button
           type="button"
-          className={tab === 'nickname' ? 'seg on' : 'seg'}
+          className={tab === 'nickname' ? 'seg-opt on' : 'seg-opt'}
           onClick={() => switchTab('nickname')}
         >
           Per nickname
         </button>
         <button
           type="button"
-          className={tab === 'filtri' ? 'seg on' : 'seg'}
+          className={tab === 'filtri' ? 'seg-opt on' : 'seg-opt'}
           onClick={clickFiltriTab}
         >
           Per filtri
@@ -622,14 +627,14 @@ export function SearchScreen({
               <div className="search-view-toggle">
                 <button
                   type="button"
-                  className={resultsView === 'list' ? 'seg on' : 'seg'}
+                  className={resultsView === 'list' ? 'seg-opt on' : 'seg-opt'}
                   onClick={() => setResultsView('list')}
                 >
                   Lista
                 </button>
                 <button
                   type="button"
-                  className={resultsView === 'grid' ? 'seg on' : 'seg'}
+                  className={resultsView === 'grid' ? 'seg-opt on' : 'seg-opt'}
                   onClick={() => setResultsView('grid')}
                 >
                   Griglia
@@ -641,6 +646,7 @@ export function SearchScreen({
                     key={r.id}
                     result={r}
                     showAffinity={tab === 'filtri'}
+                    photoUrl={thumbs.get(r.id)}
                     onOpen={() => onOpenProfile(r.id)}
                   />
                 ))}

@@ -678,7 +678,7 @@ export function DmScreen({
   onOpenProfile,
   openConversationId,
   onConversationOpened,
-  onConversationOpenChange,
+  onConversationChange,
 }: {
   onBack: () => void
   onOpenProfile: (userId: string) => void
@@ -686,22 +686,24 @@ export function DmScreen({
   openConversationId?: string | null
   onConversationOpened?: () => void
   /**
-   * Segnala a Home se siamo dentro una conversazione (true) o sull'elenco
-   * "Messaggi" (false): serve a nascondere la tab bar solo nel primo caso.
-   * Deve essere una funzione stabile (un setter di stato).
+   * Id della conversazione aperta, o null se siamo sull'elenco "Messaggi".
+   * Serve a Home per due cose: nascondere la tab bar solo dentro una
+   * conversazione, e tacere gli avvisi (toast e push) solo per questa e non
+   * per tutti i DM. Deve essere una funzione stabile (un setter di stato).
    */
-  onConversationOpenChange?: (open: boolean) => void
+  onConversationChange?: (conversationId: string | null) => void
 }) {
   const { session } = useAuth()
   const myId = session!.user.id
   const [activeConv, setActiveConv] = useState<DmConversation | null>(null)
 
   useEffect(() => {
-    onConversationOpenChange?.(activeConv != null)
-    // Uscendo dai DM la tab bar deve tornare anche se si esce dalla
-    // conversazione senza passare dall'elenco (es. tap su un toast).
-    return () => onConversationOpenChange?.(false)
-  }, [activeConv, onConversationOpenChange])
+    onConversationChange?.(activeConv?.id ?? null)
+    // Uscendo dai DM la tab bar deve tornare (e gli avvisi riaccendersi) anche
+    // se si esce dalla conversazione senza passare dall'elenco, per esempio
+    // toccando un toast che porta altrove.
+    return () => onConversationChange?.(null)
+  }, [activeConv, onConversationChange])
 
   if (activeConv) {
     return (

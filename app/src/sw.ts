@@ -23,7 +23,14 @@ interface PushSource { kind: 'room' | 'dm'; id?: string; label?: string; group?:
 // righe il testo viene comunque troncato dal sistema.
 const MAX_LINES = 5
 // Risposta di una finestra aperta alla domanda "cosa stai mostrando?".
-interface ActiveView { roomId: string | null; dmOpen: boolean }
+interface ActiveView {
+  roomId: string | null
+  dmOpen: boolean
+  // Conversazione DM aperta a schermo (null sull'elenco "Messaggi"). Assente
+  // se a rispondere è una finestra con una versione più vecchia dell'app:
+  // in quel caso si ricade sul vecchio comportamento basato su dmOpen.
+  dmConversationId?: string | null
+}
 
 // Quanto aspettare la risposta di una finestra prima di rinunciare. Se scade,
 // la notifica viene mostrata: meglio una notifica ridondante che una persa.
@@ -47,7 +54,12 @@ function askClient(client: Client): Promise<ActiveView | null> {
 
 function viewCovers(view: ActiveView | null, source: PushSource): boolean {
   if (!view) return false
-  return source.kind === 'dm' ? view.dmOpen : view.roomId === source.id
+  if (source.kind !== 'dm') return view.roomId === source.id
+  // Dentro una conversazione la notifica è ridondante solo se parla di QUELLA:
+  // un messaggio da un'altra persona deve arrivare comunque. Sull'elenco
+  // "Messaggi" (id null/assente) vale il vecchio "copre tutti i DM".
+  if (view.dmConversationId) return view.dmConversationId === source.id
+  return view.dmOpen
 }
 
 // true se l'utente sta già guardando, in primo piano, ciò di cui parla la

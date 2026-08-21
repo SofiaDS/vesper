@@ -694,8 +694,14 @@ code {
    Essendo entrambi selettori a una classe vince l'ordine: questo viene dopo
    .chat, quindi l'altezza qui sotto sovrascrive quella sopra. */
 .chat-focus {
-  margin-top: calc(-1 * var(--tabbar-h));
-  height: calc(100dvh - 3rem - var(--header-h) - var(--safe-top));
+  /* Oltre alla tab bar assente ci mangiamo anche il padding SUPERIORE di
+     <body>: fra il bordo dell'header fisso e l'inizio dei messaggi era spazio
+     morto (24px) che con l'header incollato in cima si legge come un buco.
+     Restano i 0.5rem di .chat, che bastano a non appiccicare la prima bolla
+     al bordo. Il padding inferiore di <body> resta, quindi il composer non si
+     muove: nell'altezza scaliamo solo 1.5rem invece di 3rem. */
+  margin-top: calc(-1 * (var(--tabbar-h) + 1.5rem));
+  height: calc(100dvh - 1.5rem - var(--header-h) - var(--safe-top));
 }
 
 .small-inline {
@@ -2539,10 +2545,20 @@ body:has(.install-banner) .rooms-hint {
   flex-direction: column;
   align-items: stretch;
 }
+/* Le tre azioni arrivano da classi diverse (.btn-secondary è alto e con corpo
+   1rem, .btn-danger e .btn-ghost sono le varianti compatte da riga): impilate
+   una sull'altra la differenza di altezza si vedeva. Qui contano come tre
+   scelte alla pari, quindi le pareggiamo. `box-sizing: border-box` (globale)
+   assorbe anche il bordo da 1.5px del secondario contro l'1px degli altri due,
+   e `margin: 0` toglie il margine del secondario che si sommava al gap. */
 .modal-actions-col .btn-secondary,
 .modal-actions-col .btn-danger,
 .modal-actions-col .btn-ghost {
   width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  font-size: 0.95rem;
   text-align: center;
 }
 
@@ -2809,12 +2825,24 @@ body:has(.install-banner) .rooms-hint {
 .pf-view {
   display: flex;
   flex-direction: column;
-  /* 3rem = il padding sopra e sotto di <body>, che è anche lo scroll container
-     (ha overflow-x: hidden): lo sticky si ferma sul bordo del suo scrollport,
-     cioè 1.5rem sopra il fondo della finestra. Scalandolo anche qui, la barra
-     cade nello stesso punto sia a scheda corta sia a scheda lunga, e l'altezza
-     minima non fa comparire uno scroll fantasma. */
-  min-height: calc(100dvh - 3rem - var(--safe-top) - var(--header-h) - var(--tabbar-h));
+  /* 1.5rem = il solo padding SUPERIORE di <body>: quello inferiore lo azzeriamo
+     qui sotto, quindi non va scalato. Così l'altezza minima arriva esatta al
+     fondo della finestra e non fa comparire uno scroll fantasma. */
+  min-height: calc(100dvh - 1.5rem - var(--safe-top) - var(--header-h) - var(--tabbar-h));
+}
+
+/* <body> è lo scroll container di queste schermate (ha overflow-x: hidden, che
+   rende overflow-y automatico) e ha 1.5rem di padding. Due conseguenze che
+   insieme facevano un bug: il contenuto scorre ANCHE dentro il padding, quindi
+   resta visibile fin sul bordo della finestra; ma `position: sticky; bottom: 0`
+   si ferma sul bordo dello scrollport già rientrato del padding, cioè 24px più
+   in alto. Risultato: una striscia sotto la barra in cui si vedevano passare i
+   campi. Azzerando il padding inferiore la barra arriva a filo e il suo sfondo
+   opaco copre tutto quello che le scorre sotto. Solo su queste schermate: le
+   altre non hanno una barra in fondo e il margine lì sotto serve. */
+body:has(.pf-editor),
+body:has(.pf-view) {
+  padding-bottom: 0;
 }
 /* Il form è l'unico figlio elastico: cresce fino al fondo portandosi dietro
    la savebar, che è il suo ultimo figlio (`margin-top: auto`; la distanza dal
@@ -3281,8 +3309,16 @@ body:has(.install-banner) .rooms-hint {
   gap: 0.4rem;
   margin-bottom: 0.8rem;
 }
-.seg {
+/* Segmento singolo dei selettori della Ricerca (Per nickname/Per filtri,
+   Lista/Griglia). Si chiamava `.seg`, lo stesso nome che più in basso indica il
+   CONTENITORE di un segmentato (`.seg` + `.seg-btn`, vedi TextSizeControl):
+   arrivando dopo, quella regola vinceva e imponeva `display: flex; width: 100%`
+   a questi bottoni. Nei tab la cosa non si vedeva perché `flex: 1` li
+   ridistribuiva lo stesso, ma in Lista/Griglia (`flex: 0 0 auto`) ognuno
+   prendeva il 100% del contenitore e "Griglia" finiva fuori schermo. */
+.seg-opt {
   flex: 1;
+  min-height: 2.75rem;
   padding: 0.5rem 0.6rem;
   border-radius: 8px;
   border: 1px solid rgba(232, 177, 78, 0.25);
@@ -3291,7 +3327,7 @@ body:has(.install-banner) .rooms-hint {
   cursor: pointer;
   font-size: 0.9rem;
 }
-.seg.on {
+.seg-opt.on {
   border-color: var(--accent);
   background: rgba(232, 177, 78, 0.14);
   color: var(--accent-text);
@@ -3424,8 +3460,11 @@ body:has(.install-banner) .rooms-hint {
 .search-view-toggle {
   display: flex;
   gap: 0.4rem;
+  /* Senza margine restava incastrato fra il campo di ricerca e la prima
+     scheda, senza respiro né sopra né sotto. */
+  margin: 0.7rem 0 0.6rem;
 }
-.search-view-toggle .seg {
+.search-view-toggle .seg-opt {
   flex: 0 0 auto;
   padding: 0.35rem 0.9rem;
   font-size: 0.82rem;
@@ -3445,6 +3484,18 @@ body:has(.install-banner) .rooms-hint {
   align-items: center;
   text-align: center;
   gap: 0.4rem;
+}
+/* In griglia la scheda è larga il doppio e la foto è il motivo per cui la si
+   guarda: a 42px ci si perdeva. Resta un cerchio come ovunque nell'app — così
+   l'avatar generato e l'iniziale di chi non ha foto non stonano — ma grande
+   abbastanza da riconoscere una faccia. In rem, così cresce insieme alla
+   dimensione testo scelta in Accessibilità. `flex-basis` va aggiornata insieme
+   all'altezza: qui la scheda è in colonna, quindi la base flex è verticale. */
+.search-cards-grid .search-ava {
+  width: 6rem;
+  height: 6rem;
+  flex-basis: 6rem;
+  font-size: 2.4rem;
 }
 .search-cards-grid .search-meta {
   align-items: center;

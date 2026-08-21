@@ -10,13 +10,17 @@ import { useEffect, useRef } from 'react'
 // persistenza.
 //
 // Rispecchia la stessa regola dei toast in-app di useMessageNotifications:
-// niente avviso per la stanza che stai leggendo, niente per i DM mentre la
-// sezione "Messaggi" è aperta.
-export function useActiveViewReporter(activeRoomId: string | null, dmOpen: boolean): void {
+// niente avviso per la stanza che stai leggendo, niente per la conversazione
+// DM che hai aperta (o per tutte, se sei sull'elenco "Messaggi").
+export function useActiveViewReporter(
+  activeRoomId: string | null,
+  dmOpen: boolean,
+  activeDmConversationId: string | null,
+): void {
   // Il listener viene registrato una volta sola: i valori volatili passano da
   // una ref, così non serve riagganciarlo a ogni navigazione.
-  const view = useRef({ activeRoomId, dmOpen })
-  view.current = { activeRoomId, dmOpen }
+  const view = useRef({ activeRoomId, dmOpen, activeDmConversationId })
+  view.current = { activeRoomId, dmOpen, activeDmConversationId }
 
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
@@ -27,6 +31,7 @@ export function useActiveViewReporter(activeRoomId: string | null, dmOpen: boole
       e.ports[0]?.postMessage({
         roomId: view.current.activeRoomId,
         dmOpen: view.current.dmOpen,
+        dmConversationId: view.current.activeDmConversationId,
       })
     }
 

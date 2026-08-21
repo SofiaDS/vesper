@@ -51,6 +51,36 @@ export async function listApprovedPhotos(
   return (data as ProfilePhoto[]) ?? []
 }
 
+// Foto da usare come miniatura per ciascun utente dato: la principale se c'è,
+// altrimenti la prima per ordine. Chi non ha foto approvate non compare nel
+// risultato — chi chiama ricade sull'avatar generato.
+//
+// Sono le stesse righe che chiunque può già leggere dal profilo pubblico
+// (policy `photos_select_approved`), quindi qui non si espone niente di nuovo:
+// gli id in ingresso sono solo quelli che la RPC `search_users` ha già
+// filtrato per is_searchable e blocchi.
+export async function primaryPhotoPaths(
+  userIds: string[],
+): Promise<Record<string, string>> {
+  if (userIds.length === 0) return {}
+  const { data, error } = await supabase
+    .from('profile_photos')
+    .select('user_id, storage_path')
+    .in('user_id', userIds)
+    .eq('status', 'approved')
+    .order('is_primary', { ascending: false })
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  const out: Record<string, string> = {}
+  // L'ordinamento l'ha già fatto il database: per ogni utente la prima riga che
+  // incontriamo è quella giusta.
+  for (const row of (data ?? []) as { user_id: string; storage_path: string }[]) {
+    if (!(row.user_id in out)) out[row.user_id] = row.storage_path
+  }
+  return out
+}
+
 // Ridimensiona e comprime l'immagine lato client (canvas -> JPEG) per tenere
 // il bucket leggero. Restituisce un Blob.
 async function resizeImage(file: File): Promise<Blob> {
