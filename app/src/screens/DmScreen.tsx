@@ -181,12 +181,35 @@ function ConversationView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation.id])
 
+  // Conversazione per cui abbiamo già posizionato la vista in fondo.
+  const jumpedFor = useRef<string | null>(null)
+
   useEffect(() => {
     if (skipScroll.current) {
       skipScroll.current = false
       return
     }
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messages.length === 0) return
+
+    // Stessa regola della chat di stanza (vedi ChatScreen): il primo
+    // posizionamento è un salto secco, l'animazione la meritano solo i
+    // messaggi che arrivano mentre stai leggendo.
+    const first = jumpedFor.current !== conversation.id
+    jumpedFor.current = conversation.id
+    // prefers-reduced-motion qui mancava: chi ha chiesto meno animazioni al
+    // sistema non deve vederne una nemmeno a ogni messaggio nuovo.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    bottomRef.current?.scrollIntoView({
+      behavior: first || reduceMotion ? 'auto' : 'smooth',
+    })
+    // `conversation.id` è usato qui ma NON è una dipendenza, di proposito. Al commit in
+    // cui la conversazione cambia, `messages` contiene ancora quelli della conversazione
+    // precedente (l'effetto di caricamento qui sopra fa `setMessages([])`, ma il re-render non è
+    // ancora avvenuto): l'effetto marcherebbe la nuova conversazione come "già
+    // posizionata" e il caricamento vero, subito dopo, tornerebbe ad animarsi.
+    // Dipendendo dalla sola lunghezza, la sequenza è N → 0 → M e il salto secco
+    // capita al momento giusto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length])
 
   // Segna la conversazione come letta entrando e uscendo (Step 5).

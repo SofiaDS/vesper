@@ -123,13 +123,40 @@ export function ChatScreen({
     blockedIds,
   })
 
+  // Stanza per cui abbiamo già posizionato la vista in fondo. Serve a
+  // distinguere il primo posizionamento dai successivi: vedi sotto.
+  const jumpedFor = useRef<string | null>(null)
+
   useEffect(() => {
     if (skipAutoScroll.current) {
       skipAutoScroll.current = false
       return
     }
+    // Finché la cronologia non è arrivata non c'è niente su cui posizionarsi, e
+    // marcare la stanza come "già posizionata" ora farebbe animare il primo
+    // caricamento vero.
+    if (messages.length === 0) return
+
+    // Il primo posizionamento (apertura della stanza, o cambio stanza da un
+    // toast) è istantaneo: con `smooth` la vista parte dall'alto e attraversa a
+    // vista tutta la cronologia prima di fermarsi in fondo — arrivando da una
+    // notifica è la prima cosa che si vede, ed è solo rumore. L'animazione
+    // resta per i messaggi che arrivano mentre stai già leggendo: lì comunica
+    // qualcosa, cioè che il fondo si è mosso.
+    const first = jumpedFor.current !== room.id
+    jumpedFor.current = room.id
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    bottomRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
+    bottomRef.current?.scrollIntoView({
+      behavior: first || reduceMotion ? 'auto' : 'smooth',
+    })
+    // `room.id` è usato qui ma NON è una dipendenza, di proposito. Al commit in
+    // cui la stanza cambia, `messages` contiene ancora quelli della stanza
+    // precedente (useChatMessages fa `setMessages([])`, ma il re-render non è
+    // ancora avvenuto): l'effetto marcherebbe la nuova stanza come "già
+    // posizionata" e il caricamento vero, subito dopo, tornerebbe ad animarsi.
+    // Dipendendo dalla sola lunghezza, la sequenza è N → 0 → M e il salto secco
+    // capita al momento giusto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length])
 
   // Segna la stanza come letta entrando e (di nuovo) uscendo, così i messaggi
