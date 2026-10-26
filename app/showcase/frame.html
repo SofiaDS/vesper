@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<title>Vesper · screenshot</title>
+<!--
+  Cornice degli screenshot di installazione (manifest `screenshots`).
+  ?s=foyer|rooms|dm → telefono singolo, 540×960 CSS (render a 2x = 1080×1920)
+  ?s=wide           → tre telefoni affiancati, 960×600 CSS (2x = 1920×1200)
+  Lo schermo del telefono è un iframe su screen.html: i componenti veri dell'app.
+-->
+<style>
+  @font-face { font-family: 'Atkinson Hyperlegible'; font-weight: 400; src: url('/fonts/Atkinson-Regular.woff2') format('woff2'); }
+  @font-face { font-family: 'Atkinson Hyperlegible'; font-weight: 700; src: url('/fonts/Atkinson-Bold.woff2') format('woff2'); }
+  :root { --bg: #171520; --accent: #e8b14e; --text: #f7efdd; --muted: #c9bfae; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { overflow: hidden; }
+  body {
+    font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(520px 420px at 50% 0%, rgba(232,177,78,.20), transparent 70%),
+      radial-gradient(500px 500px at 50% 100%, rgba(232,177,78,.07), transparent 70%),
+      var(--bg);
+    display: flex; flex-direction: column; align-items: center;
+  }
+  body.phone-page { width: 540px; height: 960px; }
+  body.wide-page  { width: 960px; height: 600px; }
+
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand img.orb { width: 34px; height: 34px; border-radius: 9px; }
+  .brand img.word { height: 30px; width: auto; }
+
+  .cap { text-align: center; }
+  .cap h2 { font-weight: 700; line-height: 1.12; letter-spacing: -0.01em; text-wrap: balance; }
+  .cap h2 b { color: var(--accent); font-weight: 700; }
+  .cap p { color: var(--muted); line-height: 1.4; text-wrap: balance; }
+
+  .phone {
+    background: #0c0a11; border-radius: 46px; padding: 11px;
+    box-shadow: 0 30px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(232,177,78,.28), inset 0 0 0 1px #000;
+    position: relative; flex: none;
+  }
+  .phone .glass { border-radius: 36px; overflow: hidden; position: relative; background: var(--bg); }
+  .phone iframe { border: 0; display: block; width: 390px; height: 760px; transform-origin: 0 0; }
+
+  /* pagina telefono */
+  .phone-page .brand { margin-top: 38px; }
+  .phone-page .cap { padding: 22px 44px 0; }
+  .phone-page .cap h2 { font-size: 36px; }
+  .phone-page .cap p { font-size: 17px; margin-top: 10px; }
+  .phone-page .phone { margin-top: 30px; }
+
+  /* pagina larga */
+  .wide-page { flex-direction: row; justify-content: center; gap: 44px; padding: 0 40px; }
+  .wide-page .side { width: 290px; display: flex; flex-direction: column; gap: 18px; }
+  .wide-page .cap { text-align: left; }
+  .wide-page .cap h2 { font-size: 36px; }
+  .wide-page .cap p { font-size: 17px; margin-top: 12px; }
+  .wide-page .phones { display: flex; gap: 22px; align-items: center; }
+  .wide-page .phone { border-radius: 34px; padding: 8px; }
+  .wide-page .phone .glass { border-radius: 27px; }
+  .wide-page .phones .phone:nth-child(2) { transform: translateY(14px); }
+</style>
+</head>
+<body>
+<script>
+  const SHOTS = {
+    foyer: { title: 'Conversazioni che <b>ti somigliano</b>', text: 'Il Foyer e le stanze tematiche: parla liberamente, senza giudizi.' },
+    rooms: { title: 'Trova <b>la tua stanza</b>', text: 'Cinema, libri, viaggi, sport, relazioni: stanze per ogni passione, con chi le vive come te.' },
+    dm:    { title: 'Conosci chi vuoi, <b>a modo tuo</b>', text: 'Messaggi privati riservati. Blocco e segnalazione sempre a portata di mano.' },
+  }
+  const s = new URLSearchParams(location.search).get('s') || 'foyer'
+  const brand = '<div class="brand"><img class="orb" src="/icon.svg" alt=""><img class="word" src="/wordmark.png" alt="Vesper"></div>'
+  const phone = (shot, scale) => {
+    const w = Math.round(390 * scale), h = Math.round(760 * scale)
+    return `<div class="phone"><div class="glass" style="width:${w}px;height:${h}px">` +
+      `<iframe src="/showcase/screen.html?s=${shot}" style="transform:scale(${scale})" scrolling="no"></iframe></div></div>`
+  }
+  if (s === 'wide') {
+    document.body.className = 'wide-page'
+    document.body.innerHTML =
+      `<div class="side">${brand}<div class="cap"><h2>La community, <b>sempre con te</b></h2>` +
+      `<p>Stanze tematiche, il Foyer e messaggi privati, in uno spazio verificato e sicuro.</p></div></div>` +
+      `<div class="phones">${phone('rooms', 0.6)}${phone('foyer', 0.6)}</div>`
+  } else {
+    const c = SHOTS[s]
+    document.body.className = 'phone-page'
+    document.body.innerHTML = `${brand}<div class="cap"><h2>${c.title}</h2><p>${c.text}</p></div>${phone(s, 0.85)}`
+  }
+</script>
+</body>
+</html>
