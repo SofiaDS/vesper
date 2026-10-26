@@ -17,11 +17,13 @@ const ALLOWED_ORIGINS = [
   'https://vespercommunity.com',
   'https://www.vespercommunity.com',
   'https://vesper-snowy.vercel.app',
+  'https://dev.vespercommunity.com', // ambiente dev/QA (branch dev)
   'http://localhost:5173', // vite dev
   'http://localhost:4173', // vite preview
 ]
 
-// Deploy di preview di Vercel: dominio generato a ogni push (vesper-<hash>.vercel.app).
+// Deploy di preview di Vercel: dominio generato a ogni push (vesper-<hash>.vercel.app)
+// e alias fisso del branch dev (vesper-git-dev-<team>.vercel.app).
 const VERCEL_PREVIEW = /^https:\/\/vesper-[a-z0-9-]+\.vercel\.app$/
 
 // Header CORS per una richiesta. Se l'origin non è in lista non emettiamo
