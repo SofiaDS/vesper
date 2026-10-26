@@ -4103,18 +4103,23 @@ button.dm-conv:hover {
   gap: 0.75rem;
   flex-shrink: 0;
 }
+/* "Apri in Chrome" è un link (intent://), non un bottone: niente sottolineatura. */
+.install-banner-actions a.btn-primary {
+  display: inline-block;
+  text-decoration: none;
+}
 .install-banner-dismiss {
   font-size: 0.8rem;
   opacity: 0.6;
   white-space: nowrap;
 }
 
-/* Variante iOS: nessun bottone "Installa" (beforeinstallprompt non esiste),
+/* Variante a colonna (iOS, Android manuale, browser interni): nessun bottone "Installa",
    quindi le istruzioni sono il contenuto e vanno in colonna a tutta larghezza,
    con "Non ora" spostato sotto e defilato. Nella versione precedente il testo
    stava di fianco a "Non ora": su schermo stretto si comprimeva e l'unica cosa
    nitida che restava era il bottone per rifiutare. */
-.install-banner-ios {
+.install-banner-stack {
   flex-direction: column;
   align-items: stretch;
   gap: 0.5rem;
@@ -4127,10 +4132,10 @@ button.dm-conv:hover {
 }
 /* Le istruzioni sono l'unico contenuto utile del banner su iOS: niente
    opacità ridotta, devono restare pienamente leggibili. */
-.install-banner-ios .install-banner-text {
+.install-banner-stack .install-banner-text {
   opacity: 1;
 }
-.install-banner-ios .install-banner-actions {
+.install-banner-stack .install-banner-actions {
   justify-content: flex-end;
 }
 

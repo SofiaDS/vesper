@@ -73,6 +73,13 @@ async function isAlreadyOnScreen(source: PushSource): Promise<boolean> {
   return views.some((v) => viewCovers(v, source))
 }
 
+// true se questa installazione riceve i push dal servizio Apple (Safari su
+// iPhone/iPad/Mac), che ha regole più severe sui push "silenziosi".
+async function isApplePush(): Promise<boolean> {
+  const sub = await self.registration.pushManager.getSubscription()
+  return !!sub && new URL(sub.endpoint).hostname.endsWith('push.apple.com')
+}
+
 interface PushPayload {
   title?: string
   body?: string
@@ -117,7 +124,18 @@ self.addEventListener('push', (event: PushEvent) => {
     (async () => {
       // Notifica ridondante: stai già leggendo quella stanza / i DM. Uscendo
       // senza showNotification non compare nulla.
-      if (data.source && (await isAlreadyOnScreen(data.source))) return
+      if (data.source && (await isAlreadyOnScreen(data.source))) {
+        // Safari (iPhone e Mac) revoca la subscription se un push non mostra
+        // nessuna notifica. Per i soli endpoint Apple ne mostriamo una
+        // silenziosa e la chiudiamo subito: conta come mostrata ma non si vede.
+        if (await isApplePush()) {
+          const tag = `suppressed:${Date.now()}`
+          await self.registration.showNotification(data.title ?? 'Vesper', { tag, silent: true })
+          const shown = await self.registration.getNotifications({ tag })
+          shown.forEach((n) => n.close())
+        }
+        return
+      }
 
       const url = data.url ?? '/'
       if (!data.source) {

@@ -5,7 +5,10 @@
   "description": "Community chatroom-first per donne lesbiche, bi, queer e persone LGBTQ+ femminili.",
   "lang": "it",
   "dir": "ltr",
-  "categories": ["social", "lifestyle"],
+  "categories": [
+    "social",
+    "lifestyle"
+  ],
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -13,6 +16,13 @@
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://vespercommunity.com/manifest.webmanifest"
+    }
+  ],
+  "prefer_related_applications": false,
   "background_color": "#171520",
   "theme_color": "#171520",
   "icons": [
