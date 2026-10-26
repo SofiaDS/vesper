@@ -41,32 +41,32 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshots/phone-1.png",
+      "src": "/screenshots/phone-foyer-v2.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Foyer della community"
+      "label": "Il Foyer: la chat principale della community"
     },
     {
-      "src": "/screenshots/phone-2.png",
+      "src": "/screenshots/phone-stanze-v2.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Le stanze tematiche"
+    },
+    {
+      "src": "/screenshots/phone-dm-v2.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Messaggi privati"
     },
     {
-      "src": "/screenshots/phone-3.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Spazio inclusivo e sicuro"
-    },
-    {
-      "src": "/screenshots/tablet-1.png",
+      "src": "/screenshots/wide-v2.png",
       "sizes": "1920x1200",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Foyer della community su tablet"
+      "label": "Stanze e Foyer di Vesper"
     }
   ]
 }
