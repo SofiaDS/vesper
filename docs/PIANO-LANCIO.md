@@ -130,6 +130,8 @@ Stato verificato il 29 ottobre (sola lettura, nessuna modifica fatta).
 
 ## Moderazione AI: cosa sistemare
 
+Proposta completa con il codice: [MODERAZIONE-AI.md](MODERAZIONE-AI.md).
+
 Com'è oggi (`supabase/functions/moderate-message`):
 - Soft mode: niente viene bloccato, il messaggio viene solo segnato
   `flagged_by_ai` e finisce nella coda AiFlags.
